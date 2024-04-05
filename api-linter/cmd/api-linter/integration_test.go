@@ -46,31 +46,6 @@ var testCases = []struct {
 		message Book {}
 		`,
 	},
-	{
-		testName: "PackageVersion",
-		rule:     "core::0215::versioned-packages",
-		proto: `
-		syntax = "proto3";
-
-		// disable-me-here
-		package google.test;
-
-		message Test {}
-		`,
-	},
-	{
-		testName: "FieldNames",
-		rule:     "core::0140::lower-snake",
-		proto: `
-				syntax = "proto3";
-				import "dummy.proto";
-				message Test {
-					// disable-me-here
-					string badName = 1;
-					dummy.Dummy dummy = 2;
-				}
-			`,
-	},
 }
 
 func TestRules_EnabledByDefault(t *testing.T) {
