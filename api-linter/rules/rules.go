@@ -14,7 +14,7 @@
 
 // Package rules contains implementations of rules that apply to Google APIs.
 //
-// Rules are sorted into subpackages by the AIP (https://aip.dev/) that
+// Rules are sorted into subpackages by the AIP (https://aep.dev/) that
 // mandates the rule. Every rule represented in code here must be represented
 // in English in a corresponding AIP. Conversely, anything mandated in an AIP
 // should have a rule here if it is feasible to enforce in code (sometimes it
@@ -51,68 +51,68 @@ package rules
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/aip0121"
-	"github.com/googleapis/api-linter/rules/aip0122"
-	"github.com/googleapis/api-linter/rules/aip0123"
-	"github.com/googleapis/api-linter/rules/aip0126"
-	"github.com/googleapis/api-linter/rules/aip0127"
-	"github.com/googleapis/api-linter/rules/aip0128"
-	"github.com/googleapis/api-linter/rules/aip0131"
-	"github.com/googleapis/api-linter/rules/aip0132"
-	"github.com/googleapis/api-linter/rules/aip0133"
-	"github.com/googleapis/api-linter/rules/aip0134"
-	"github.com/googleapis/api-linter/rules/aip0135"
-	"github.com/googleapis/api-linter/rules/aip0136"
-	"github.com/googleapis/api-linter/rules/aip0141"
-	"github.com/googleapis/api-linter/rules/aip0142"
-	"github.com/googleapis/api-linter/rules/aip0144"
-	"github.com/googleapis/api-linter/rules/aip0151"
-	"github.com/googleapis/api-linter/rules/aip0152"
-	"github.com/googleapis/api-linter/rules/aip0154"
-	"github.com/googleapis/api-linter/rules/aip0155"
-	"github.com/googleapis/api-linter/rules/aip0156"
-	"github.com/googleapis/api-linter/rules/aip0158"
-	"github.com/googleapis/api-linter/rules/aip0163"
-	"github.com/googleapis/api-linter/rules/aip0164"
-	"github.com/googleapis/api-linter/rules/aip0165"
-	"github.com/googleapis/api-linter/rules/aip0202"
-	"github.com/googleapis/api-linter/rules/aip4232"
+	"github.com/googleapis/api-linter/rules/aep0121"
+	"github.com/googleapis/api-linter/rules/aep0122"
+	"github.com/googleapis/api-linter/rules/aep0123"
+	"github.com/googleapis/api-linter/rules/aep0126"
+	"github.com/googleapis/api-linter/rules/aep0127"
+	"github.com/googleapis/api-linter/rules/aep0128"
+	"github.com/googleapis/api-linter/rules/aep0131"
+	"github.com/googleapis/api-linter/rules/aep0132"
+	"github.com/googleapis/api-linter/rules/aep0133"
+	"github.com/googleapis/api-linter/rules/aep0134"
+	"github.com/googleapis/api-linter/rules/aep0135"
+	"github.com/googleapis/api-linter/rules/aep0136"
+	"github.com/googleapis/api-linter/rules/aep0141"
+	"github.com/googleapis/api-linter/rules/aep0142"
+	"github.com/googleapis/api-linter/rules/aep0144"
+	"github.com/googleapis/api-linter/rules/aep0151"
+	"github.com/googleapis/api-linter/rules/aep0152"
+	"github.com/googleapis/api-linter/rules/aep0154"
+	"github.com/googleapis/api-linter/rules/aep0155"
+	"github.com/googleapis/api-linter/rules/aep0156"
+	"github.com/googleapis/api-linter/rules/aep0158"
+	"github.com/googleapis/api-linter/rules/aep0163"
+	"github.com/googleapis/api-linter/rules/aep0164"
+	"github.com/googleapis/api-linter/rules/aep0165"
+	"github.com/googleapis/api-linter/rules/aep0202"
+	"github.com/googleapis/api-linter/rules/aep4232"
 )
 
 type addRulesFuncType func(lint.RuleRegistry) error
 
-var aipAddRulesFuncs = []addRulesFuncType{
-	aip0121.AddRules,
-	aip0122.AddRules,
-	aip0123.AddRules,
-	aip0126.AddRules,
-	aip0127.AddRules,
-	aip0128.AddRules,
-	aip0131.AddRules,
-	aip0132.AddRules,
-	aip0133.AddRules,
-	aip0134.AddRules,
-	aip0135.AddRules,
-	aip0136.AddRules,
-	aip0141.AddRules,
-	aip0142.AddRules,
-	aip0144.AddRules,
-	aip0151.AddRules,
-	aip0152.AddRules,
-	aip0154.AddRules,
-	aip0155.AddRules,
-	aip0156.AddRules,
-	aip0158.AddRules,
-	aip0163.AddRules,
-	aip0164.AddRules,
-	aip0165.AddRules,
-	aip0202.AddRules,
-	aip4232.AddRules,
+var aepAddRulesFuncs = []addRulesFuncType{
+	aep0121.AddRules,
+	aep0122.AddRules,
+	aep0123.AddRules,
+	aep0126.AddRules,
+	aep0127.AddRules,
+	aep0128.AddRules,
+	aep0131.AddRules,
+	aep0132.AddRules,
+	aep0133.AddRules,
+	aep0134.AddRules,
+	aep0135.AddRules,
+	aep0136.AddRules,
+	aep0141.AddRules,
+	aep0142.AddRules,
+	aep0144.AddRules,
+	aep0151.AddRules,
+	aep0152.AddRules,
+	aep0154.AddRules,
+	aep0155.AddRules,
+	aep0156.AddRules,
+	aep0158.AddRules,
+	aep0163.AddRules,
+	aep0164.AddRules,
+	aep0165.AddRules,
+	aep0202.AddRules,
+	aep4232.AddRules,
 }
 
 // Add all rules to the given registry.
 func Add(r lint.RuleRegistry) error {
-	return addAIPRules(r, aipAddRulesFuncs)
+	return addAIPRules(r, aepAddRulesFuncs)
 }
 
 func addAIPRules(r lint.RuleRegistry, addRulesFuncs []addRulesFuncType) error {

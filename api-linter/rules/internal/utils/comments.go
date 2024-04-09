@@ -17,7 +17,7 @@ package utils
 import "strings"
 
 // SeparateInternalComments splits the given comment block into "external" and
-// "internal" comments based on https://google.aip.dev/192#internal-comments.
+// "internal" comments based on https://google.aep.dev/192#internal-comments.
 func SeparateInternalComments(comments ...string) struct {
 	Internal []string
 	External []string
