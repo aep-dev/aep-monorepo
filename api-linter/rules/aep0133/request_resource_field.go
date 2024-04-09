@@ -32,7 +32,7 @@ var resourceField = &lint.MessageRule{
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// The rule (resource field name must map to the POST body) is
-		// checked by AIP-0133 ("core::0133::http-body")
+		// checked by AEP-0133 ("core::0133::http-body")
 		for _, fieldDesc := range m.GetFields() {
 			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
 				// Rule check: Is the field named properly?

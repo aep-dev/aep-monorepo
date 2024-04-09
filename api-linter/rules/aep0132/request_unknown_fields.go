@@ -22,16 +22,16 @@ import (
 )
 
 var allowedFields = stringset.New(
-	"parent",       // AIP-132
-	"page_size",    // AIP-158
-	"page_token",   // AIP-158
-	"skip",         // AIP-158
-	"filter",       // AIP-132
-	"order_by",     // AIP-132
-	"show_deleted", // AIP-135
-	"request_id",   // AIP-155
-	"read_mask",    // AIP-157
-	"view",         // AIP-157
+	"parent",       // AEP-132
+	"page_size",    // AEP-158
+	"page_token",   // AEP-158
+	"skip",         // AEP-158
+	"filter",       // AEP-132
+	"order_by",     // AEP-132
+	"show_deleted", // AEP-135
+	"request_id",   // AEP-155
+	"read_mask",    // AEP-157
+	"view",         // AEP-157
 )
 
 // List methods should not have unrecognized fields.
@@ -43,7 +43,7 @@ var unknownFields = &lint.FieldRule{
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		if !allowedFields.Contains(field.GetName()) {
 			return []lint.Problem{{
-				Message:    "List RPCs should only contain fields explicitly described in AIPs.",
+				Message:    "List RPCs should only contain fields explicitly described in AEPs.",
 				Descriptor: field,
 			}}
 		}

@@ -34,9 +34,9 @@ var unknownFields = &lint.MessageRule{
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]*builder.FieldType{
-			"parent":        nil, // AIP-133
-			"request_id":    nil, // AIP-155
-			"validate_only": nil, // AIP-163
+			"parent":        nil, // AEP-133
+			"request_id":    nil, // AEP-155
+			"validate_only": nil, // AEP-163
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
@@ -49,7 +49,7 @@ var unknownFields = &lint.MessageRule{
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Create RPCs must only contain fields explicitly described in AEPs, not %q.",
 						field.GetName(),
 					),
 					Descriptor: field,

@@ -29,18 +29,18 @@ var unknownFields = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"name":          {}, // AIP-135
-			"force":         {}, // AIP-135
-			"allow_missing": {}, // AIP-135
-			"etag":          {}, // AIP-154
-			"request_id":    {}, // AIP-155
-			"validate_only": {}, // AIP-163
+			"name":          {}, // AEP-135
+			"force":         {}, // AEP-135
+			"allow_missing": {}, // AEP-135
+			"etag":          {}, // AEP-154
+			"request_id":    {}, // AEP-155
+			"validate_only": {}, // AEP-163
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Unexpected field: Delete RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Unexpected field: Delete RPCs must only contain fields explicitly described in AEPs, not %q.",
 						string(field.GetName()),
 					),
 					Descriptor: field,

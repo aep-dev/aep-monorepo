@@ -26,10 +26,10 @@ import (
 // The resource itself is not included here, but also permitted.
 // This is covered in code in the rule itself.
 var respAllowedFields = stringset.New(
-	"next_page_token",       // AIP-158
-	"total_size",            // AIP-132
-	"unreachable",           // AIP-217
-	"unreachable_locations", // Wrong, but a separate AIP-217 rule catches it.
+	"next_page_token",       // AEP-158
+	"total_size",            // AEP-132
+	"unreachable",           // AEP-217
+	"unreachable_locations", // Wrong, but a separate AEP-217 rule catches it.
 )
 
 var responseUnknownFields = &lint.FieldRule{
@@ -41,9 +41,9 @@ var responseUnknownFields = &lint.FieldRule{
 		// A repeated variant of the resource should be permitted.
 		resource := utils.ListResponseResourceName(f.GetOwner())
 		if strings.HasSuffix(resource, "_revisions") {
-			// This is an AIP-162 ListFooRevisions response, which is subtly
-			// different from an AIP-132 List response. We need to modify the RPC
-			// name to what the AIP-132 List response would be in order to permit
+			// This is an AEP-162 ListFooRevisions response, which is subtly
+			// different from an AEP-132 List response. We need to modify the RPC
+			// name to what the AEP-132 List response would be in order to permit
 			// the resource field properly.
 			resource = utils.ToPlural(strings.TrimSuffix(resource, "_revisions"))
 		}
@@ -54,7 +54,7 @@ var responseUnknownFields = &lint.FieldRule{
 		// It is not the resource field; check it against the whitelist.
 		if !respAllowedFields.Contains(f.GetName()) {
 			return []lint.Problem{{
-				Message:    "List responses should only contain fields explicitly described in AIPs.",
+				Message:    "List responses should only contain fields explicitly described in AEPs.",
 				Descriptor: f,
 			}}
 		}

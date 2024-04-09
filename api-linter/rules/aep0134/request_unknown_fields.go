@@ -31,17 +31,17 @@ var unknownFields = &lint.MessageRule{
 		resource := extractResource(m.GetName())
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := stringset.New(
-			fieldNameFromResource(resource), // AIP-134
-			"allow_missing",                 // AIP-134
-			"request_id",                    // AIP-155
-			"update_mask",                   // AIP-134
-			"validate_only",                 // AIP-163
+			fieldNameFromResource(resource), // AEP-134
+			"allow_missing",                 // AEP-134
+			"request_id",                    // AEP-155
+			"update_mask",                   // AEP-134
+			"validate_only",                 // AEP-163
 		)
 		for _, field := range m.GetFields() {
 			if !allowedFields.Contains(field.GetName()) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Unexpected field: Update RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Unexpected field: Update RPCs must only contain fields explicitly described in AEPs, not %q.",
 						field.GetName(),
 					),
 					Descriptor: field,

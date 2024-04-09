@@ -57,7 +57,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool validate_only = 3 [(google.api.field_behavior) = REQUIRED];",
 			"validate_only",
 			testutils.Problems{
-				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
+				{Message: `Update RPCs must only require fields explicitly described in AEPs, not "validate_only"`},
 			},
 		},
 		{
@@ -65,7 +65,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			testutils.Problems{
-				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Update RPCs must only require fields explicitly described in AEPs, not "create_iam"`},
 			},
 		},
 		{
@@ -73,7 +73,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"Foo foo = 3 [(google.api.field_behavior) = REQUIRED];",
 			"foo",
 			testutils.Problems{
-				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "foo"`},
+				{Message: `Update RPCs must only require fields explicitly described in AEPs, not "foo"`},
 			},
 		},
 	} {

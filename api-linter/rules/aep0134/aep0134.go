@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0121 contains rules defined in https://aep.dev/121.
-package aep0121
+// Package aep0134 contains rules defined in https://aep.dev/134.
+package aep0134
 
 import (
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
+	"github.com/stoewer/go-strcase"
 )
 
 // AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		121,
-		resourceMustSupportGet,
-		resourceMustSupportList,
-		noMutableCycles,
+		134,
+		allowMissing,
+		httpBody,
+		httpMethod,
+		httpNameField,
+		methodSignature,
+		responseMessageName,
+		requestMaskField,
+		requestMaskRequired,
+		requestMessageName,
+		requestRequiredFields,
+		requestResourceField,
+		requestResourceRequired,
+		responseLRO,
+		synonyms,
+		unknownFields,
 	)
+}
+
+func extractResource(reqName string) string {
+	// Strips "Update" from the beginning and "Request" from the end.
+	return reqName[6 : len(reqName)-7]
+}
+
+func fieldNameFromResource(resource string) string {
+	return strings.ToLower(strcase.SnakeCase(resource))
 }

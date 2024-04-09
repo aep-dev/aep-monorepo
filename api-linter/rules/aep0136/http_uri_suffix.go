@@ -42,7 +42,7 @@ var uriSuffix = &lint.MethodRule{
 			// This is somewhat tricky to test for perfectly, and may need to evolve
 			// over time, but the following rules should be mostly correct:
 			//   1. If the URI contains `{name=` or `{parent=`, expect `:verb`.
-			//   2. Address known edge cases from other AIPs.
+			//   2. Address known edge cases from other AEPs.
 			//   3. For collections, expect `nouns:verb`.
 			//   4. Otherwise, expect `:verbNoun`.
 			//
@@ -64,7 +64,7 @@ var uriSuffix = &lint.MethodRule{
 				}
 			}
 
-			// AIP-162 introduces some special cases around revisions, where
+			// AEP-162 introduces some special cases around revisions, where
 			// `ListFooRevisions` gets a suffix of `:listRevisions` (and the same for
 			// `Delete` and `Tag`).
 			n := m.GetName()

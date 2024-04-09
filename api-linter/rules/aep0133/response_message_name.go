@@ -41,7 +41,7 @@ var outputName = &lint.MethodRule{
 		// message should be named `Foo`
 		//
 		// Note: If `got` is empty string, this is an unannotated LRO.
-		// The AIP-151 rule will whine about that, and this rule should not as it
+		// The AEP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
 		if got != want && got != "" {
 			return []lint.Problem{{

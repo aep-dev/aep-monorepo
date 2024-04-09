@@ -69,7 +69,7 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 	case *desc.MethodDescriptor:
 		response := m.GetOutputType()
 
-		// If this is a Delete method (AIP-135) with a return value of Empty,
+		// If this is a Delete method (AEP-135) with a return value of Empty,
 		// try to find the resource.
 		//
 		// Note: This needs to precede the LRO logic because Delete requests
@@ -102,7 +102,7 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 			return DeclarativeFriendlyResource(response)
 		}
 
-		// If the return value is a List response (AIP-132), we should be able
+		// If the return value is a List response (AEP-132), we should be able
 		// to find the resource as a field in the response.
 		if n := response.GetName(); strings.HasPrefix(n, "List") && strings.HasSuffix(n, "Response") {
 			for _, field := range response.GetFields() {

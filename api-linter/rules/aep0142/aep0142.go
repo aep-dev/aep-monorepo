@@ -12,33 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0132 contains rules defined in https://aep.dev/132.
-package aep0132
+// Package aep0142 contains rules defined in https://aep.dev/142.
+package aep0142
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-132 rules to the provided registry.
+// AddRules adds all of the AEP-142 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		132,
-		httpBody,
-		httpMethod,
-		httpURIParent,
-		methodSignature,
-		requestFieldTypes,
-		requestMessageName,
-		requestParentBehavior,
-		requestParentField,
-		requestParentReference,
-		requestParentValidReference,
-		requestParentRequired,
-		requestRequiredFields,
-		requestShowDeletedRequired,
-		resourceReferenceType,
-		responseMessageName,
-		responseUnknownFields,
-		unknownFields,
+		142,
+		fieldNames,
+		fieldType,
 	)
+}
+
+// isTimestamp simply returns if the field is of type google.protobuf.Timestamp
+// or not.
+func isTimestamp(f *desc.FieldDescriptor) bool {
+	return utils.GetTypeName(f) == "google.protobuf.Timestamp"
 }

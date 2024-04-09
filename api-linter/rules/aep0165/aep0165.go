@@ -22,7 +22,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-165 rules to the provided registry.
+// AddRules adds all of the AEP-165 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		165,
@@ -51,17 +51,17 @@ var (
 	purgeURINameRegexp     = regexp.MustCompile(`:purge$`)
 )
 
-// Returns true if this is a AIP-165 Purge method, false otherwise.
+// Returns true if this is a AEP-165 Purge method, false otherwise.
 func isPurgeMethod(m *desc.MethodDescriptor) bool {
 	return purgeMethodRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-165 Purge request message, false otherwise.
+// Returns true if this is an AEP-165 Purge request message, false otherwise.
 func isPurgeRequestMessage(m *desc.MessageDescriptor) bool {
 	return purgeReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-165 Purge response message, false otherwise.
+// Returns true if this is an AEP-165 Purge response message, false otherwise.
 func isPurgeResponseMessage(m *desc.MessageDescriptor) bool {
 	return purgeRespMessageRegexp.MatchString(m.GetName())
 }

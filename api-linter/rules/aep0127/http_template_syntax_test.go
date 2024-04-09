@@ -28,7 +28,7 @@ func TestHttpTemplateSyntax(t *testing.T) {
 	}{
 		// NOTE: These examples are contrived to test the enforcment of the
 		// template syntax. Many of these examples either fail or do not make
-		// sense in the context of other AIP rules.
+		// sense in the context of other AEP rules.
 
 		// Valid cases
 		{"SingleLiteral", "/v1", true},

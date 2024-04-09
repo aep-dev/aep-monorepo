@@ -14,9 +14,9 @@
 
 // Package rules contains implementations of rules that apply to Google APIs.
 //
-// Rules are sorted into subpackages by the AIP (https://aep.dev/) that
+// Rules are sorted into subpackages by the AEP (https://aep.dev/) that
 // mandates the rule. Every rule represented in code here must be represented
-// in English in a corresponding AIP. Conversely, anything mandated in an AIP
+// in English in a corresponding AEP. Conversely, anything mandated in an AEP
 // should have a rule here if it is feasible to enforce in code (sometimes it
 // is infeasible, however).
 //
@@ -44,8 +44,8 @@
 //	}
 //
 // Once a rule is written, it needs to be registered. This involves adding
-// the rule to the `AddRules` method for the appropriate AIP package.
-// If this is the first rule for a new AIP, then the `rules.go` init() function
+// the rule to the `AddRules` method for the appropriate AEP package.
+// If this is the first rule for a new AEP, then the `rules.go` init() function
 // must also be updated to run the `AddRules` function for the new package.
 package rules
 
@@ -112,10 +112,10 @@ var aepAddRulesFuncs = []addRulesFuncType{
 
 // Add all rules to the given registry.
 func Add(r lint.RuleRegistry) error {
-	return addAIPRules(r, aepAddRulesFuncs)
+	return addAEPRules(r, aepAddRulesFuncs)
 }
 
-func addAIPRules(r lint.RuleRegistry, addRulesFuncs []addRulesFuncType) error {
+func addAEPRules(r lint.RuleRegistry, addRulesFuncs []addRulesFuncType) error {
 	for _, addRules := range addRulesFuncs {
 		if err := addRules(r); err != nil {
 			return err

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep4232 contains rules defined in https://aep.dev/4232.
-package aep4232
+// Package aep0156 contains rules defined in https://aep.dev/156.
+package aep0156
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// AddRules adds all of the AEP-156 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		4232,
-		repeatedFields,
-		requiredFields,
+		156,
+		forbiddenMethods,
 	)
-}
-
-func hasMethodSignatures(m *desc.MethodDescriptor) bool {
-	sigs := utils.GetMethodSignatures(m)
-	return len(sigs) > 0
 }

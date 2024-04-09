@@ -100,7 +100,7 @@ func TestResponseMessageName(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			for _, tmplName := range []string{"sync", "lro"} {
 				t.Run(tmplName, func(t *testing.T) {
-					// Create a minimal service with a AIP-135 Delete method
+					// Create a minimal service with a AEP-135 Delete method
 					file := testutils.ParseProto3Tmpl(t, tmpl[tmplName], test)
 
 					// Run the lint rule, and establish that it returns the expected problems.

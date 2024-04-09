@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0155 contains rules defined in https://aep.dev/155.
-package aep0155
+// Package aep0135 contains rules defined in https://aep.dev/135.
+package aep0135
 
 import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules adds all of the AIP-155 rules to the provided registry.
+// AddRules accepts a register function and registers each of
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		155,
-		requestIdFormat,
+		135,
+		forceField,
+		httpBody,
+		httpMethod,
+		httpNameField,
+		methodSignature,
+		responseMessageName,
+		requestMessageName,
+		requestForceField,
+		requestNameBehavior,
+		requestNameField,
+		requestNameReference,
+		requestNameRequired,
+		requestRequiredFields,
+		responseLRO,
+		unknownFields,
 	)
 }

@@ -12,24 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0122 contains rules defined in https://aep.dev/122.
-package aep0122
+// Package aep0132 contains rules defined in https://aep.dev/132.
+package aep0132
 
 import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// AddRules adds all of the AEP-132 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		122,
-		resourceCollectionIdentifiers,
-		httpURICase,
-		nameSuffix,
-		noSelfLinks,
+		132,
+		httpBody,
+		httpMethod,
+		httpURIParent,
+		methodSignature,
+		requestFieldTypes,
+		requestMessageName,
+		requestParentBehavior,
+		requestParentField,
+		requestParentReference,
+		requestParentValidReference,
+		requestParentRequired,
+		requestRequiredFields,
+		requestShowDeletedRequired,
 		resourceReferenceType,
-		resourceIdOutputOnly,
-		embeddedResource,
+		responseMessageName,
+		responseUnknownFields,
+		unknownFields,
 	)
 }

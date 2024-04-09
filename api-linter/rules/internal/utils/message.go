@@ -32,17 +32,17 @@ var (
 	deleteReqMessageRegexp         = regexp.MustCompile("^Delete[A-Za-z0-9]*Request$")
 )
 
-// Returns true if this is an AIP-131 Get request message, false otherwise.
+// Returns true if this is an AEP-131 Get request message, false otherwise.
 func IsGetRequestMessage(m *desc.MessageDescriptor) bool {
 	return getReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Return true if this is an AIP-132 List request message, false otherwise.
+// Return true if this is an AEP-132 List request message, false otherwise.
 func IsListRequestMessage(m *desc.MessageDescriptor) bool {
 	return listReqMessageRegexp.MatchString(m.GetName()) && !IsListRevisionsRequestMessage(m)
 }
 
-// Return true if this is an AIP-132 List response message, false otherwise.
+// Return true if this is an AEP-132 List response message, false otherwise.
 func IsListResponseMessage(m *desc.MessageDescriptor) bool {
 	return listRespMessageRegexp.MatchString(m.GetName()) && !IsListRevisionsResponseMessage(m)
 }
@@ -58,29 +58,29 @@ func ListResponseResourceName(m *desc.MessageDescriptor) string {
 	return strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(m.GetName())[1])
 }
 
-// IsListRevisionsRequestMessage returns true if this is an AIP-162 List
+// IsListRevisionsRequestMessage returns true if this is an AEP-162 List
 // Revisions request message, false otherwise.
 func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
 	return listRevisionsReqMessageRegexp.MatchString(m.GetName())
 }
 
-// IsListRevisionsResponseMessage returns true if this is an AIP-162 List
+// IsListRevisionsResponseMessage returns true if this is an AEP-162 List
 // Revisions response message, false otherwise.
 func IsListRevisionsResponseMessage(m *desc.MessageDescriptor) bool {
 	return listRevisionsRespMessageRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-133 Get request message, false otherwise.
+// Returns true if this is an AEP-133 Get request message, false otherwise.
 func IsCreateRequestMessage(m *desc.MessageDescriptor) bool {
 	return createReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-134 Update request message, false otherwise.
+// Returns true if this is an AEP-134 Update request message, false otherwise.
 func IsUpdateRequestMessage(m *desc.MessageDescriptor) bool {
 	return updateReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-135 Delete request message, false otherwise.
+// Returns true if this is an AEP-135 Delete request message, false otherwise.
 func IsDeleteRequestMessage(m *desc.MessageDescriptor) bool {
 	return deleteReqMessageRegexp.MatchString(m.GetName())
 }

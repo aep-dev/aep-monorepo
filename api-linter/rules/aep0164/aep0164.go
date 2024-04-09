@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0152 contains rules defined in https://aep.dev/152.
-package aep0152
+// Package aep0164 contains rules defined in https://aep.dev/164.
+package aep0164
 
 import (
 	"regexp"
@@ -22,11 +22,10 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// AddRules adds all of the AEP-164 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		152,
+		164,
 		httpBody,
 		httpMethod,
 		httpURISuffix,
@@ -34,23 +33,25 @@ func AddRules(r lint.RuleRegistry) error {
 		requestNameBehavior,
 		requestNameField,
 		requestNameReference,
-		requestResourceSuffix,
+		requestUnknownFields,
+		resourceExpireTimeField,
+		responseLRO,
 		responseMessageName,
 	)
 }
 
 var (
-	runMethodRegexp     = regexp.MustCompile(`^Run[A-Za-z0-9]+Job$`)
-	runReqMessageRegexp = regexp.MustCompile(`^Run[A-Za-z0-9]+JobRequest$`)
-	runURIRegexp        = regexp.MustCompile(`:run$`)
+	undeleteMethodRegexp     = regexp.MustCompile("^Undelete(?:[A-Z]|$)")
+	undeleteReqMessageRegexp = regexp.MustCompile("^Undelete[A-Za-z0-9]*Request$")
+	undeleteURINameRegexp    = regexp.MustCompile(`{name=[a-zA-Z/*]+}:undelete$`)
 )
 
-// Returns true if this is an AIP-152 Run method, false otherwise.
-func isRunMethod(m *desc.MethodDescriptor) bool {
-	return runMethodRegexp.MatchString(m.GetName())
+// Returns true if this is a AEP-164 Undelete method, false otherwise.
+func isUndeleteMethod(m *desc.MethodDescriptor) bool {
+	return undeleteMethodRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-152 Run request message, false otherwise.
-func isRunRequestMessage(m *desc.MessageDescriptor) bool {
-	return runReqMessageRegexp.MatchString(m.GetName())
+// Returns true if this is an AEP-164 Undelete request message, false otherwise.
+func isUndeleteRequestMessage(m *desc.MessageDescriptor) bool {
+	return undeleteReqMessageRegexp.MatchString(m.GetName())
 }

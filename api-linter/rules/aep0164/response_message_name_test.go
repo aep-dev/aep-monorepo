@@ -66,7 +66,7 @@ func TestResponseMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-164 Undelete method
+			// Create a minimal service with a AEP-164 Undelete method
 			file := testutils.ParseProto3Tmpl(t, test.tmpl, test)
 
 			// Run the lint rule, and establish that it returns the expected problems.

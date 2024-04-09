@@ -45,7 +45,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = REQUIRED];",
 			"read_mask",
 			testutils.Problems{
-				{Message: `Get RPCs must only require fields explicitly described in AIPs, not "read_mask"`},
+				{Message: `Get RPCs must only require fields explicitly described in AEPs, not "read_mask"`},
 			},
 		},
 		{
@@ -53,7 +53,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			testutils.Problems{
-				{Message: `Get RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Get RPCs must only require fields explicitly described in AEPs, not "create_iam"`},
 			},
 		},
 	} {

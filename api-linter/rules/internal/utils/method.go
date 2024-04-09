@@ -31,12 +31,12 @@ var (
 	legacyListRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
 )
 
-// IsCreateMethod returns true if this is a AIP-133 Create method.
+// IsCreateMethod returns true if this is a AEP-133 Create method.
 func IsCreateMethod(m *desc.MethodDescriptor) bool {
 	return createMethodRegexp.MatchString(m.GetName())
 }
 
-// IsGetMethod returns true if this is a AIP-131 Get method.
+// IsGetMethod returns true if this is a AEP-131 Get method.
 func IsGetMethod(m *desc.MethodDescriptor) bool {
 	methodName := m.GetName()
 	if methodName == "GetIamPolicy" {
@@ -45,7 +45,7 @@ func IsGetMethod(m *desc.MethodDescriptor) bool {
 	return getMethodRegexp.MatchString(methodName)
 }
 
-// IsListMethod return true if this is an AIP-132 List method
+// IsListMethod return true if this is an AEP-132 List method
 func IsListMethod(m *desc.MethodDescriptor) bool {
 	return listMethodRegexp.MatchString(m.GetName()) && !IsLegacyListRevisionsMethod(m)
 }
@@ -77,13 +77,13 @@ func IsLegacyListRevisionsMethod(m *desc.MethodDescriptor) bool {
 	return legacyListRevisionsURINameRegexp.MatchString(h)
 }
 
-// IsUpdateMethod returns true if this is a AIP-134 Update method
+// IsUpdateMethod returns true if this is a AEP-134 Update method
 func IsUpdateMethod(m *desc.MethodDescriptor) bool {
 	methodName := m.GetName()
 	return updateMethodRegexp.MatchString(methodName)
 }
 
-// Returns true if this is a AIP-135 Delete method, false otherwise.
+// Returns true if this is a AEP-135 Delete method, false otherwise.
 func IsDeleteMethod(m *desc.MethodDescriptor) bool {
 	return deleteMethodRegexp.MatchString(m.GetName()) && !deleteRevisionMethodRegexp.MatchString(m.GetName())
 }

@@ -63,7 +63,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"validate_only",
 			"",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
+				{Message: `Create RPCs must only require fields explicitly described in AEPs, not "validate_only"`},
 			},
 		},
 		{
@@ -72,7 +72,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"create_iam",
 			"",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Create RPCs must only require fields explicitly described in AEPs, not "create_iam"`},
 			},
 		},
 		{
@@ -81,7 +81,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"foo",
 			"",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "foo"`},
+				{Message: `Create RPCs must only require fields explicitly described in AEPs, not "foo"`},
 			},
 		},
 	} {

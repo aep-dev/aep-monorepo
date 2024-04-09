@@ -24,7 +24,7 @@ import (
 )
 
 // AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		136,
@@ -34,7 +34,7 @@ func AddRules(r lint.RuleRegistry) error {
 		standardMethodsOnly,
 		uriSuffix,
 		verbNoun,
-		// These rules are disabled as they have no matching AIP guidance.
+		// These rules are disabled as they have no matching AEP guidance.
 		// See https://github.com/aep-dev/google.aep.dev/issues/955 for details.
 		// httpNameVariable,
 		// httpParentVariable,

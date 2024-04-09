@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0126 contains rules defined in https://aep.dev/126.
-package aep0126
+// Package aep0154 contains rules defined in https://aep.dev/154.
+package aep0154
 
-import "github.com/googleapis/api-linter/lint"
+import (
+	"github.com/googleapis/api-linter/lint"
+)
 
-// AddRules adds all of the AIP-126 rules to the provided registry.
+// AddRules adds all of the AEP-154 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		126,
-		enumValueUpperSnakeCase,
-		unspecified,
+		154,
+		declarativeFriendlyRequired,
+		fieldType,
+		noDuplicateEtag,
 	)
 }

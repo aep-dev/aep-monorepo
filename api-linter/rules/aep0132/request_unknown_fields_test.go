@@ -49,7 +49,7 @@ func TestUnknownFields(t *testing.T) {
 		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View").AddValue(builder.NewEnumValue("BASIC"))), testutils.Problems{}},
 		{"Invalid", "ListBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{Message: "explicitly described"}}},
 		{"Irrelevant", "EnumerteBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
-		{"IrrelevantAIP162", "ListBookRevisionsRequest", "name", builder.FieldTypeString(), testutils.Problems{}},
+		{"IrrelevantAEP162", "ListBookRevisionsRequest", "name", builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.

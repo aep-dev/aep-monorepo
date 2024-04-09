@@ -45,7 +45,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool allow_missing = 2 [(google.api.field_behavior) = REQUIRED];",
 			"allow_missing",
 			testutils.Problems{
-				{Message: `Delete RPCs must only require fields explicitly described in AIPs, not "allow_missing"`},
+				{Message: `Delete RPCs must only require fields explicitly described in AEPs, not "allow_missing"`},
 			},
 		},
 		{
@@ -53,7 +53,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool create_iam = 2 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			testutils.Problems{
-				{Message: `Delete RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Delete RPCs must only require fields explicitly described in AEPs, not "create_iam"`},
 			},
 		},
 	} {

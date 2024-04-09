@@ -33,7 +33,7 @@ var httpNameVariable = &lint.MethodRule{
 		for _, http := range utils.GetHTTPRules(m) {
 			vars := http.GetVariables()
 
-			// Special case: AIP-162 describes "revision" methods; the `name`
+			// Special case: AEP-162 describes "revision" methods; the `name`
 			// variable is appropriate (and mandated) for those.
 			if strings.HasSuffix(m.GetName(), "Revision") || strings.HasSuffix(m.GetName(), "Revisions") {
 				return nil

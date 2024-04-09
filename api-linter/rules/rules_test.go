@@ -7,7 +7,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-func TestAddAIPRules(t *testing.T) {
+func TestAddAEPRules(t *testing.T) {
 	wantError := errors.New("test")
 	tests := []struct {
 		name          string
@@ -36,9 +36,9 @@ func TestAddAIPRules(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := addAIPRules(lint.NewRuleRegistry(), test.addRulesFuncs)
+			err := addAEPRules(lint.NewRuleRegistry(), test.addRulesFuncs)
 			if err != test.err {
-				t.Errorf("addAIPRules got error %v, but want %v", err, test.err)
+				t.Errorf("addAEPRules got error %v, but want %v", err, test.err)
 			}
 		})
 	}

@@ -67,7 +67,7 @@ func GetResourceNameField(r *apb.ResourceDescriptor) string {
 }
 
 // IsResourceRevision determines if the given message represents a resource
-// revision as described in AIP-162.
+// revision as described in AEP-162.
 func IsResourceRevision(m *desc.MessageDescriptor) bool {
 	return IsResource(m) && strings.HasSuffix(m.GetName(), "Revision")
 }

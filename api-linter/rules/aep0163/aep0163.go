@@ -12,29 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0128 contains rules defined in https://aep.dev/128.
-package aep0128
+// Package aep0163 contains rules defined in https://aep.dev/163.
+package aep0163
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// AddRules adds all of the AEP-163 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		128,
-		resourceAnnotationsField,
-		resourceReconcilingBehavior,
-		resourceReconcilingField,
+		163,
+		declarativeFriendlyRequired,
+		synonyms,
 	)
-}
-
-func isDeclarativeFriendlyResource(m *desc.MessageDescriptor) bool {
-	// IsDeclarativeFriendly returns true for both
-	// resources and request messages, but we only care about resources.
-	resource := utils.DeclarativeFriendlyResource(m)
-	return resource != nil && resource == m
 }

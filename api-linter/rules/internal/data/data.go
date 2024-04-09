@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package data contains constants used in multiple AIP rules.
+// Package data contains constants used in multiple AEP rules.
 package data
 
 import "bitbucket.org/creachadair/stringset"

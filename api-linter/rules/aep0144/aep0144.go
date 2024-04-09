@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,31 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0131 contains rules defined in https://aep.dev/131.
-package aep0131
+// Package aep0144 contains rules defined in https://aep.dev/144.
+package aep0144
 
 import (
+	"regexp"
+
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		131,
+		144,
 		httpBody,
 		httpMethod,
-		httpNameField,
-		methodSignature,
-		responseMessageName,
 		requestMessageName,
-		requestNameBehavior,
-		requestNameField,
-		requestNameReference,
-		requestNameReferenceType,
-		requestNameRequired,
-		requestRequiredFields,
-		synonyms,
-		unknownFields,
 	)
+}
+
+var addRemoveMethodRegexp = regexp.MustCompile("^(?:Add|Remove)(?:[A-Z]|$)")
+
+// Returns true if this is an AEP-144 Add/Remove method, false otherwise.
+func isAddRemoveMethod(m *desc.MethodDescriptor) bool {
+	return addRemoveMethodRegexp.MatchString(m.GetName())
 }

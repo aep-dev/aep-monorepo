@@ -39,7 +39,7 @@ var requestRequiredFields = &lint.MessageRule{
 			// add a problem.
 			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Delete RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Delete RPCs must only require fields explicitly described in AEPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}

@@ -40,7 +40,7 @@ var responseMessageName = &lint.MethodRule{
 		// response message should be named `Pu,geBooksResponse`.
 		//
 		// Note: If `got` is empty string, this is an unannotated LRO.
-		// The AIP-151 rule will whine about that, and this rule should not as it
+		// The AEP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
 		got := utils.GetOperationInfo(m).GetResponseType()
 		want := m.GetName() + "Response"

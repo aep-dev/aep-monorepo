@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0156 contains rules defined in https://aep.dev/156.
-package aep0156
+// Package aep0128 contains rules defined in https://aep.dev/128.
+package aep0128
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-156 rules to the provided registry.
+// AddRules accepts a register function and registers each of
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		156,
-		forbiddenMethods,
+		128,
+		resourceAnnotationsField,
+		resourceReconcilingBehavior,
+		resourceReconcilingField,
 	)
+}
+
+func isDeclarativeFriendlyResource(m *desc.MessageDescriptor) bool {
+	// IsDeclarativeFriendly returns true for both
+	// resources and request messages, but we only care about resources.
+	resource := utils.DeclarativeFriendlyResource(m)
+	return resource != nil && resource == m
 }

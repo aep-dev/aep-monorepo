@@ -78,7 +78,7 @@ func TestUnknownFields(t *testing.T) {
 			"Invalid",
 			"CreateBookRequest",
 			[]field{{"name", builder.FieldTypeString()}},
-			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"name\"."}},
+			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AEPs, not \"name\"."}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("name")
 			},
@@ -87,7 +87,7 @@ func TestUnknownFields(t *testing.T) {
 			"InvalidResourceRelatedField",
 			"CreateBookStoreRequest",
 			[]field{{"book_id", builder.FieldTypeString()}},
-			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"book_id\"."}},
+			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AEPs, not \"book_id\"."}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("book_id")
 			},

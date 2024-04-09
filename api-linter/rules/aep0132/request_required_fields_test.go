@@ -45,7 +45,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"int32 page_size = 2 [(google.api.field_behavior) = REQUIRED];",
 			"page_size",
 			testutils.Problems{
-				{Message: `List RPCs must only require fields explicitly described in AIPs, not "page_size"`},
+				{Message: `List RPCs must only require fields explicitly described in AEPs, not "page_size"`},
 			},
 		},
 		{
@@ -53,7 +53,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			testutils.Problems{
-				{Message: `List RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `List RPCs must only require fields explicitly described in AEPs, not "create_iam"`},
 			},
 		},
 	} {

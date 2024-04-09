@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0144 contains rules defined in https://aep.dev/144.
-package aep0144
+// Package aep0152 contains rules defined in https://aep.dev/152.
+package aep0152
 
 import (
 	"regexp"
@@ -23,19 +23,34 @@ import (
 )
 
 // AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		144,
+		152,
 		httpBody,
 		httpMethod,
+		httpURISuffix,
 		requestMessageName,
+		requestNameBehavior,
+		requestNameField,
+		requestNameReference,
+		requestResourceSuffix,
+		responseMessageName,
 	)
 }
 
-var addRemoveMethodRegexp = regexp.MustCompile("^(?:Add|Remove)(?:[A-Z]|$)")
+var (
+	runMethodRegexp     = regexp.MustCompile(`^Run[A-Za-z0-9]+Job$`)
+	runReqMessageRegexp = regexp.MustCompile(`^Run[A-Za-z0-9]+JobRequest$`)
+	runURIRegexp        = regexp.MustCompile(`:run$`)
+)
 
-// Returns true if this is an AIP-144 Add/Remove method, false otherwise.
-func isAddRemoveMethod(m *desc.MethodDescriptor) bool {
-	return addRemoveMethodRegexp.MatchString(m.GetName())
+// Returns true if this is an AEP-152 Run method, false otherwise.
+func isRunMethod(m *desc.MethodDescriptor) bool {
+	return runMethodRegexp.MatchString(m.GetName())
+}
+
+// Returns true if this is an AEP-152 Run request message, false otherwise.
+func isRunRequestMessage(m *desc.MessageDescriptor) bool {
+	return runReqMessageRegexp.MatchString(m.GetName())
 }

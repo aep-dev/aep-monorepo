@@ -28,7 +28,7 @@ var httpMethod = &lint.MethodRule{
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// DeleteFooRevision is still a custom method, but delete is expected
-		// (enforced in AIP-162 rules).
+		// (enforced in AEP-162 rules).
 		n := m.GetName()
 		if strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision") {
 			return nil

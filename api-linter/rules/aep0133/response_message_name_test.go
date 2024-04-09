@@ -40,7 +40,7 @@ func TestOutputMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-134 Update method
+			// Create a minimal service with a AEP-134 Update method
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {

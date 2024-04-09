@@ -12,32 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aep0151 contains rules defined in https://aep.dev/151.
-package aep0151
+// Package aep0122 contains rules defined in https://aep.dev/122.
+package aep0122
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-151 rules to the provided registry.
+// AddRules accepts a register function and registers each of
+// this AEP's rules to it.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
-		151,
-		lroAnnotationExists,
-		lroMetadata,
-		lroMetadataReachable,
-		lroResponse,
-		lroResponseReachable,
-		responseUnary,
+		122,
+		resourceCollectionIdentifiers,
+		httpURICase,
+		nameSuffix,
+		noSelfLinks,
+		resourceReferenceType,
+		resourceIdOutputOnly,
+		embeddedResource,
 	)
-}
-
-func isLRO(m *desc.MethodDescriptor) bool {
-	return m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation"
-}
-
-func isAnnotatedLRO(m *desc.MethodDescriptor) bool {
-	return isLRO(m) && utils.GetOperationInfo(m) != nil
 }

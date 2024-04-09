@@ -16,7 +16,7 @@ package data
 
 import "testing"
 
-// "per" is a special exception to the preposition rule, per AIP-140
+// "per" is a special exception to the preposition rule, per AEP-140
 // (but it would be easy for a well-meaning person to add it to the set).
 func TestPrepositionsExcludesPer(t *testing.T) {
 	if Prepositions.Contains("per") {
