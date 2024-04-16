@@ -22,8 +22,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-func checkRuleName(aip int, name string) []error {
-	path := fmt.Sprintf("rules/aip%04d/%s.go", aip, strcase.SnakeCase(name))
+func checkRuleName(aep int, name string) []error {
+	path := fmt.Sprintf("rules/aep%04d/%s.go", aep, strcase.SnakeCase(name))
 
 	// Read in the file.
 	contentsBytes, err := os.ReadFile(path)
@@ -36,13 +36,13 @@ func checkRuleName(aip int, name string) []error {
 	// If it can not be found, complain.
 	match := ruleNameRegexp.FindStringSubmatch(contents)
 	if match == nil {
-		return []error{fmt.Errorf("no rule name found: AIP-%d, %s", aip, name)}
+		return []error{fmt.Errorf("no rule name found: aep-%d, %s", aep, name)}
 	}
 
 	// If the rule name declaration does not match, complain.
 	errs := []error{}
-	if fmt.Sprintf("%d", aip) != match[1] {
-		errs = append(errs, fmt.Errorf("mismatch between path and rule AIP: %s", path))
+	if fmt.Sprintf("%d", aep) != match[1] {
+		errs = append(errs, fmt.Errorf("mismatch between path and rule aep: %s", path))
 	}
 	if name != match[2] {
 		errs = append(errs, fmt.Errorf("mismatch between rule name and filename: %s", path))

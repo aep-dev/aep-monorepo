@@ -27,7 +27,7 @@ import (
 )
 
 // The set of checkers that are run on every discovered rule.
-var checkers = []func(aip int, name string) []error{
+var checkers = []func(aep int, name string) []error{
 	checkRuleDocumented,
 	checkRuleName,
 	checkRuleRegistered,
@@ -54,32 +54,32 @@ func main() {
 			func(p string, _ os.FileInfo) bool { return strings.Contains(p, "/internal/") },
 			func(p string, _ os.FileInfo) bool { return p == "rules/rules.go" },
 			func(p string, _ os.FileInfo) bool { return strings.HasSuffix(p, "_test.go") },
-			func(p string, _ os.FileInfo) bool { return aipIndex.MatchString(p) },
+			func(p string, _ os.FileInfo) bool { return aepIndex.MatchString(p) },
 		} {
 			if exempt(path, info) {
 				return nil
 			}
 		}
 
-		// This represents a rule. Get the AIP and rule name from the path.
+		// This represents a rule. Get the aep and rule name from the path.
 		match := ruleFile.FindStringSubmatch(path)
 		if match == nil {
 			errors = append(errors, fmt.Errorf("unexpected path: %s", path))
 			return nil
 		}
 
-		// Get the AIP number and final rule segment.
-		aip, err := strconv.Atoi(match[1])
+		// Get the aep number and final rule segment.
+		aep, err := strconv.Atoi(match[1])
 		if err != nil {
 			errors = append(errors, err)
 			return nil
 		}
 		name := strings.ReplaceAll(match[2], "_", "-")
-		token := fmt.Sprintf("%04d-%s", aip, name)
+		token := fmt.Sprintf("%04d-%s", aep, name)
 
 		// Run each checker and run up the list of errors.
 		for _, checker := range checkers {
-			if errs := checker(aip, name); len(errs) > 0 {
+			if errs := checker(aep, name); len(errs) > 0 {
 				errors = append(errors, errs...)
 				failedRules.Add(token)
 			}
@@ -120,6 +120,6 @@ func main() {
 }
 
 var (
-	ruleFile = regexp.MustCompile(`rules/aip([\d]{4})/([a-z0-9_]+).go`)
-	aipIndex = regexp.MustCompile(`rules/aip[\d]{4}/aip[\d]{4}\.go`)
+	ruleFile = regexp.MustCompile(`rules/aep([\d]{4})/([a-z0-9_]+).go`)
+	aepIndex = regexp.MustCompile(`rules/aep[\d]{4}/aep[\d]{4}\.go`)
 )

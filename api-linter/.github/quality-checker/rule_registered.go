@@ -23,8 +23,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-func checkRuleRegistered(aip int, name string) []error {
-	path := fmt.Sprintf("rules/aip%04d/%s.go", aip, strcase.SnakeCase(name))
+func checkRuleRegistered(aep int, name string) []error {
+	path := fmt.Sprintf("rules/aep%04d/%s.go", aep, strcase.SnakeCase(name))
 
 	// Read in the file.
 	contents, err := os.ReadFile(path)
@@ -41,24 +41,24 @@ func checkRuleRegistered(aip int, name string) []error {
 	// Some errors are now non-fatal; start a running tab.
 	errata := []error{}
 
-	// Ensure this rule is registered within its AIP module file.
+	// Ensure this rule is registered within its aep module file.
 	ruleVar := ruleMatch[1]
-	contents, err = os.ReadFile(fmt.Sprintf("rules/aip%04d/aip%04d.go", aip, aip))
+	contents, err = os.ReadFile(fmt.Sprintf("rules/aep%04d/aep%04d.go", aep, aep))
 	if err != nil {
 		return []error{err}
 	}
 	if !strings.Contains(string(contents), ruleVar) {
-		errata = append(errata, fmt.Errorf("rule %q for AIP-%d not registered in the AIP's AllRules", name, aip))
+		errata = append(errata, fmt.Errorf("rule %q for aep-%d not registered in the aep's AllRules", name, aep))
 	}
 
-	// Ensure that the AIP itself is registered in `rules/rules.go`.
+	// Ensure that the aep itself is registered in `rules/rules.go`.
 	contents, err = os.ReadFile("rules/rules.go")
 	if err != nil {
 		errata = append(errata, err)
 		return errata
 	}
-	if !strings.Contains(string(contents), fmt.Sprintf("aip%04d.AddRules", aip)) {
-		errata = append(errata, fmt.Errorf("rules.go does not call AllRules for for AIP-%d", aip))
+	if !strings.Contains(string(contents), fmt.Sprintf("aep%04d.AddRules", aep)) {
+		errata = append(errata, fmt.Errorf("rules.go does not call AllRules for for aep-%d", aep))
 	}
 
 	// Done; return any errata we found.
