@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 233
+  aep: 233
   name: [core, '0233', response-resource-field]
   summary:
     Batch Create RPCs must have a repeated field for the resource in the response.
@@ -12,7 +12,7 @@ redirect_from:
 # Batch Create methods: Resource field
 
 This rule enforces that all `BatchCreate` methods have a repeated field in the
-response message for the resource itself, as mandated in [AIP-233][].
+response message for the resource itself, as mandated in [AEP-233][].
 
 ## Details
 
@@ -50,11 +50,11 @@ message BatchCreateBooksResponse {
 
 If you need to violate this rule, use a leading comment above the message (if
 the resource field is missing) or above the field (if it is improperly named).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0233::response-resource-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message BatchCreateBooksResponse {
   // `repeated Book books` is missing.
 }
@@ -63,5 +63,5 @@ message BatchCreateBooksResponse {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-233]: https://aip.dev/233
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-233]: https://aep.dev/233
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

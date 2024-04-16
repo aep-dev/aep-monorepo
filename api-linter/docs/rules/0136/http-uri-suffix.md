@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 136
+  aep: 136
   name: [core, '0136', http-uri-suffix]
   summary: Custom methods should have a correct URI suffix.
 permalink: /136/http-uri-suffix
@@ -11,7 +11,7 @@ redirect_from:
 # Custom methods: URI suffix
 
 This rule enforces that custom methods include the custom verb in the REST URI,
-as mandated in [AIP-136][].
+as mandated in [AEP-136][].
 
 ## Details
 
@@ -95,11 +95,11 @@ represented as a single word. A common occurrence here is for words like
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0136::http-uri-suffix=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:checkoutBook"
@@ -111,7 +111,7 @@ rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-136]: https://aip.dev/136
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-136]: https://aep.dev/136
+[aep.dev/not-precedent]: https://aep.dev/not-precedent
 [http-name-variable]: ./http-name-variable.md
 [http-parent-variable]: ./http-parent-variable.md

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 192
+  aep: 192
   name: [core, '0192', no-html]
   summary: Comments must not use raw HTML
 permalink: /192/no-html
@@ -11,7 +11,7 @@ redirect_from:
 # No HTML in comments
 
 This rule enforces that every descriptor in every proto file does not use raw
-HTML in comments, as mandated in [AIP-192][].
+HTML in comments, as mandated in [AEP-192][].
 
 ## Details
 
@@ -54,20 +54,20 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the descriptor
-(and revel in the irony). Remember to also include an [aip.dev/not-precedent][]
+(and revel in the irony). Remember to also include an [aep.dev/not-precedent][]
 comment explaining why.
 
 ```proto
 // A representation of a book.
 message Book {
   // (-- api-linter: core::0192::no-html=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   // The name of the book.
   // Format: <code>publishers/{publisher}/books/{book}</code>
   string name = 1;
 }
 ```
 
-[aip-192]: https://aip.dev/192
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-192]: https://aep.dev/192
+[aep.dev/not-precedent]: https://aep.dev/not-precedent
 [famous anti-pattern]: https://stackoverflow.com/questions/1732348/

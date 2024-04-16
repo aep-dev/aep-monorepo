@@ -1,5 +1,5 @@
 ---
-aip_listing: 192
+aep_listing: 192
 permalink: /192/
 redirect_from:
   - /0192/
@@ -7,4 +7,4 @@ redirect_from:
 
 # Documentation
 
-{% include linter-aip-listing.md aip=192 %}
+{% include linter-aep-listing.md aep=192 %}

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 146
+  aep: 146
   name: [core, '0146', any]
   summary: Avoid `google.protobuf.Any` fields.
 permalink: /146/any
@@ -11,7 +11,7 @@ redirect_from:
 # Any
 
 This rule discourages the use of `google.protobuf.Any`, as described in
-[AIP-146][].
+[AEP-146][].
 
 ## Details
 
@@ -32,17 +32,17 @@ message Book {
 
 **Correct** code for this rule:
 
-The correct code is likely to vary substantially by use case. See [AIP-146][]
+The correct code is likely to vary substantially by use case. See [AEP-146][]
 for details and tradeoffs of various approaches for generic fields.
 
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0146::any=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   google.protobuf.Any contents = 1;
 }
@@ -51,5 +51,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-146]: https://aip.dev/146
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-146]: https://aep.dev/146
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

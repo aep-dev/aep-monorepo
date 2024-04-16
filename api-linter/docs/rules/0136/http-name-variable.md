@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 136
+  aep: 136
   name: [core, '0136', http-name-variable]
   summary:
     Custom methods should only use `name` if the RPC noun matches the resource.
@@ -10,12 +10,12 @@ redirect_from:
 ---
 
 **Important:** This rule has been temporarily disabled as it does not match any
-AIP guidance. See discussion [here][https://github.com/aip-dev/google.aip.dev/issues/955].
+AEP guidance. See discussion [here][https://github.com/aep-dev/google.aep.dev/issues/955].
 
 # Custom methods: HTTP name variable
 
 This rule enforces that custom methods only use the `name` variable if the RPC
-noun matches the resource, as mandated in [AIP-136][].
+noun matches the resource, as mandated in [AEP-136][].
 
 ## Details
 
@@ -70,11 +70,11 @@ created by the custom RPC).
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0136::http-name-variable=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:writePage"
@@ -86,6 +86,6 @@ rpc WritePage(WritePageRequest) return (WritePageResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-136]: https://aip.dev/136
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-136]: https://aep.dev/136
+[aep.dev/not-precedent]: https://aep.dev/not-precedent
 [http-parent-variable]: ./http-parent-variable.md

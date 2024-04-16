@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 192
+  aep: 192
   name: [core, '0192', only-leading-comments]
   summary: All public comments should be leading comments.
 permalink: /192/only-leading-comments
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that every descriptor in every proto file has a public
 comment information only in leading comment (not trailing comments or detached
-comments), as mandated in [AIP-192][].
+comments), as mandated in [AEP-192][].
 
 ## Details
 
@@ -51,7 +51,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the descriptor
-(and revel in the irony). Remember to also include an [aip.dev/not-precedent][]
+(and revel in the irony). Remember to also include an [aep.dev/not-precedent][]
 comment explaining why.
 
 ```proto
@@ -59,12 +59,12 @@ comment explaining why.
 
 // A representation of a book.
 // (-- api-linter: core::0192::only-leading-comments=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   // The resource name of the book.
   string name = 1;
 }
 ```
 
-[aip-192]: https://aip.dev/192
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-192]: https://aep.dev/192
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 131
+  aep: 131
   name: [core, '0131', request-required-fields]
   summary: Get RPCs must not have unexpected required fields in the request.
 permalink: /131/request-required-fields
@@ -11,14 +11,14 @@ redirect_from:
 # Get methods: Required fields
 
 This rule enforces that all `Get` standard methods do not have unexpected
-required fields, as mandated in [AIP-131][].
+required fields, as mandated in [AEP-131][].
 
 ## Details
 
 This rule looks at any message matching `Get*Request` and complains if it
 comes across any required fields other than:
 
-- `string name` ([AIP-131][])
+- `string name` ([AEP-131][])
 
 ## Examples
 
@@ -60,7 +60,7 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message GetBookRequest {
@@ -73,7 +73,7 @@ message GetBookRequest {
   }];
 
   // (-- api-linter: core::0131::request-required-fields=disabled
-  //     aip.dev/not-precedent: We really need this field to be required because
+  //     aep.dev/not-precedent: We really need this field to be required because
   //     reasons. --)
    google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
@@ -82,5 +82,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-131]: https://aep.dev/131
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

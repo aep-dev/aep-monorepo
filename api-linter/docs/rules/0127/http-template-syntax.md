@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 127
+  aep: 127
   name: [core, '0127', http-template-syntax]
   summary: |
     HTTP patterns should follow the HTTP path template syntax.
@@ -12,7 +12,7 @@ redirect_from:
 # HTTP Pattern Variables
 
 This rule enforces that HTTP annotation patterns follow the path template syntax
-rules, as mandated in [AIP-127][].
+rules, as mandated in [AEP-127][].
 
 ## Details
 
@@ -73,11 +73,11 @@ rpc GetBook(GetBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0127::http-template-syntax=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
         get: "v1/{name=shelves/*}"
@@ -88,5 +88,5 @@ rpc GetBook(GetBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-127]: https://aip.dev/127
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-127]: https://aep.dev/127
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

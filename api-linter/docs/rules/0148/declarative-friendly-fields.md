@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 148
+  aep: 148
   name: [core, '0148', declarative-friendly-fields]
   summary: Declarative-friendly resources must include some standard fields.
 permalink: /148/declarative-friendly-fields
@@ -11,7 +11,7 @@ redirect_from:
 # Declarative-friendly fields
 
 This rule requires certain standard fields on declarative-friendly resources,
-as mandated in [AIP-148][].
+as mandated in [AEP-148][].
 
 ## Details
 
@@ -71,11 +71,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0148::declarative-friendly-fields=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -95,5 +95,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-148]: https://aip.dev/148
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-148]: https://aep.dev/148
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

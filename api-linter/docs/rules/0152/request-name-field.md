@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 152
+  aep: 152
   name: [core, '0152', request-name-field]
   summary: Run RPCs must have a `name` field in the request.
 permalink: /152/request-name-field
@@ -11,7 +11,7 @@ redirect_from:
 # Run requests: Name field
 
 This rule enforces that all `Run` methods have a `string name`
-field in the request message, as mandated in [AIP-152][].
+field in the request message, as mandated in [AEP-152][].
 
 ## Details
 
@@ -52,11 +52,11 @@ message RunWriteBookJobRequest {
 
 If you need to violate this rule, use a leading comment above the message (if
 the `name` field is missing) or above the field (if it is the wrong type).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0152::request-name-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message RunWriteBookJobRequest {
   string write_book_job = 1;
 }
@@ -65,5 +65,5 @@ message RunWriteBookJobRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-152]: https://aip.dev/152
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-152]: https://aep.dev/152
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

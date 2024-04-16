@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 235
+  aep: 235
   name: [core, '0235', response-resource-field]
   summary:
     Batch Delete RPCs must have a repeated field for the resource in the response.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchDelete` methods have a repeated field in the
 soft-delete response message for the resource itself, as mandated in
-[AIP-235][].
+[AEP-235][].
 
 ## Details
 
@@ -51,11 +51,11 @@ message BatchDeleteBooksResponse {
 
 If you need to violate this rule, use a leading comment above the message (if
 the resource field is missing) or above the field (if it is improperly named).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0235::response-resource-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message BatchDeleteBooksResponse {
   // `repeated Book books` is missing.
 }
@@ -64,5 +64,5 @@ message BatchDeleteBooksResponse {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-235]: https://aip.dev/235
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-235]: https://aep.dev/235
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

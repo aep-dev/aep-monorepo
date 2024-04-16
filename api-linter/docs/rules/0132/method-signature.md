@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 132
+  aep: 132
   name: [core, '0132', method-signature]
   summary: |
     List RPCs should annotate a method signature of "parent".
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `List` standard methods have a
 `google.api.method_signature` annotation with a value of `"parent"`, as
-mandated in [AIP-132][].
+mandated in [AEP-132][].
 
 ## Details
 
@@ -52,16 +52,16 @@ rpc ListBooks(ListBooksRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0132::method-signature=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc ListBooks(ListBooksRequest) returns (Book);
 ```
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-132]: https://aip.dev/132
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-132]: https://aep.dev/132
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

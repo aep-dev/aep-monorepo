@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 140
+  aep: 140
   name: [core, '0140', numbers]
   summary: Field names should not have words beginning with numbers.
 permalink: /140/numbers
@@ -11,7 +11,7 @@ redirect_from:
 # Field names: Numbers
 
 This rule enforces that field names do not begin any word in the field with a
-number, as mandated in [AIP-140][].
+number, as mandated in [AEP-140][].
 
 ## Details
 
@@ -58,11 +58,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0140::numbers=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
   int32 review_90th_percentile_stars = 2;
@@ -72,5 +72,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-140]: https://aip.dev/140
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-140]: https://aep.dev/140
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

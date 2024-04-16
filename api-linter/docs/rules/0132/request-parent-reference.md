@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 132
+  aep: 132
   name: [core, '0132', request-parent-reference]
   summary: |
     List RPCs should annotate the `parent` field with `google.api.resource_reference`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `List` standard methods have
 `google.api.resource_reference` on their `string parent` field, as mandated in
-[AIP-132][].
+[AEP-132][].
 
 ## Details
 
@@ -51,11 +51,11 @@ message ListBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0132::request-parent-reference=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
   string parent = 1 [(google.api.field_behavior) = REQUIRED];
 }
@@ -64,5 +64,5 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-132]: https://aip.dev/132
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-132]: https://aep.dev/132
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

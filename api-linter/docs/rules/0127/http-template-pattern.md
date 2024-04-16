@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 127
+  aep: 127
   name: [core, '0127', http-template-pattern]
   summary: |
     HTTP template variable patterns should match the patterns defined by their resources.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that any HTTP annotations that reference a resource must
 match one of the pattern strings defined by that resource, as mandated in
-[AIP-127][].
+[AEP-127][].
 
 ## Details
 
@@ -78,11 +78,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0127::http-template-pattern=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
         get: "v1/{name=shelves/*}"
@@ -93,5 +93,5 @@ rpc GetBook(GetBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-127]: https://aip.dev/127
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-127]: https://aep.dev/127
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

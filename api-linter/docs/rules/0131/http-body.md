@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 131
+  aep: 131
   name: [core, '0131', http-body]
   summary: Get methods must not have an HTTP body.
 permalink: /131/http-body
@@ -11,7 +11,7 @@ redirect_from:
 # Get methods: No HTTP body
 
 This rule enforces that all `Get` RPCs omit the HTTP `body`, as mandated in
-[AIP-131][].
+[AEP-131][].
 
 ## Details
 
@@ -46,12 +46,12 @@ rpc GetBook(GetBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0131::http-body=disabled
 //     api-linter: core::0131::http-method=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}"
@@ -67,5 +67,5 @@ different HTTP method (as depicted above).
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-131]: https://aep.dev/131
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

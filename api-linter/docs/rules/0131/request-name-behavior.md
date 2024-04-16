@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 131
+  aep: 131
   name: [core, '0131', request-name-behavior]
   summary: |
     Get RPCs should annotate the `name` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Get` standard methods have
 `google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
-mandated in [AIP-131][].
+mandated in [AEP-131][].
 
 ## Details
 
@@ -50,12 +50,12 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message GetBookRequest {
   // (-- api-linter: core::0131::request-name-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
@@ -65,5 +65,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-131]: https://aep.dev/131
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

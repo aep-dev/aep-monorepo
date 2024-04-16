@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 158
+  aep: 158
   name: [core, '0158', request-skip-field]
   summary: Paginated RPC `skip` fields must have type `int32`.
 permalink: /158/request-skip-field
@@ -11,7 +11,7 @@ redirect_from:
 # Paginated methods: skip field
 
 This rule enforces that all `List` and `Search` request `skip` fields have type `int32`, as
-mandated in [AIP-158][].
+mandated in [AEP-158][].
 
 ## Details
 
@@ -57,7 +57,7 @@ message ListBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message ListBooksRequest {
@@ -71,7 +71,7 @@ message ListBooksRequest {
   string page_token = 3;
 
   // (-- api-linter: core::0158::request-skip-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string skip = 4;
 }
 ```
@@ -79,5 +79,5 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-158]: https://aip.dev/158
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-158]: https://aep.dev/158
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

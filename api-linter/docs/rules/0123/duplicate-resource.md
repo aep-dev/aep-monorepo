@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 123
+  aep: 123
   name: [core, '0123', duplicate-resource]
   summary: Resource types should not be defined more than once.
 permalink: /123/duplicate-resource
@@ -11,7 +11,7 @@ redirect_from:
 # Resource annotation presence
 
 This rule enforces that the same resource type doesn't appear in more than one
-`google.api.resource` annotation, as described in [AIP-123][].
+`google.api.resource` annotation, as described in [AEP-123][].
 
 ## Details
 
@@ -71,11 +71,11 @@ message Author {
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0123::duplicate-resource=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
 message Book {
@@ -97,5 +97,5 @@ message Author {
 }
 ```
 
-[aip-123]: http://aip.dev/123
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-123]: http://aep.dev/123
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

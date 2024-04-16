@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', tag-revision-request-name-field]
   summary: Tag Revision RPCs must have a `name` field in the request.
 permalink: /162/tag-revision-request-name-field
@@ -11,7 +11,7 @@ redirect_from:
 # Tag Revision requests: Name field
 
 This rule enforces that all Tag Revision methods have a `string name`
-field in the request message, as mandated in [AIP-162][].
+field in the request message, as mandated in [AEP-162][].
 
 ## Details
 
@@ -61,12 +61,12 @@ message TagBookRevisionRequest {
 
 If you need to violate this rule, use a leading comment above the message (if
 the `name` field is missing) or above the field (if it is the wrong type).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message TagBookRevisionRequest {
   // (-- api-linter: core::0162::tag-revision-request-name-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   bytes name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
@@ -79,5 +79,5 @@ message TagBookRevisionRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', response-lro]
   summary: |
     Declarative-friendly delete methods should use long-running operations.
@@ -12,7 +12,7 @@ redirect_from:
 # Long-running Delete
 
 This rule enforces that declarative-friendly delete methods use long-running
-operations, as mandated in [AIP-135][].
+operations, as mandated in [AEP-135][].
 
 ## Details
 
@@ -54,11 +54,11 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0135::response-lro=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
     delete: "/v1/{name=publishers/*/books/*}"
@@ -72,5 +72,5 @@ likely to expect strong consistency.
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

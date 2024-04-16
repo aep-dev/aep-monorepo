@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', request-name-behavior]
   summary: |
     Delete RPCs should annotate the `name` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Delete` standard methods have
 `google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
-mandated in [AIP-135][].
+mandated in [AEP-135][].
 
 ## Details
 
@@ -50,12 +50,12 @@ message DeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
   // (-- api-linter: core::0135::request-name-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
@@ -65,5 +65,5 @@ message DeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

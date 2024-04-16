@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 148
+  aep: 148
   name: [core, '0148', use-uid]
   summary: Use uid instead of id in resource messages.
 permalink: /148/use-uid
@@ -11,7 +11,7 @@ redirect_from:
 # Use `uid` as the resource ID field
 
 This rule encourages the use of `uid` instead of `id` for resource messages, as
-mandated in [AIP-148][].
+mandated in [AEP-148][].
 
 ## Details
 
@@ -53,12 +53,12 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field or its
-enclosing message. Remember to also include an [aip.dev/not-precedent][]
+enclosing message. Remember to also include an [aep.dev/not-precedent][]
 comment explaining why.
 
 ```proto
 // (-- api-linter: core::0148::use-uid=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -73,5 +73,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-148]: https://aip.dev/148
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-148]: https://aep.dev/148
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

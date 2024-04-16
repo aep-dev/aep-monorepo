@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 134
+  aep: 134
   name: [core, '0134', http-uri-name]
   summary: Update methods must map the resource's name field to the URI.
 permalink: /134/http-uri-name
@@ -11,7 +11,7 @@ redirect_from:
 # Update methods: HTTP URI name field
 
 This rule enforces that all `Update` RPCs map the `name` field from the
-resource object to the HTTP URI, as mandated in [AIP-134][].
+resource object to the HTTP URI, as mandated in [AEP-134][].
 
 ## Details
 
@@ -51,11 +51,11 @@ rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0134::http-uri-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}"
@@ -67,5 +67,5 @@ rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-134]: https://aip.dev/134
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-134]: https://aep.dev/134
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

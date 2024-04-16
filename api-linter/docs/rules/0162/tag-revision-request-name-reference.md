@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', tag-revision-request-name-reference]
   summary: |
     Tag Revision requests should annotate the `name` field with `google.api.resource_reference`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all Tag Revision requests have
 `google.api.resource_reference` on their `string name` field, as mandated in
-[AIP-162][].
+[AEP-162][].
 
 ## Details
 
@@ -51,12 +51,12 @@ message TagBookRevisionRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message TagBookRevisionRequest {
   // (-- api-linter: core::0162::tag-revision-request-name-reference=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.field_behavior) = REQUIRED];
 
   string tag = 2 [(google.api.field_behavior) = REQUIRED];
@@ -66,5 +66,5 @@ message TagBookRevisionRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

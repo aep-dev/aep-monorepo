@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', commit-http-uri-suffix]
   summary: Commit methods must have the correct URI suffix
 permalink: /162/commit-http-uri-suffix
@@ -11,7 +11,7 @@ redirect_from:
 # Commit methods: URI suffix
 
 This rule enforces that `Commit` methods include the `:commit` suffix
-in the REST URI, as mandated in [AIP-162][].
+in the REST URI, as mandated in [AEP-162][].
 
 ## Details
 
@@ -47,11 +47,11 @@ rpc CommitBook(CommitBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0162::commit-http-uri-suffix=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc Commit(CommitBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:save"
@@ -63,5 +63,5 @@ rpc Commit(CommitBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

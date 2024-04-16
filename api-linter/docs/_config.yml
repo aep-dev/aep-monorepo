@@ -2,7 +2,7 @@
 markdown: kramdown
 plugins:
   - jekyll-redirect-from
-url: https://linter.aip.dev
+url: https://linter.aep.dev
 defaults:
   - scope:
       path: ''

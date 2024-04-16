@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 231
+  aep: 231
   name: [core, '0231', request-unknown-fields]
   summary: Batch Get RPCs should not have unexpected fields in the request.
 permalink: /231/request-unknown-fields
@@ -11,18 +11,18 @@ redirect_from:
 # Batch Get methods: Unknown request fields
 
 This rule enforces that all `BatchGet` standard methods do not have unexpected
-fields, as mandated in [AIP-231][].
+fields, as mandated in [AEP-231][].
 
 ## Details
 
 This rule looks at any message matching `BatchGet*Request` and complains if it comes
 across any fields other than:
 
-- `repeated string names` ([AIP-231][])
-- `string parent` ([AIP-231][])
-- `google.protobuf.FieldMask read_mask` ([AIP-157][])
-- `repeated Get*Request requests` ([AIP-231][])
-- `View view` ([AIP-157][])
+- `repeated string names` ([AEP-231][])
+- `string parent` ([AEP-231][])
+- `google.protobuf.FieldMask read_mask` ([AEP-157][])
+- `repeated Get*Request requests` ([AEP-231][])
+- `View view` ([AEP-157][])
 
 ## Examples
 
@@ -63,7 +63,7 @@ message BatchGetBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchGetBooksRequest {
@@ -77,7 +77,7 @@ message BatchGetBooksRequest {
   ];
 
   // (-- api-linter: core::0231::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 3;
 }
 ```
@@ -85,6 +85,6 @@ message BatchGetBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-157]: https://aip.dev/157
-[aip-231]: https://aip.dev/231
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-157]: https://aep.dev/157
+[aep-231]: https://aep.dev/231
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

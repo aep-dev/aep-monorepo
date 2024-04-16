@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 165
+  aep: 165
   name: [core, '0165', request-parent-reference]
   summary: |
     Purge requests should annotate the `parent` field with `google.api.resource_reference`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Purge` requests have
 `google.api.resource_reference` on their `string parent` field, as mandated in
-[AIP-165][].
+[AEP-165][].
 
 ## Details
 
@@ -55,12 +55,12 @@ message PurgeBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message PurgeBooksRequest {
   // (-- api-linter: core::0165::request-parent-reference=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string parent = 1 [(google.api.field_behavior) = REQUIRED];
 
   string filter = 2 [(google.api.field_behavior) = REQUIRED];
@@ -72,5 +72,5 @@ message PurgeBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-165]: https://aip.dev/165
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-165]: https://aep.dev/165
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

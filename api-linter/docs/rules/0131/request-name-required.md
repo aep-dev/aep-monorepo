@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 131
+  aep: 131
   name: [core, '0131', request-name-required]
   summary: Get RPCs must have a `name` field in the request.
 permalink: /131/request-name-required
@@ -11,7 +11,7 @@ redirect_from:
 # Get methods: Name field
 
 This rule enforces that all `Get` standard methods have a `string name` field
-in the request message, as mandated in [AIP-131][].
+in the request message, as mandated in [AEP-131][].
 
 ## Details
 
@@ -47,11 +47,11 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0131::request-name-required=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
+//     aep.dev/not-precedent: This is named "book" for historical reasons. --)
 message GetBookRequest {
   string book = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -63,5 +63,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-131]: https://aep.dev/131
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

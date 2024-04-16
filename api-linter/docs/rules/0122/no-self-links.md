@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', no-self-links]
   summary: Resources should not contain self-links.
 permalink: /122/no-self-links
@@ -11,7 +11,7 @@ redirect_from:
 # No self links
 
 This rule enforces that resource messages do not contain any fields called
-`string self_link`, as mandated in [AIP-122][].
+`string self_link`, as mandated in [AEP-122][].
 
 ## Details
 
@@ -52,7 +52,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // Incorrect.
@@ -64,7 +64,7 @@ message Book {
   string name = 1;
 
   // (-- api-linter: core::0122::no-self-links=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string self_link = 2;
 }
 ```
@@ -72,5 +72,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: https://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: https://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

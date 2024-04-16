@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 164
+  aep: 164
   name: [core, '0164', request-message-name]
   summary: Undelete methods must have standardized request message names.
 permalink: /164/request-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Undelete methods: Request message
 
 This rule enforces that all `Undelete` RPCs have a request message name of
-`Undelete*Request`, as mandated in [AIP-164][].
+`Undelete*Request`, as mandated in [AEP-164][].
 
 ## Details
 
@@ -49,11 +49,11 @@ rpc UndeleteBook(UndeleteBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0164::request-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UndeleteBook(Book) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:undelete"
@@ -65,5 +65,5 @@ rpc UndeleteBook(Book) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-164]: https://aip.dev/164
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-164]: https://aep.dev/164
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

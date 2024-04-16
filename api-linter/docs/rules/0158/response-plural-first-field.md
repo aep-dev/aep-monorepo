@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 158
+  aep: 158
   name: [core, '0158', response-plural-first-field]
   summary: First field of Paginated RPCs' response should be plural.
 permalink: /158/response-plural-first-field
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that all `List` and `Search` methods have a plural name
 repeatable field as a first field in the response message, as mandated in
-[AIP-158][].
+[AEP-158][].
 
 ## Details
 
@@ -46,12 +46,12 @@ message ListBooksResponse {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message or
-above the field. Remember to also include an [aip.dev/not-precedent][] comment
+above the field. Remember to also include an [aep.dev/not-precedent][] comment
 explaining why.
 
 ```proto
 // (-- api-linter: core::0158::response-plural-first-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksResponse {
   repeated Book book = 1;
   string next_page_token = 2;
@@ -61,5 +61,5 @@ message ListBooksResponse {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-158]: https://aip.dev/158
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-158]: https://aep.dev/158
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

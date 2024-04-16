@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 233
+  aep: 233
   name: [core, '0233', request-requests-behavior]
   summary: |
     Batch Create requests should annotate the `requests` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchCreate` requests have
 `google.api.field_behavior` set to `REQUIRED` on their `requests` field, as
-mandated in [AIP-233][].
+mandated in [AEP-233][].
 
 ## Details
 
@@ -55,7 +55,7 @@ message BatchCreateBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchCreateBooksRequest {
@@ -64,7 +64,7 @@ message BatchCreateBooksRequest {
   ];
 
   // (-- api-linter: core::0233::request-requests-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   repeated CreateBookRequest requests = 2;
 }
 ```
@@ -72,5 +72,5 @@ message BatchCreateBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-233]: https://aip.dev/233
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-233]: https://aep.dev/233
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

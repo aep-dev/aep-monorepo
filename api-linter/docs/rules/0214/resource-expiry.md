@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 214
+  aep: 214
   name: [core, '0214', resource-expiry]
   summary: Resources with user-set expiry times should offer a ttl field.
 permalink: /214/resource-expiry
@@ -11,7 +11,7 @@ redirect_from:
 # Resource expiry
 
 This rule enforces that resources that have an expire time that can be set by
-users also have an input-only `ttl` field, as recommended in [AIP-214][].
+users also have an input-only `ttl` field, as recommended in [AEP-214][].
 
 ## Details
 
@@ -58,13 +58,13 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the enum.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   string name = 1;
   // (-- api-linter: core::0214::resource-expiry=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   google.protobuf.Timestamp expire_time = 2
     [(google.api.field_behavior) = OUTPUT_ONLY];
 }
@@ -73,5 +73,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-214]: https://aip.dev/214
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-214]: https://aep.dev/214
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

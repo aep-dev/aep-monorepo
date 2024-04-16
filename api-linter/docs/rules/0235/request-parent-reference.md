@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 235
+  aep: 235
   name: [core, '0235', request-parent-reference]
   summary: |
     Batch Delete requests should annotate the `parent` field with `google.api.resource_reference`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchDelete` requests have
 `google.api.resource_reference` on their `string parent` field, as mandated in
-[AIP-235][].
+[AEP-235][].
 
 ## Details
 
@@ -56,12 +56,12 @@ message BatchDeleteBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchDeleteBooksRequest {
   // (-- api-linter: core::0235::request-parent-reference=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string parent = 1;
 
   repeated string names = 2 [
@@ -74,5 +74,5 @@ message BatchDeleteBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-235]: https://aip.dev/235
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-235]: https://aep.dev/235
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

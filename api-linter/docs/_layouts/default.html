@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: 'en-US' }}" class="glue-flexbox">
   <head>
-    <title>{% if page.aip %}AIP-{{ page.aip.id }}: {% endif %}{{ page.title }}</title>
+    <title>{% if page.aep %}AEP-{{ page.aep.id }}: {% endif %}{{ page.title }}</title>
     <base href="{{ site.url }}/">
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -119,7 +119,7 @@
         <div class="glue-header__cta">
           <ul class="glue-header__cta-list">
             <li class="glue-header__cta-li glue-header__cta-li--secondary">
-              <a href="https://aip.dev" class="glue-header__cta-li-link
+              <a href="https://aep.dev" class="glue-header__cta-li-link
                   glue-header__cta-li-link--secondary " tabindex="0">
                     API Improvement Proposals
               </a>
@@ -193,7 +193,7 @@
             <ul>
                 {%- if page.rule %}
                 <li>
-                  <a href="https://github.com/googleapis/api-linter/blob/main/rules/aip{{ page.rule.name[1] }}/{{ page.rule.name[2] | replace: '-', '_' }}.go">
+                  <a href="https://github.com/googleapis/api-linter/blob/main/rules/aep{{ page.rule.name[1] }}/{{ page.rule.name[2] | replace: '-', '_' }}.go">
                     View implementation
                   </a>
                 </li>

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aep: 133
   name: [core, '0133', request-resource-behavior]
   summary: |
     Create RPCs should annotate the resource field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Create` standard methods have
 `google.api.field_behavior` set to `REQUIRED` on the field representing the
-resource, as mandated in [AIP-133][].
+resource, as mandated in [AEP-133][].
 
 ## Details
 
@@ -52,7 +52,7 @@ message CreateBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message CreateBooksRequest {
@@ -62,7 +62,7 @@ message CreateBooksRequest {
   ];
 
   // (-- api-linter: core::0133::request-resource-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   Book book = 2;
 }
 ```
@@ -70,5 +70,5 @@ message CreateBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-133]: https://aep.dev/133
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

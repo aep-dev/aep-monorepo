@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 4232
+  aep: 4232
   name: [client-libraries, '4232', repeated-fields]
   summary: Method Signatures can only have repeated fields in the last element.
 permalink: /4232/repeated-fields
@@ -10,7 +10,7 @@ permalink: /4232/repeated-fields
 
 This rule enforces that all `google.api.method_signature` annotations do not
 have `repeated` fields in any position other than the last field of a signature,
-as mandated in [AIP-4232][].
+as mandated in [AEP-4232][].
 
 ## Details
 
@@ -49,11 +49,11 @@ rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: client-libraries::4232::repeated-fields=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchDelete"
@@ -66,5 +66,5 @@ rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-4232]: https://aip.dev/4232
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-4232]: https://aep.dev/4232
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

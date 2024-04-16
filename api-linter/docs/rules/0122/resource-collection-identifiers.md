@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', resource-collection-identifiers]
   summary: Resource patterns must use lowerCamelCase for collection identifiers.
 permalink: /122/resource-collection-identifiers
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that messages that have a `google.api.resource` annotation
 have properly formatted collection identifiers in each `pattern`, as described
-in [AIP-122][].
+in [AEP-122][].
 
 ## Details
 
@@ -67,7 +67,7 @@ If you need to violate this rule, use a leading comment above the message.
 
 ```proto
 // (-- api-linter: core::0122::resource-collection-identifiers=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -80,5 +80,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: http://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: http://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

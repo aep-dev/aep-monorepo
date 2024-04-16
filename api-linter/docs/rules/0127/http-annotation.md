@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 127
+  aep: 127
   name: [core, '0127', http-annotation]
   summary: HTTP annotations must be present on non-streaming methods.
 permalink: /127/http-annotation
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that the HTTP annotation is present on all
 non-bidi-streaming methods and absent on streaming methods, as mandated in
-[AIP-127](http://aip.dev/127).
+[AEP-127](http://aep.dev/127).
 
 ## Details
 
@@ -69,16 +69,16 @@ rpc EditBook(stream EditBookRequest) returns (stream EditBookResponse);
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0127::http-annotation=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book);
 ```
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-127]: https://aip.dev/127
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-127]: https://aep.dev/127
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 233
+  aep: 233
   name: [core, '0233', http-uri-suffix]
   summary: Batch Create methods must have the correct URI suffix
 permalink: /233/http-uri-suffix
@@ -11,7 +11,7 @@ redirect_from:
 # Batch Create methods: URI suffix
 
 This rule enforces that `BatchCreate` methods include the `:batchCreate` suffix
-in the REST URI, as mandated in [AIP-233][].
+in the REST URI, as mandated in [AEP-233][].
 
 ## Details
 
@@ -47,11 +47,11 @@ rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse)
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0233::http-uri-suffix=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batch" // Should end with `:batchCreate`.
@@ -63,5 +63,5 @@ rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse)
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-233]: https://aip.dev/233
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-233]: https://aep.dev/233
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

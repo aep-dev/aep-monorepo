@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 148
+  aep: 148
   name: [core, '0148', human-names]
   summary: Avoid imprecise terms for human names.
 permalink: /148/human-names
@@ -11,7 +11,7 @@ redirect_from:
 # Human names
 
 This rule encourages terms for human names (`given_name` and `family_name`)
-that are more accurate across cultures, as mandated in [AIP-148][].
+that are more accurate across cultures, as mandated in [AEP-148][].
 
 ## Details
 
@@ -44,12 +44,12 @@ message Human {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field or its
-enclosing message. Remember to also include an [aip.dev/not-precedent][]
+enclosing message. Remember to also include an [aep.dev/not-precedent][]
 comment explaining why.
 
 ```proto
 // (-- api-linter: core::0148::human-names=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Human {
   string first_name = 1;
   string last_name = 2;
@@ -59,5 +59,5 @@ message Human {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-148]: https://aip.dev/148
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-148]: https://aep.dev/148
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

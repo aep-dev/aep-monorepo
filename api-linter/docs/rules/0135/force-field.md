@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', force-field]
   summary: Delete RPCs for resources with child collections should have a `force` field in the request.
 permalink: /135/force-field
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that the standard `Delete` method for a resource that parents
 other resources in the service have a `bool force` field in the request message,
-as mandated in [AIP-135][].
+as mandated in [AEP-135][].
 
 ## Details
 
@@ -54,11 +54,11 @@ message DeletePublisherRequest {
 
 If you need to violate this rule, use a leading comment above the message (if
 the `name` field is missing) or above the field (if it is the wrong type).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0135::force-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message DeletePublisherRequest {
   // Where Publisher parents the Book resource.
   string name = 1 [
@@ -69,5 +69,5 @@ message DeletePublisherRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135#cascading-delete
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135#cascading-delete
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

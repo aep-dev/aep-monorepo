@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 121
+  aep: 121
   name: [core, '0121', resource-must-support-list]
   summary: All resources must have a Standard List method.
 permalink: /121/resource-must-support-list
@@ -11,7 +11,7 @@ redirect_from:
 # Resource must support list
 
 This rule enforces that all, non-Singleton resources support the List operation
-as mandated in [AIP-121][].
+as mandated in [AEP-121][].
 
 ## Details
 
@@ -57,11 +57,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the service.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0121::resource-must-support-list=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 service Foo {
   // Book has a create, but no List method.
   rpc CreateBook(CreateBookRequest) returns (Book) {};
@@ -78,5 +78,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-121]: https://aip.dev/121
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-121]: https://aep.dev/121
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

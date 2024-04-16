@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 148
+  aep: 148
   name: [core, '0148',field-behavior]
   summary: Standard resource fields should have the correct field behavior.
 permalink: /148/field-behavior
@@ -11,7 +11,7 @@ redirect_from:
 # Standard resource fields: Field behavior
 
 This rule enforces that all standard resource fields have the correct
-`google.api.field_behavior`, as mandated in [AIP-148][].
+`google.api.field_behavior`, as mandated in [AEP-148][].
 
 ## Details
 
@@ -77,7 +77,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -89,19 +89,19 @@ message Book {
   string name = 1;
 
   // (-- api-linter: core::0148::field-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   google.protobuf.Timestamp create_time = 2;
 
   // (-- api-linter: core::0148::field-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   google.protobuf.Timestamp update_time = 3;
 
   // (-- api-linter: core::0148::field-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   google.protobuf.Timestamp delete_time = 4;
 
   // (-- api-linter: core::0148::field-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string uid = 5;
 }
 ```
@@ -109,5 +109,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-148]: https://aip.dev/148
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-148]: https://aep.dev/148
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

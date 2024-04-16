@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 156
+  aep: 156
   name: [core, '0156', forbidden-methods]
   summary: Singletons must not define Create, or Delete methods.
 permalink: /156/forbidden-methods
@@ -11,7 +11,7 @@ redirect_from:
 # Singletons: Forbidden methods
 
 This rule enforces that singleton resources do not define `Create`, or `Delete`
-methods, as mandated in [AIP-156][].
+methods, as mandated in [AEP-156][].
 
 ## Details
 
@@ -77,7 +77,7 @@ rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 rpc GetSettings(GetSettingsRequest) returns (Settings) {
@@ -94,7 +94,7 @@ rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
 }
 
 // (-- api-linter: core::0156::forbidden-methods=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/settings}"
@@ -103,7 +103,7 @@ rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
 }
 
 // (-- api-linter: core::0156::forbidden-methods=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteSettings(DeleteSettingsRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
     delete: "/v1/{name=publishers/*/settings}"
@@ -114,5 +114,5 @@ rpc DeleteSettings(DeleteSettingsRequest) returns (google.protobuf.Empty) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-156]: https://aip.dev/156
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-156]: https://aep.dev/156
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

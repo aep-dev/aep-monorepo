@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 191
+  aep: 191
   name: [core, '0191', filenames]
   summary: Proto files must use reasonable filenames.
 permalink: /191/filenames
@@ -11,7 +11,7 @@ redirect_from:
 # Filenames
 
 This rule attempts to enforce reasonable filenames for proto files, as mandated
-in [AIP-191][].
+in [AEP-191][].
 
 ## Details
 
@@ -43,13 +43,13 @@ This rule currently complains if the filename:
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0191::filenames=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 ```
 
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

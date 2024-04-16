@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 234
+  aep: 234
   name: [core, '0234', request-unknown-fields]
   summary: Batch Update RPCs should not have unexpected fields in the request.
 permalink: /234/request-unknown-fields
@@ -11,19 +11,19 @@ redirect_from:
 # Batch Update methods: Unknown request fields
 
 This rule enforces that all `BatchUpdate` standard methods do not have unexpected
-fields, as mandated in [AIP-234][].
+fields, as mandated in [AEP-234][].
 
 ## Details
 
 This rule looks at any message matching `BatchUpdate*Request` and complains if it comes
 across any fields other than:
 
-- `bool allow_missing` ([AIP-134][])
-- `string parent` ([AIP-234][])
-- `string request_id` ([AIP-155][])
-- `repeated Update*Request requests` ([AIP-234][])
-- `google.protobuf.FieldMask update_mask` ([AIP-134][])
-- `bool validate_only` ([AIP-163][])
+- `bool allow_missing` ([AEP-134][])
+- `string parent` ([AEP-234][])
+- `string request_id` ([AEP-155][])
+- `repeated Update*Request requests` ([AEP-234][])
+- `google.protobuf.FieldMask update_mask` ([AEP-134][])
+- `bool validate_only` ([AEP-163][])
 
 ## Examples
 
@@ -62,7 +62,7 @@ message BatchUpdateBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchUpdateBooksRequest {
@@ -75,7 +75,7 @@ message BatchUpdateBooksRequest {
   ];
 
   // (-- api-linter: core::0234::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 3;
 }
 ```
@@ -83,8 +83,8 @@ message BatchUpdateBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-134]: https://aip.dev/134
-[aip-155]: https://aip.dev/155
-[aip-163]: https://aip.dev/163
-[aip-234]: https://aip.dev/234
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-134]: https://aep.dev/134
+[aep-155]: https://aep.dev/155
+[aep-163]: https://aep.dev/163
+[aep-234]: https://aep.dev/234
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

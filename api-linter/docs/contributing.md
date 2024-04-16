@@ -33,9 +33,9 @@ fork instead).
 
 One of the best ways to contribute is by writing a new lint rule. Rules are
 located in the `rules/` directory. Rules are grouped into packages based on the
-[AIP][] that mandates the behavior.
+[AEP][] that mandates the behavior.
 
-**Important:** **All** linter rules **must** have a corresponding AIP that
+**Important:** **All** linter rules **must** have a corresponding AEP that
 mandates the behavior. There are no exceptions to this.
 
 Additionally, we observe the following guidelines around rules:
@@ -46,9 +46,9 @@ Additionally, we observe the following guidelines around rules:
   - The rule must have a corresponding test (or tests). Each rule package
     **must** maintain 100% coverage of statements.
 - All rules **must** have a three part name. The first part is the "rule group"
-  (such as `core`), the second part is the AIP number, zero-padded, and the
+  (such as `core`), the second part is the AEP number, zero-padded, and the
   third part is a unique name for the rule. The name only has to be unique
-  within the scope of the AIP.
+  within the scope of the AEP.
   - If word separation is needed, `kebab-case` **must** be used.
 - Every rule **must** have corresponding documentation. Documentation lives in
   the `docs/` directory, and powers this documentation site using GitHub Pages.
@@ -84,9 +84,9 @@ is defined in [`rules.go`][].
 
 There are two steps:
 
-1. In the registry in `rules.go`, ensure that the corresponding AIP package is
+1. In the registry in `rules.go`, ensure that the corresponding AEP package is
    imported, and that its `AddRules` function is called.
-2. In the AIP package, ensure that the new rule is included in the `AddRules`
+2. In the AEP package, ensure that the new rule is included in the `AddRules`
    function.
 
 We have a CI lint to remind you to do so.
@@ -96,9 +96,9 @@ We have a CI lint to remind you to do so.
 Rule documentation is the primary purpose of this site, and it is important
 that all rules are documented. This documentation is written in Markdown, and
 goes in the `docs/rules/` directory. The naming convention is
-`{aip}-{rule_name}.md`:
+`{aep}-{rule_name}.md`:
 
-- `{aip}` is the _four-digit_ AIP number (zero-padded if needed!)
+- `{aep}` is the _four-digit_ AEP number (zero-padded if needed!)
 - `{rule_name}` is the final component of the rule name in the rule itself.
 
 The actual Markdown document is fairly boilerplate, and copy and paste from
@@ -109,11 +109,11 @@ Pages. The format is:
 
     ---
     rule:
-      aip: 0
+      aep: 0
       name: [core, '0000', my-rule]
     ---
 
-- The AIP number **must** be included as an integer, and **must** be set as a
+- The AEP number **must** be included as an integer, and **must** be set as a
   string in the `name` array (quotes are required to keep the YAML parser from
   interpreting it as an integer and dropping leading zeroes).
 - The `name` field **must** be the name of the rule (as passed to
@@ -151,7 +151,7 @@ git commit --allow-empty -m 'fix: new patch release'
 ```
 
 <!-- prettier-ignore-start -->
-[aip]: https://aip.dev/
+[aep]: https://aep.dev/
 [go]: https://golang.org/
 [`go.mod`]: https://github.com/googleapis/api-linter/blob/main/go.mod
 [`problem`]: https://godoc.org/github.com/googleapis/api-linter/lint#Problem

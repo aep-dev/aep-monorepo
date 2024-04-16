@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 127
+  aep: 127
   name: [core, '0127', uri-leading-slash]
   summary: URIs should always begin with a leading slash.
 permalink: /127/uri-leading-slash
@@ -11,7 +11,7 @@ redirect_from:
 # URI Forward Slashes
 
 This rule enforces that URIs must begin with a forward slash, as mandated in
-[AIP-127][].
+[AEP-127][].
 
 ## Details
 
@@ -47,4 +47,4 @@ rpc GetBook(GetBookRequest) returns (Book) {
 
 Do not violate this rule. This would create an invalid URL.
 
-[aip-127]: https://aip.dev/127
+[aep-127]: https://aep.dev/127

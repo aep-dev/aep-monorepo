@@ -1,5 +1,5 @@
 ---
-aip_listing: 126
+aep_listing: 126
 permalink: /126/
 redirect_from:
   - /0126/
@@ -7,4 +7,4 @@ redirect_from:
 
 # Enumerations
 
-{% include linter-aip-listing.md aip=126 %}
+{% include linter-aep-listing.md aep=126 %}

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 148
+  aep: 148
   name: [core, '0148', ip-address-format]
   summary: Annotate IP address fields with an IP address format.
 permalink: /148/ip-address-format
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule encourages the use of one of the IP Address format annotations,
 `IPV4`, `IPV6`, or `IPV4_OR_IPV6`, on the `ip_address` field or a field ending
-with `_ip_address`, as mandated in [AIP-148][].
+with `_ip_address`, as mandated in [AEP-148][].
 
 ## Details
 
@@ -56,7 +56,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field or its
-enclosing message. Remember to also include an [aip.dev/not-precedent][]
+enclosing message. Remember to also include an [aep.dev/not-precedent][]
 comment explaining why.
 
 ```proto
@@ -69,7 +69,7 @@ message Book {
   string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // (-- api-linter: core::0148::ip-address-format=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string ip_address = 2;
 }
 ```
@@ -77,5 +77,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-148]: https://aip.dev/148
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-148]: https://aep.dev/148
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

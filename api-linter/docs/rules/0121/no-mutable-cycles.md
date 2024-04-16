@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 121
+  aep: 121
   name: [core, '0121', no-mutable-cycles]
   summary: Resources must not form a resource reference cycle.
 permalink: /121/no-mutable-cycles
@@ -11,7 +11,7 @@ redirect_from:
 # Resources must not form a resource reference cycle
 
 This rule enforces that resources do not create reference cycles of mutable 
-references as mandated in [AIP-121][].
+references as mandated in [AEP-121][].
 
 ## Details
 
@@ -88,7 +88,7 @@ message Author {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the service.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -100,7 +100,7 @@ message Book {
   string name = 1;
 
   // (-- api-linter: core::0121::no-mutable-cycles=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string author = 2 [
     (google.api.resource_reference).type = "library.googleapis.com/Author"
   ];
@@ -115,7 +115,7 @@ message Author {
   string name = 1;
 
   // (-- api-linter: core::0121::no-mutable-cycles=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string book = 2 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -125,5 +125,5 @@ message Author {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-121]: https://aip.dev/121
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-121]: https://aep.dev/121
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

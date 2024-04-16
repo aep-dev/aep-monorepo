@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 123
+  aep: 123
   name: [core, '0123', resource-plural]
   summary: Resource plural is required
 permalink: /123/resource-plural
@@ -11,7 +11,7 @@ redirect_from:
 # Resource type name
 
 This rule enforces that messages that have a `google.api.resource` annotation,
-have a properly formatted `plural`, as described in [AIP-123][].
+have a properly formatted `plural`, as described in [AEP-123][].
 
 ## Details
 
@@ -56,7 +56,7 @@ If you need to violate this rule, use a leading comment above the message.
 
 ```proto
 // (-- api-linter: core::0123::resource-plural=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Genre/Mystery/Book"
@@ -70,5 +70,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-123]: http://aip.dev/123
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-123]: http://aep.dev/123
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

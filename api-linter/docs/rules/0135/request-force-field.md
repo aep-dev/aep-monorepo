@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', request-force-field]
   summary: Delete request `force` fields must have type `bool`.
 permalink: /135/request-force-field
@@ -11,7 +11,7 @@ redirect_from:
 # Delete requests: force field
 
 This rule enforces that all `Delete` request `force` fields have type `bool`, as
-mandated in [AIP-135][].
+mandated in [AEP-135][].
 
 ## Details
 
@@ -49,7 +49,7 @@ message DeletePublisherRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeletePublisherRequest {
@@ -59,7 +59,7 @@ message DeletePublisherRequest {
   ];
 
   // (-- api-linter: core::0135::request-force-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   int32 force = 2;
 }
 ```
@@ -67,5 +67,5 @@ message DeletePublisherRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

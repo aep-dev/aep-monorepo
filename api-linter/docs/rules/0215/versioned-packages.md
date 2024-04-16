@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 215
+  aep: 215
   name: [core, '0215', versioned-packages]
   summary: API-specific protos should be in versioned packages.
 permalink: /215/versioned-packages
@@ -11,7 +11,7 @@ redirect_from:
 # Versioned packages
 
 This rule enforces that API-specific protos use versioned packages, as mandated
-in [AIP-215][].
+in [AEP-215][].
 
 ## Details
 
@@ -50,13 +50,13 @@ This rule **should** be disabled in this situation.
 ## Disabling
 
 If you need to violate this rule, place the comment above the package statement.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0215::versioned-packages=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 package foo.bar;
 ```
 
-[aip-215]: https://aip.dev/215
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-215]: https://aep.dev/215
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

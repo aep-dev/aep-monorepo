@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 233
+  aep: 233
   name: [core, '0233', request-parent-reference]
   summary: |
     Batch Create requests should annotate the `parent` field with `google.api.resource_reference`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchCreate` requests have
 `google.api.resource_reference` on their `string parent` field, as mandated in
-[AIP-233][].
+[AEP-233][].
 
 ## Details
 
@@ -50,12 +50,12 @@ message BatchCreateBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchCreateBooksRequest {
   // (-- api-linter: core::0233::request-parent-reference=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string parent = 1;
 
   repeated CreateBookRequest requests = 2;
@@ -65,5 +65,5 @@ message BatchCreateBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-233]: https://aip.dev/233
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-233]: https://aep.dev/233
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

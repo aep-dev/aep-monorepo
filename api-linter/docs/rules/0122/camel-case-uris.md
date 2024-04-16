@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', camel-case-uris]
   summary: All resource names must use camel case in collection identifiers.
 permalink: /122/camel-case-uris
@@ -11,7 +11,7 @@ redirect_from:
 # HTTP URI case
 
 This rule enforces that the HTTP URI pattern only uses camel case for word
-separation, as mandated in [AIP-122][].
+separation, as mandated in [AEP-122][].
 
 ## Details
 
@@ -46,11 +46,11 @@ rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0122::camel-case-uris=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
     // Should be "electronicBooks", not "electronic_books".
@@ -62,5 +62,5 @@ rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: https://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: https://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 123
+  aep: 123
   name: [core, '0123', resource-reference-type]
   summary: Resource reference annotations should only apply to strings.
 permalink: /123/resource-reference-type
@@ -11,7 +11,7 @@ redirect_from:
 # Resource annotation presence
 
 This rule enforces that any field with a `google.api.resource_reference`
-annotation has a `string` type, as described in [AIP-123][].
+annotation has a `string` type, as described in [AEP-123][].
 
 ## Details
 
@@ -65,4 +65,4 @@ message Book {
 
 Do not violate this rule; it will break several tools.
 
-[aip-123]: https://aip.dev/123
+[aep-123]: https://aep.dev/123

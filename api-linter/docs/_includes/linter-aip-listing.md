@@ -1,12 +1,12 @@
-{% comment %} When this file is included, it _must_ be sent an `aip` value.
+{% comment %} When this file is included, it _must_ be sent an `aep` value.
 This determines which rules are rendered.{% endcomment -%}
 
-Rules for [AIP-{{include.aip}}](), covering
+Rules for [AEP-{{include.aep}}](), covering
 {{ page.prose_title | default: page.title | downcase }}.
 
 <!-- prettier-ignore -->
-<div class="aip-rule-listing">
-  {% assign rule_pages = site.pages | where_exp: "p", "p.rule != nil" | where_exp: "p", "p.rule.aip == include.aip" | sort: "rule.name" -%}
+<div class="aep-rule-listing">
+  {% assign rule_pages = site.pages | where_exp: "p", "p.rule != nil" | where_exp: "p", "p.rule.aep == include.aep" | sort: "rule.name" -%}
   <table class="glue-table--datatable glue-table--stacked api-linter-rule-listing" style="width: 100%;">
     <tr>
       <th>Rule name</th>
@@ -25,8 +25,8 @@ Rules for [AIP-{{include.aip}}](), covering
   </table>
 </div>
 
-**Note:** Because AIPs sometimes cover topics that have some overlap, some
+**Note:** Because AEPs sometimes cover topics that have some overlap, some
 rules related to {{ page.prose_title | default: page.title | downcase }} may be
-included in the rules for other AIPs.
+included in the rules for other AEPs.
 
-[aip-{{include.aip}}]: https://aip.dev/{{ includes.aip }}
+[aep-{{include.aep}}]: https://aep.dev/{{ includes.aep }}

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 231
+  aep: 231
   name: [core, '0231', response-resource-field]
   summary:
     Batch Get RPCs must have a repeated field for the resource in the response.
@@ -12,7 +12,7 @@ redirect_from:
 # Batch Get methods: Resource field
 
 This rule enforces that all `BatchGet` methods have a repeated field in the
-response message for the resource itself, as mandated in [AIP-231][].
+response message for the resource itself, as mandated in [AEP-231][].
 
 ## Details
 
@@ -50,11 +50,11 @@ message BatchGetBooksResponse {
 
 If you need to violate this rule, use a leading comment above the message (if
 the resource field is missing) or above the field (if it is improperly named).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0231::response-resource-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message BatchGetBooksResponse {
   Book books = 1;
 }
@@ -63,5 +63,5 @@ message BatchGetBooksResponse {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-231]: https://aip.dev/231
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-231]: https://aep.dev/231
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

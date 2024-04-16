@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 191
+  aep: 191
   name: [core, '0191', file-option-consistency]
   summary: All proto files must set file packaging options consistently.
 permalink: /191/file-option-consistency
@@ -11,7 +11,7 @@ redirect_from:
 # File option consistency
 
 This rule enforces that every proto file for a public API surface sets file
-packaging options consistently, as mandated in [AIP-191][].
+packaging options consistently, as mandated in [AEP-191][].
 
 ## Details
 
@@ -93,11 +93,11 @@ option ruby_namespace = "Google::Example::V1";
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0191::file-option-consistency=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
 package google.example.v1;
@@ -107,5 +107,5 @@ import "foo.proto";
 option csharp_namespace = "Example\\V1";
 ```
 
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

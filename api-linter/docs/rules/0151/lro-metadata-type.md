@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 151
+  aep: 151
   name: [core, '0151', lro-metadata-type]
   summary: LRO methods must have a metadata type.
 permalink: /151/lro-metadata-type
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that methods returning long-running operations specify a
 metadata type in the `google.longrunning.operation_info` annotation, as
-mandated in [AIP-151][].
+mandated in [AEP-151][].
 
 ## Details
 
@@ -75,11 +75,11 @@ rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0151::lro-metadata-type=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books}:write"
@@ -95,5 +95,5 @@ rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-151]: https://aip.dev/151
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-151]: https://aep.dev/151
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

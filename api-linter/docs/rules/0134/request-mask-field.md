@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 134
+  aep: 134
   name: [core, '0134', request-mask-field]
   summary: Update RPCs must have a field mask in the request.
 permalink: /134/request-mask-field
@@ -11,7 +11,7 @@ redirect_from:
 # Update methods: Mask field
 
 This rule enforces that all `Update` standard methods have a field in the
-request message for the field mask, as mandated in [AIP-134][].
+request message for the field mask, as mandated in [AEP-134][].
 
 ## Details
 
@@ -45,13 +45,13 @@ message UpdateBookRequest {
 
 If you need to violate this rule, use a leading comment above the message (if
 the resource field is missing) or above the field (if it is improperly named).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message UpdateBookRequest {
   Book book = 1;
   // (-- api-linter: core::0134::request-mask-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string update_mask = 2;
 }
 ```
@@ -59,5 +59,5 @@ message UpdateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-134]: https://aip.dev/134
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-134]: https://aep.dev/134
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

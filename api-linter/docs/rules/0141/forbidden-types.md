@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 141
+  aep: 141
   name: [core, '0141', forbidden-types]
   summary: Fields should avoid unsigned integer types.
 permalink: /141/forbidden-types
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that fields do not use unsigned integer types (because many
 programming languages and systems do not support them well), as mandated in
-[AIP-141][].
+[AEP-141][].
 
 ## Details
 
@@ -50,13 +50,13 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   string name = 1;
   // (-- api-linter: core::0141::forbidden-types=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   uint32 page_count = 2;
 }
 ```
@@ -64,5 +64,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-141]: https://aip.dev/141
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-141]: https://aep.dev/141
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

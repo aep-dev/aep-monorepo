@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 234
+  aep: 234
   name: [core, '0234', response-resource-field]
   summary:
     Batch Update RPCs must have a repeated field for the resource in the response.
@@ -12,7 +12,7 @@ redirect_from:
 # Batch Update methods: Resource field
 
 This rule enforces that all `BatchUpdate` methods have a repeated field in the
-response message for the resource itself, as mandated in [AIP-234][].
+response message for the resource itself, as mandated in [AEP-234][].
 
 ## Details
 
@@ -50,11 +50,11 @@ message BatchUpdateBooksResponse {
 
 If you need to violate this rule, use a leading comment above the message (if
 the resource field is missing) or above the field (if it is improperly named).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0234::response-resource-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message BatchUpdateBooksResponse {
   // `repeated Book books` is missing.
 }
@@ -63,5 +63,5 @@ message BatchUpdateBooksResponse {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-234]: https://aip.dev/234
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-234]: https://aep.dev/234
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

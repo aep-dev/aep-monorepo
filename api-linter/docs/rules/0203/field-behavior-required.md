@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 203
+  aep: 203
   name: [core, '0203', field-behavior-required]
   summary: |
     Field behavior is required, and must have one of OUTPUT_ONLY, REQUIRED, or
@@ -14,7 +14,7 @@ redirect_from:
 
 This rule enforces that each field in a message used in a request has a
 `google.api.field_behavior` annotation with valid values, as mandated by
-[AIP-203][].
+[AEP-203][].
 
 ## Details
 
@@ -55,7 +55,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -63,7 +63,7 @@ message Book {
 
   // Required. The title of the book.
   // (-- api-linter: core::0203::field-behavior-required=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   optional string title = 2;
 }
 ```
@@ -71,5 +71,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-203]: https://aip.dev/203
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-203]: https://aep.dev/203
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 164
+  aep: 164
   name: [core, '0164', request-unknown-fields]
   summary: Undelete RPCs should not have unexpected fields in the request.
 permalink: /164/request-unknown-fields
@@ -11,17 +11,17 @@ redirect_from:
 # Undelete methods: Unknown fields
 
 This rule enforces that all `Undelete` requests do not have unexpected
-fields, as mandated in [AIP-164][].
+fields, as mandated in [AEP-164][].
 
 ## Details
 
 This rule looks at any message matching `Undelete*Request` and complains if it
 comes across any fields other than:
 
-- `string name` ([AIP-164][])
-- `string etag` ([AIP-154][])
-- `string request_id` ([AIP-155][])
-- `bool validate_only` ([AIP-163][])
+- `string name` ([AEP-164][])
+- `string etag` ([AEP-154][])
+- `string request_id` ([AEP-155][])
+- `bool validate_only` ([AEP-163][])
 
 ## Examples
 
@@ -53,7 +53,7 @@ message UndeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message UndeleteBookRequest {
@@ -63,7 +63,7 @@ message UndeleteBookRequest {
   ];
 
   // (-- api-linter: core::0164::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 2;
 }
 ```
@@ -71,8 +71,8 @@ message UndeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-154]: https://aip.dev/154
-[aip-155]: https://aip.dev/155
-[aip-163]: https://aip.dev/163
-[aip-164]: https://aip.dev/164
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-154]: https://aep.dev/154
+[aep-155]: https://aep.dev/155
+[aep-163]: https://aep.dev/163
+[aep-164]: https://aep.dev/164
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 192
+  aep: 192
   name: [core, '0192', no-markdown-headings]
   summary: Public comments should not include Markdown headings.
 permalink: /192/no-markdown-headings
@@ -11,7 +11,7 @@ redirect_from:
 # No Markdown headings
 
 This rule enforces that public comments for proto descriptors do not have
-Markdown headings (`#`, `##`, etc.), as mandated in [AIP-192][].
+Markdown headings (`#`, `##`, etc.), as mandated in [AEP-192][].
 
 ## Details
 
@@ -46,19 +46,19 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the descriptor.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // # A representation of a book.
 // (-- api-linter: core::0192::no-markdown-headings=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   // # The resource name of the book.
   // (-- api-linter: core::0192::no-markdown-headings=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1;
 }
 ```
 
-[aip-192]: https://aip.dev/192
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-192]: https://aep.dev/192
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 123
+  aep: 123
   name: [core, '0123', resource-definition-pattern]
   summary: Resource annotations should define a pattern.
 permalink: /123/resource-definition-pattern
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that files that define a resource with the
 `google.api.resource_definition` annotation have a `pattern` defined, as
-described in [AIP-123][].
+described in [AEP-123][].
 
 ## Details
 
@@ -75,7 +75,7 @@ If you need to violate this rule, use a comment on the annotation.
 import "google/api/resource.proto";
 
 // (-- api-linter: core::0123::resource-definition-pattern=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 option (google.api.resource_definition) = {
   type: "library.googleapis.com/Book"
 };
@@ -84,5 +84,5 @@ option (google.api.resource_definition) = {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-123]: http://aip.dev/123
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-123]: http://aep.dev/123
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

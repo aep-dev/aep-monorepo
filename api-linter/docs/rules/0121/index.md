@@ -1,5 +1,5 @@
 ---
-aip_listing: 121
+aep_listing: 121
 permalink: /121/
 redirect_from:
   - /0121/
@@ -7,4 +7,4 @@ redirect_from:
 
 # Resource names
 
-{% include linter-aip-listing.md aip=121 %}
+{% include linter-aep-listing.md aep=121 %}

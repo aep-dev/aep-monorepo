@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 140
+  aep: 140
   name: [core, '0140', uri]
   summary: Field names should prefer `uri` to `url`.
 permalink: /140/uri
@@ -11,7 +11,7 @@ redirect_from:
 # Field names: URIs
 
 This rule enforces that field names use `uri` rather than `url`, as mandated in
-[AIP-140][].
+[AEP-140][].
 
 ## Details
 
@@ -41,11 +41,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0140::uri=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string url = 1;
 }
@@ -54,5 +54,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-140]: https://aip.dev/140
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-140]: https://aep.dev/140
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

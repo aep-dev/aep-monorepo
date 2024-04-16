@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 142
+  aep: 142
   name: [core, '0142', time-field-type]
   summary: Timestamps should use `google.protobuf.Timestamp`.
 permalink: /142/time-field-type
@@ -11,7 +11,7 @@ redirect_from:
 # Timestamp field type
 
 This rule enforces that timestamps are represented with
-`google.protobuf.Timestamp`, as mandated in [AIP-142][].
+`google.protobuf.Timestamp`, as mandated in [AEP-142][].
 
 ## Details
 
@@ -44,11 +44,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0142::time-field-type=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
   int32 publish_time_sec = 2;
@@ -58,5 +58,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-142]: https://aip.dev/142
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-142]: https://aep.dev/142
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

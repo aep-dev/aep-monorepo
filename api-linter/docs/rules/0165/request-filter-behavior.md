@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 165
+  aep: 165
   name: [core, '0165', request-filter-behavior]
   summary: |
     Purge requests should annotate the `filter` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Purge` requests have
 `google.api.field_behavior` set to `REQUIRED` on their `string filter` field, as
-mandated in [AIP-165][].
+mandated in [AEP-165][].
 
 ## Details
 
@@ -59,7 +59,7 @@ message PurgeBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message PurgeBooksRequest {
@@ -69,7 +69,7 @@ message PurgeBooksRequest {
   ];
 
   // (-- api-linter: core::0165::request-filter-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string filter = 2;
 
   bool force = 3;
@@ -79,5 +79,5 @@ message PurgeBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-165]: https://aip.dev/165
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-165]: https://aep.dev/165
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

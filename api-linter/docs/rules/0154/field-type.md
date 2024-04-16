@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 154
+  aep: 154
   name: [core, '0154', field-type]
   summary: Etag fields must be strings.
 permalink: /154/field-type
@@ -10,7 +10,7 @@ redirect_from:
 
 # Etag field type
 
-This rule enforces that `etag` fields are strings, as mandated in [AIP-154][].
+This rule enforces that `etag` fields are strings, as mandated in [AEP-154][].
 
 ## Details
 
@@ -46,7 +46,7 @@ message DeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
@@ -54,7 +54,7 @@ message DeleteBookRequest {
     type: "library.googleapis.com/Book"
   }];
   // (-- api-linter: core::0154::field-type=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   bytes etag = 2;
 }
 ```
@@ -62,5 +62,5 @@ message DeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-154]: https://aip.dev/154
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-154]: https://aep.dev/154
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

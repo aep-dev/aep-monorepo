@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 123
+  aep: 123
   name: [core, '0123', name-never-optional]
   summary: Resource name fields must never be labeled with proto3_optional.
 permalink: /123/name-never-optional
@@ -56,7 +56,7 @@ If you need to violate this rule, use a leading comment above the message.
 
 ```proto
 // (-- api-linter: core::0123::name-never-optional=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -70,4 +70,4 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

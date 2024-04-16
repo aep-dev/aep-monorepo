@@ -23,7 +23,7 @@ message GetBookRequest {
 
 When able, it also offers a suggestion for the correct fix.
 
-**Note:** Not every piece of AIP guidance is able to be expressed as lint rules
+**Note:** Not every piece of AEP guidance is able to be expressed as lint rules
 (and some things that are able to be expressed may not be written yet). The
 linter should be used as a useful tool, but not as a substitute for reading and
 understanding API guidance.
@@ -65,7 +65,7 @@ Usage of api-linter:
       --enable-rule stringArray         Enable a rule with the given name.
                                         May be specified multiple times.
       --ignore-comment-disables         If set to true, disable comments will be ignored.
-                                        This is helpful when strict enforcement of AIPs are necessary and
+                                        This is helpful when strict enforcement of AEPs are necessary and
                                         proto definitions should not be able to disable checks.
       --list-rules                      Print the rules and exit.  Honors the output-format flag.
       --output-format string            The format of the linting results.
@@ -85,7 +85,7 @@ Usage of api-linter:
 This software is made available under the [Apache 2.0][] license.
 
 [apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0
-[api improvement proposals]: https://aip.dev/
+[api improvement proposals]: https://aep.dev/
 [configuration]: ./configuration.md
 [protocol buffers]: https://developers.google.com/protocol-buffers
 [rule documentation]: ./rules/index.md

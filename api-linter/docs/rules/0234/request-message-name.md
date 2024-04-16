@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 234
+  aep: 234
   name: [core, '0234', request-message-name]
   summary: Batch Update methods must have standardized request message names.
 permalink: /234/request-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Batch Update methods: Request message
 
 This rule enforces that all `BatchUpdate` RPCs have a request message name of
-`BatchUpdate*Request`, as mandated in [AIP-234][].
+`BatchUpdate*Request`, as mandated in [AEP-234][].
 
 ## Details
 
@@ -49,11 +49,11 @@ rpc BatchUpdateBooks(BatchUpdateBooksRequest) returns (BatchUpdateBooksResponse)
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0234::request-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchUpdateBooks(UpdateBookRequest) returns (BatchUpdateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchUpdate"
@@ -65,5 +65,5 @@ rpc BatchUpdateBooks(UpdateBookRequest) returns (BatchUpdateBooksResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-234]: https://aip.dev/234
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-234]: https://aep.dev/234
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

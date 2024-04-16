@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 235
+  aep: 235
   name: [core, '0235', request-requests-behavior]
   summary: |
     Batch Delete requests should annotate the `requests` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchDelete` requests have
 `google.api.field_behavior` set to `REQUIRED` on their `requests` field, as
-mandated in [AIP-235][].
+mandated in [AEP-235][].
 
 ## Details
 
@@ -55,7 +55,7 @@ message BatchDeleteBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchDeleteBooksRequest {
@@ -64,7 +64,7 @@ message BatchDeleteBooksRequest {
   ];
 
   // (-- api-linter: core::0235::request-requests-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   repeated DeleteBookRequest requests = 2;
 }
 ```
@@ -72,5 +72,5 @@ message BatchDeleteBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-235]: https://aip.dev/235
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-235]: https://aep.dev/235
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 143
+  aep: 143
   name: [core, '0143', string-type]
   summary: Fields representing standardized codes must be strings.
 permalink: /143/string-type
@@ -11,7 +11,7 @@ redirect_from:
 # Standardized code strings
 
 This rule attempts to enforce that standard codes for concepts like language,
-currency, etc. are strings, as mandated in [AIP-143][].
+currency, etc. are strings, as mandated in [AEP-143][].
 
 ## Details
 
@@ -58,11 +58,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0143::string-type=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 enum LanguageCode {
   LANGUAGE_CODE_UNSPECIFIED = 0;
   EN_US = 1;
@@ -78,5 +78,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-143]: https://aip.dev/143
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-143]: https://aep.dev/143
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

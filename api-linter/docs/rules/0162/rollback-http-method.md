@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', rollback-http-method]
   summary: Rollback methods must use the POST HTTP verb.
 permalink: /162/rollback-http-method
@@ -11,7 +11,7 @@ redirect_from:
 # Rollback methods: POST HTTP verb
 
 This rule enforces that all `Rollback` RPCs use the `POST` HTTP verb, as
-mandated in [AIP-162][].
+mandated in [AEP-162][].
 
 ## Details
 
@@ -47,11 +47,11 @@ rpc RollbackBook(RollbackBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0162::rollback-http-method=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc RollbackBook(RollbackBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}:rollback"
@@ -62,5 +62,5 @@ rpc RollbackBook(RollbackBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

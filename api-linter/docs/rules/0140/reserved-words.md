@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 140
+  aep: 140
   name: [core, '0140', reserved-words]
   summary: Field names must not be reserved words.
 permalink: /140/reserved-words
@@ -11,7 +11,7 @@ redirect_from:
 # Field names: Reserved words
 
 This rule enforces that field names are not reserved words, as mandated in
-[AIP-140][].
+[AEP-140][].
 
 ## Details
 
@@ -49,13 +49,13 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   string name = 1;
   // (-- api-linter: core::0140::reserved-words=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   bool public = 2;  // Reserved word in Java, JavaScript
 }
 ```
@@ -64,7 +64,7 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 <!-- prettier-ignore-start -->
-[aip-140]: https://aip.dev/140
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
-[the code]: https://github.com/googleapis/api-linter/blob/main/rules/aip0140/reserved_words.go
+[aep-140]: https://aep.dev/140
+[aep.dev/not-precedent]: https://aep.dev/not-precedent
+[the code]: https://github.com/googleapis/api-linter/blob/main/rules/aep0140/reserved_words.go
 <!-- prettier-ignore-end -->

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', resource-id-output-only]
   summary: Resource ID fields must be classified as `OUTPUT_ONLY`.
 permalink: /122/resource-id-output-only
@@ -11,7 +11,7 @@ redirect_from:
 # Output Only Resource ID fields
 
 This rule enforces that resource ID fields are classified as `OUTPUT_ONLY`, as
-mandated in [AIP-122][].
+mandated in [AEP-122][].
 
 ## Details
 
@@ -64,10 +64,10 @@ message Book {
   };
   string name = 1;
   // (-- api-linter: core::0122::resource-id-output-only=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string book_id = 2;
   // (-- api-linter: core::0122::resource-id-output-only=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string uid = 3;
 }
 ```
@@ -75,5 +75,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: http://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: http://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

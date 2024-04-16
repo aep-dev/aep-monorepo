@@ -22,7 +22,7 @@
           {%- elsif segment == "core" %}
           Core rules
           {%- elsif segment | abs %}
-          AIP-{{ segment }}
+          AEP-{{ segment }}
           {%- else %}
           {{ segment | replace: ('-', ' ') | capitalize }}
           {% endif %}
@@ -34,7 +34,7 @@
       class="glue-breadcrumbs__item glue-breadcrumbs__item--active"
       aria-level="3"
     >
-      {% if page.aip_listing %}AIP-{{ page.aip_listing }}{% else %}{{ page.title }}{% endif %}
+      {% if page.aep_listing %}AEP-{{ page.aep_listing }}{% else %}{{ page.title }}{% endif %}
     </li>
   </ol>
 </nav>

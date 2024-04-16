@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 233
+  aep: 233
   name: [core, '0233', request-message-name]
   summary: Batch Create methods must have standardized request message names.
 permalink: /233/request-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Batch Create methods: Request message
 
 This rule enforces that all `BatchCreate` RPCs have a request message name of
-`BatchCreate*Request`, as mandated in [AIP-233][].
+`BatchCreate*Request`, as mandated in [AEP-233][].
 
 ## Details
 
@@ -49,11 +49,11 @@ rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse)
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0233::request-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchCreateBooks(CreateBookRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchCreate"
@@ -65,5 +65,5 @@ rpc BatchCreateBooks(CreateBookRequest) returns (BatchCreateBooksResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-233]: https://aip.dev/233
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-233]: https://aep.dev/233
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', delete-revision-http-body]
   summary: Delete Revision methods should not have an HTTP body.
 permalink: /162/delete-revision-http-body
@@ -11,7 +11,7 @@ redirect_from:
 # Delete Revision methods: HTTP body
 
 This rule enforces that all Delete Revision RPCs have no HTTP `body`, as mandated in
-[AIP-162][].
+[AEP-162][].
 
 ## Details
 
@@ -46,11 +46,11 @@ rpc DeleteBookRevision(DeleteBookRevisionRequest) returns (google.protobuf.Empty
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0162::delete-revision-http-body=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBookRevision(DeleteBookRevisionRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
     delete: "/v1/{name=publishers/*/books/*}:deleteRevision"
@@ -62,5 +62,5 @@ rpc DeleteBookRevision(DeleteBookRevisionRequest) returns (google.protobuf.Empty
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 234
+  aep: 234
   name: [core, '0234', request-requests-behavior]
   summary: |
     Batch Update requests should annotate the `requests` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `BatchUpdate` requests have
 `google.api.field_behavior` set to `REQUIRED` on their `requests` field, as
-mandated in [AIP-234][].
+mandated in [AEP-234][].
 
 ## Details
 
@@ -55,7 +55,7 @@ message BatchUpdateBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchUpdateBooksRequest {
@@ -64,7 +64,7 @@ message BatchUpdateBooksRequest {
   ];
 
   // (-- api-linter: core::0234::request-requests-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   repeated UpdateBookRequest requests = 2;
 }
 ```
@@ -72,5 +72,5 @@ message BatchUpdateBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-234]: https://aip.dev/234
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-234]: https://aep.dev/234
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

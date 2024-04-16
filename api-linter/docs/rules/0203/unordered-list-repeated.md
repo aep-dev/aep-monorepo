@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 203
+  aep: 203
   name: [core, '0203', unordered-list-repeated]
   summary: Only repeated fields may be annotated with `UNORDERED_LIST`.
 permalink: /203/unordered-list-repeated
@@ -11,7 +11,7 @@ redirect_from:
 # Repeated fields: Unordered
 
 This rule enforces that only repeated fields, not singular ones, are annotated
-with `(google.api.field_behavior) = UNORDERED_LIST`, as mandated by [AIP-203][].
+with `(google.api.field_behavior) = UNORDERED_LIST`, as mandated by [AEP-203][].
 
 ## Details
 
@@ -45,12 +45,12 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   // (-- api-linter: core::0203::unordered-list-repeated=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.field_behavior) = UNORDERED_LIST];
 
   repeated string genres = 2 [(google.api.field_behavior) = UNORDERED_LIST];
@@ -60,5 +60,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-203]: https://aip.dev/203
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-203]: https://aep.dev/203
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

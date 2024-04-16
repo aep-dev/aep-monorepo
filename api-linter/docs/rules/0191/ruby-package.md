@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 191
+  aep: 191
   name: [core, '0191', ruby-package]
   summary: The `option ruby_package` annotation should be idiomatic if set.
 permalink: /191/ruby-package
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that if a proto file for a public API surface sets
 `option ruby_package`, that it uses language idiomatic conventions, as mandated
-in [AIP-191][].
+in [AEP-191][].
 
 ## Details
 
@@ -91,11 +91,11 @@ rule **may** be disabled in this case.
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0191::ruby-package=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
 package google.example.v1;
@@ -103,5 +103,5 @@ package google.example.v1;
 option ruby_package = "google::example::v1";
 ```
 
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

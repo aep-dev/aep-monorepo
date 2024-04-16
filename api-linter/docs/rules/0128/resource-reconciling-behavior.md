@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 128
+  aep: 128
   name: [core, '0128', resource-reconciling-behavior]
   summary: Declarative-friendly resources should annotate the `reconciling` field as `OUTPUT_ONLY`.
 permalink: /128/resource-reconciling-behavior
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that all declarative-friendly resources have
 `google.api.field_behavior` set to `OUTPUT_ONLY` on their `bool
-reconciling` field, as mandated in [AIP-128][].
+reconciling` field, as mandated in [AEP-128][].
 
 ## Details
 
@@ -61,7 +61,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -74,7 +74,7 @@ message Book {
   string name = 1;
 
   // (-- api-linter: core::0128::resource-reconciling-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   bool reconciling = 2;
 }
 ```
@@ -82,5 +82,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-128]: https://aip.dev/128
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-128]: https://aep.dev/128
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

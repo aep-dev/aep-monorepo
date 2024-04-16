@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 163
+  aep: 163
   name: [core, '0163', declarative-friendly-required]
   summary: Declarative-friendly mutations should have a validate_only field.
 permalink: /163/declarative-friendly-required
@@ -11,7 +11,7 @@ redirect_from:
 # Required change validation
 
 This rule enforces that declarative-friendly mutations have a `validate_only`
-field, as mandated in [AIP-163][].
+field, as mandated in [AEP-163][].
 
 ## Details
 
@@ -51,11 +51,11 @@ message DeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0163::declarative-friendly-required=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message DeleteBookRequest {
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
@@ -69,5 +69,5 @@ likely to expect strong consistency.
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-163]: https://aip.dev/163
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-163]: https://aep.dev/163
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

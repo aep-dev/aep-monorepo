@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 162
+  aep: 162
   name: [core, '0162', rollback-request-revision-id-behavior]
   summary: |
     Rollback requests should annotate the `revision_id` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Rollback` requests have
 `google.api.field_behavior` set to `REQUIRED` on their `string revision_id` field, as
-mandated in [AIP-162][].
+mandated in [AEP-162][].
 
 ## Details
 
@@ -55,7 +55,7 @@ message RollbackBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message RollbackBookRequest {
@@ -65,7 +65,7 @@ message RollbackBookRequest {
   ];
 
   // (-- api-linter: core::0162::rollback-request-revision-id-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string revision_id = 2;
 }
 ```
@@ -73,5 +73,5 @@ message RollbackBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-162]: https://aip.dev/162
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-162]: https://aep.dev/162
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

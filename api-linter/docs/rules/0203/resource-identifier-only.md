@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 203
+  aep: 203
   name: [core, '0203', resource-identifier-only]
   summary: Only the resource's name field can have field behavior IDENTIFIER.
 permalink: /203/resource-identifier-only
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that only the field representing the resource's name is
 annotated with with `(google.api.field_behavior) = IDENTIFIER`, as mandated
-by [AIP-203][].
+by [AEP-203][].
 
 ## Details
 
@@ -54,7 +54,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -65,7 +65,7 @@ message Book {
   string name = 1 [(google.api.field_behavior) = IDENTIFER];
 
   // (-- api-linter: core::0203::resource-identifier-only=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string description = 2 [(google.api.field_behavior) = IDENTIFER];
 }
 ```
@@ -73,5 +73,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-203]: https://aip.dev/203
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-203]: https://aep.dev/203
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 152
+  aep: 152
   name: [core, '0152', request-resource-suffix]
   summary: |
     Run requests should identify a resource type which ends in "Job".
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Run` methods specify a `type` that ends in "Job" 
 in the `google.api.resource_reference` annotation of their `string name` field, 
-as mandated in [AIP-152][].
+as mandated in [AEP-152][].
 
 ## Details
 
@@ -52,12 +52,12 @@ message RunWriteBookJobRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message RunWriteBookJobRequest {
   // (-- api-linter: core::0152::request-resource-suffix=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
@@ -68,5 +68,5 @@ message RunWriteBookJobRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-152]: https://aip.dev/152
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-152]: https://aep.dev/152
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

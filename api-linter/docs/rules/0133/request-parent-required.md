@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aep: 133
   name: [core, '0133', request-parent-required]
   summary: Create RPCs must have a `parent` field in the request.
 permalink: /133/request-parent-required
@@ -11,7 +11,7 @@ redirect_from:
 # Create methods: Parent field
 
 This rule enforces that all `Create` standard methods have a `string parent`
-field in the request message, as mandated in [AIP-133][].
+field in the request message, as mandated in [AEP-133][].
 
 ## Details
 
@@ -46,11 +46,11 @@ message CreateBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0133::request-parent-required=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message CreateBookRequest {
   string publisher = 1;
   Book book = 2;
@@ -61,5 +61,5 @@ message CreateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-133]: https://aep.dev/133
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

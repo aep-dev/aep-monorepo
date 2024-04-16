@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 151
+  aep: 151
   name: [core, '0151', response-unary]
   summary: Long-running operations must not use streaming.
 permalink: /151/response-unary
@@ -11,7 +11,7 @@ redirect_from:
 # Paginated methods: Unary responses
 
 This rule enforces that all long-running operation methods use unary responses,
-as mandated in [AIP-151][].
+as mandated in [AEP-151][].
 
 ## Details
 
@@ -48,12 +48,12 @@ rpc ReadBook(ReadBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message or
-above the field. Remember to also include an [aip.dev/not-precedent][] comment
+above the field. Remember to also include an [aep.dev/not-precedent][] comment
 explaining why.
 
 ```proto
 // (-- api-linter: core::0151::response-unary
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc ReadBook(ReadBookRequest) returns (stream google.longrunning.Operation) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*/books/*}:read"
@@ -65,5 +65,5 @@ rpc ReadBook(ReadBookRequest) returns (stream google.longrunning.Operation) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-151]: https://aip.dev/151
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-151]: https://aep.dev/151
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 164
+  aep: 164
   name: [core, '0164', resource-expire-time-field]
   summary: Resources supporting soft delete must have an `expire_time` field.
 permalink: /164/resource-expire-time-field
@@ -11,7 +11,7 @@ redirect_from:
 # Resources supporting soft delete: `expire_time` field required
 
 This rule enforces that all resources supporting soft delete have an
-`google.protobuf.Timestamp expire_time` field, as mandated in [AIP-164][].
+`google.protobuf.Timestamp expire_time` field, as mandated in [AEP-164][].
 
 ## Details
 
@@ -73,7 +73,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the resource.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 service Library {
@@ -86,7 +86,7 @@ service Library {
 }
 
 // (-- api-linter: core::0164::resource-expire-time-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -100,5 +100,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-164]: https://aip.dev/164
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-164]: https://aep.dev/164
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

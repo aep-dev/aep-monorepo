@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 154
+  aep: 154
   name: [core, '0154', declarative-friendly-required]
   summary: Declarative-friendly resources must have an etag field.
 permalink: /154/declarative-friendly-required
@@ -11,7 +11,7 @@ redirect_from:
 # Required etags
 
 This rule enforces that declarative-friendly resources have etags, as mandated
-in [AIP-154][].
+in [AEP-154][].
 
 ## Details
 
@@ -80,11 +80,11 @@ message DeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0154::declarative-friendly-required=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -102,5 +102,5 @@ likely to expect strong consistency.
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-154]: https://aip.dev/154
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-154]: https://aep.dev/154
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

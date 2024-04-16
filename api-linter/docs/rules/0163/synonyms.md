@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 163
+  aep: 163
   name: [core, '0163', synonyms]
   summary: Change validation fields should be named `validate_only`.
 permalink: /163/synonyms
@@ -11,7 +11,7 @@ redirect_from:
 # Synonyms
 
 This rule enforces that the `validate_only` field is named `validate_only`, and
-not a common synonym, as mandated in [AIP-163][].
+not a common synonym, as mandated in [AEP-163][].
 
 ## Details
 
@@ -45,14 +45,14 @@ message CreateBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message CreateBookRequest {
   string parent = 1;
   Book book = 2;
   // (-- api-linter: core::0163::synonyms=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   bool dry_run = 3;
 }
 ```
@@ -60,5 +60,5 @@ message CreateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-163]: https://aip.dev/163
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-163]: https://aep.dev/163
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

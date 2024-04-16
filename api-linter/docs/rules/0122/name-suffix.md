@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', name-suffix]
   summary: Fields should not use the suffix `_name`.
 permalink: /122/name-suffix
@@ -11,7 +11,7 @@ redirect_from:
 # Name field suffix
 
 This rule enforces that fields do not use the suffix `_name`, as mandated in
-[AIP-122][].
+[AEP-122][].
 
 ## Details
 
@@ -49,7 +49,7 @@ If you need to violate this rule, use a leading comment above the method.
 
 ```proto
 // (-- api-linter: core::0122::name-suffix=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
   string author_name = 2;  // Should be `author`.
@@ -59,5 +59,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: http://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: http://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

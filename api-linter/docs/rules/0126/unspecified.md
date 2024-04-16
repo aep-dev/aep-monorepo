@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 126
+  aep: 126
   name: [core, '0126', unspecified]
   summary: All enums must have a default unspecified value.
 permalink: /126/unspecified
@@ -11,7 +11,7 @@ redirect_from:
 # Enum unspecified value
 
 This rule enforces that all enums have a default unspecified value, as mandated
-in [AIP-126][].
+in [AEP-126][].
 
 Because our APIs create automatically-generated client libraries, we need to
 consider languages that have varying behavior around default values. To avoid
@@ -56,12 +56,12 @@ enum Format {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the enum value.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 enum Format {
   // (-- api-linter: core::0126::unspecified=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   HARDCOVER = 0;
 }
 ```
@@ -69,5 +69,5 @@ enum Format {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-126]: https://aip.dev/126
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-126]: https://aep.dev/126
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

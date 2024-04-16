@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 132
+  aep: 132
   name: [core, '0132', request-unknown-fields]
   summary: List RPCs should not have unexpected fields in the request.
 permalink: /132/request-unknown-fields
@@ -11,23 +11,23 @@ redirect_from:
 # List methods: Unknown fields (Request)
 
 This rule enforces that all `List` standard methods do not have unexpected
-fields, as mandated in [AIP-132][].
+fields, as mandated in [AEP-132][].
 
 ## Details
 
 This rule looks at any message matching `List*Request` and complains if it
 comes across any fields other than:
 
-- `string parent` ([AIP-132][])
-- `int32 page_size` ([AIP-158][])
-- `string page_token` ([AIP-158][])
-- `int32 skip` ([AIP-158][])
-- `string filter` ([AIP-132][])
-- `string order_by` ([AIP-132][])
-- `bool show_deleted` ([AIP-132][])
-- `string request_id` ([AIP-155][])
-- `google.protobuf.FieldMask read_mask` ([AIP-157][])
-- `View view` ([AIP-157][])
+- `string parent` ([AEP-132][])
+- `int32 page_size` ([AEP-158][])
+- `string page_token` ([AEP-158][])
+- `int32 skip` ([AEP-158][])
+- `string filter` ([AEP-132][])
+- `string order_by` ([AEP-132][])
+- `bool show_deleted` ([AEP-132][])
+- `string request_id` ([AEP-155][])
+- `google.protobuf.FieldMask read_mask` ([AEP-157][])
+- `View view` ([AEP-157][])
 
 It only checks field names; it does not validate type correctness. This is
 handled by other rules, such as
@@ -61,7 +61,7 @@ message ListBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message ListBooksRequest {
@@ -70,7 +70,7 @@ message ListBooksRequest {
   string page_token = 3;
 
   // (-- api-linter: core::0132::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 4;
 }
 ```
@@ -78,9 +78,9 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-132]: https://aip.dev/132
-[aip-135]: https://aip.dev/135
-[aip-155]: https://aip.dev/155
-[aip-157]: https://aip.dev/157
-[aip-158]: https://aip.dev/158
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-132]: https://aep.dev/132
+[aep-135]: https://aep.dev/135
+[aep-155]: https://aep.dev/155
+[aep-157]: https://aep.dev/157
+[aep-158]: https://aep.dev/158
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

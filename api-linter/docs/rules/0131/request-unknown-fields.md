@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 131
+  aep: 131
   name: [core, '0131', request-unknown-fields]
   summary: Get RPCs should not have unexpected fields in the request.
 permalink: /131/request-unknown-fields
@@ -11,17 +11,17 @@ redirect_from:
 # Get methods: Unknown fields
 
 This rule enforces that all `Get` standard methods do not have unexpected
-fields, as mandated in [AIP-131][].
+fields, as mandated in [AEP-131][].
 
 ## Details
 
 This rule looks at any message matching `Get*Request` and complains if it comes
 across any fields other than:
 
-- `string name` ([AIP-131][])
-- `string request_id` ([AIP-155][])
-- `google.protobuf.FieldMask read_mask` ([AIP-157][])
-- `View view` ([AIP-157][])
+- `string name` ([AEP-131][])
+- `string request_id` ([AEP-155][])
+- `google.protobuf.FieldMask read_mask` ([AEP-157][])
+- `View view` ([AEP-157][])
 
 ## Examples
 
@@ -47,14 +47,14 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message GetBookRequest {
   string name = 1;
 
   // (-- api-linter: core::0131::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 2;
 }
 ```
@@ -62,7 +62,7 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
-[aip-155]: https://aip.dev/155
-[aip-157]: https://aip.dev/157
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-131]: https://aep.dev/131
+[aep-155]: https://aep.dev/155
+[aep-157]: https://aep.dev/157
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

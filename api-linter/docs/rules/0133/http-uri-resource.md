@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aep: 133
   name: [core, '0133', http-uri-resource]
   summary: The collection where the resource is added should map to the URI path.
 permalink: /133/http-uri-resource
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that the collection identifier used in the URI path is
 provided in the definition for the resource being created, as mandated in
-[AIP-133][].
+[AEP-133][].
 
 ## Details
 
@@ -87,11 +87,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0133::http-uri-resource=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CreateBook(CreateBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/"
@@ -103,5 +103,5 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-133]: https://aep.dev/133
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

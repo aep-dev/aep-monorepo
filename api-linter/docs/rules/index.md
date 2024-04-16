@@ -4,10 +4,10 @@ permalink: /rules/
 
 # Rule Documentation
 
-Rules are divided into groups according to AIP block: each discrete block of
-AIPs may have a group of rules. The generally-applicable AIPs are organized
+Rules are divided into groups according to AEP block: each discrete block of
+AEPs may have a group of rules. The generally-applicable AEPs are organized
 into the "core" group of rules, and remaining blocks are grouped based on the
-`scope` name provided to the block on [aip.dev][].
+`scope` name provided to the block on [aep.dev][].
 
 <ul class="glue-tile-set glue-mod-mt-std" style="margin-top: 40px;">
   <li>
@@ -23,7 +23,7 @@ into the "core" group of rules, and remaining blocks are grouped based on the
           Core rules
         </h4>
         <p class="glue-tile__description">
-          Core rules are based on generally-applicable AIPs, and are enabled
+          Core rules are based on generally-applicable AEPs, and are enabled
           by default.
         </p>
         <ul class="glue-tile__links">
@@ -49,7 +49,7 @@ into the "core" group of rules, and remaining blocks are grouped based on the
           Client Library rules
         </h4>
         <p class="glue-tile__description">
-          Client library rules are based on client library-specific AIPs, and are enabled by default.
+          Client library rules are based on client library-specific AEPs, and are enabled by default.
         </p>
         <ul class="glue-tile__links">
           <li class="glue-tile__link">
@@ -74,7 +74,7 @@ into the "core" group of rules, and remaining blocks are grouped based on the
           Cloud rules
         </h4>
         <p class="glue-tile__description">
-          Cloud rules are based on Cloud-specific AIPs, and are disabled by default.
+          Cloud rules are based on Cloud-specific AEPs, and are disabled by default.
         </p>
         <ul class="glue-tile__links">
           <li class="glue-tile__link">
@@ -88,4 +88,4 @@ into the "core" group of rules, and remaining blocks are grouped based on the
   </li>
 </ul>
 
-[aip.dev]: https://aip.dev/
+[aep.dev]: https://aep.dev/

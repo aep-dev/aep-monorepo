@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 132
+  aep: 132
   name: [core, '0132', request-required-fields]
   summary: List RPCs must not have unexpected required fields in the request.
 permalink: /132/request-required-fields
@@ -11,14 +11,14 @@ redirect_from:
 # List methods: Required fields
 
 This rule enforces that all `List` standard methods do not have unexpected
-required fields, as mandated in [AIP-132][].
+required fields, as mandated in [AEP-132][].
 
 ## Details
 
 This rule looks at any message matching `List*Request` and complains if it
 comes across any required fields other than:
 
-- `string parent` ([AIP-132][])
+- `string parent` ([AEP-132][])
 
 ## Examples
 
@@ -60,7 +60,7 @@ message ListBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message ListBooksRequest {
@@ -73,7 +73,7 @@ message ListBooksRequest {
 	    }];
 
   // (-- api-linter: core::0132::request-required-fields=disabled
-  //     aip.dev/not-precedent: We really need this field to be required because
+  //     aep.dev/not-precedent: We really need this field to be required because
   // reasons. --)
   int32 page_size = 2 [(google.api.field_behavior) = REQUIRED]
 }
@@ -82,5 +82,5 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-132]: https://aip.dev/132
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-132]: https://aep.dev/132
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

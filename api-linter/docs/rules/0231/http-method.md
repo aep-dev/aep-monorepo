@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 231
+  aep: 231
   name: [core, '0231', http-method]
   summary: Batch Get methods must use the GET HTTP verb.
 permalink: /231/http-method
@@ -11,7 +11,7 @@ redirect_from:
 # Get methods: GET HTTP verb
 
 This rule enforces that all `BatchGet` RPCs use the `GET` HTTP verb, as
-mandated in [AIP-231][].
+mandated in [AEP-231][].
 
 ## Details
 
@@ -46,11 +46,11 @@ rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0231::http-method=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*}/books:batchGet"  // Should be `get:`.
@@ -61,5 +61,5 @@ rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-231]: https://aip.dev/231
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-231]: https://aep.dev/231
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

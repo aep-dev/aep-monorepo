@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 214
+  aep: 214
   name: [core, '0214', ttl-type]
   summary: The `ttl` field should be a `google.protobuf.Duration`.
 permalink: /214/ttl-type
@@ -11,7 +11,7 @@ redirect_from:
 # Resource expiry
 
 This rule enforces that `ttl` fields use `google.protobuf.Duration`, as
-mandated in [AIP-214][].
+mandated in [AEP-214][].
 
 ## Details
 
@@ -49,7 +49,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the enum.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
@@ -57,7 +57,7 @@ message Book {
   oneof expiration {
     google.protobuf.Timestamp expire_time = 2;
     // (-- api-linter: core::0214::ttl-type=disabled
-    //     aip.dev/not-precedent: We need to do this because reasons. --)
+    //     aep.dev/not-precedent: We need to do this because reasons. --)
     int32 ttl = 3;  // Should be `google.protobuf.Duration`.
   }
 }
@@ -66,5 +66,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-214]: https://aip.dev/214
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-214]: https://aep.dev/214
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

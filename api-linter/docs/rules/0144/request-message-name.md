@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 144
+  aep: 144
   name: [core, '0144', request-message-name]
   summary: Add/Remove methods must have standardized request message names.
 permalink: /144/request-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Add/Remove methods: Request message
 
 This rule enforces that all `Add` and `Remove` RPCs have a request message name
-of `Add*Request` or `Remove*Request`, as mandated in [AIP-144][].
+of `Add*Request` or `Remove*Request`, as mandated in [AEP-144][].
 
 ## Details
 
@@ -49,11 +49,11 @@ rpc AddAuthor(AddAuthorRequest) returns (AddAuthorResponse) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0144::request-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc AddAuthor(AppendAuthorRequest) returns (AddAuthorResponse) {
   option (google.api.http) = {
     post: "/v1/{book=publishers/*/books/*}:addAuthor"
@@ -65,5 +65,5 @@ rpc AddAuthor(AppendAuthorRequest) returns (AddAuthorResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-144]: https://aip.dev/144
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-144]: https://aep.dev/144
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

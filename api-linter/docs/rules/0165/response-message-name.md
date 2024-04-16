@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 165
+  aep: 165
   name: [core, '0165', response-message-name]
   summary: Purge methods must return a long-running operation.
 permalink: /165/response-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Purge methods: Response message
 
 This rule enforces that all `Purge` RPCs return a long-running operation that
-resolves to a response with a corresponding name, as mandated in [AIP-165][].
+resolves to a response with a corresponding name, as mandated in [AEP-165][].
 
 ## Details
 
@@ -70,11 +70,11 @@ rpc PurgeBooks(PurgeBooksRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0165::response-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc PurgeBooks(PurgeBooksRequest) returns (PurgeBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:purge"
@@ -86,5 +86,5 @@ rpc PurgeBooks(PurgeBooksRequest) returns (PurgeBooksResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-165]: https://aip.dev/165
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-165]: https://aep.dev/165
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

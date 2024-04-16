@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', response-message-name]
   summary: Delete methods must return Empty or the resource.
 permalink: /135/response-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Delete methods: Response message
 
 This rule enforces that all `Delete` RPCs have a response message of
-`google.protobuf.Empty` or the resource, as mandated in [AIP-135][].
+`google.protobuf.Empty` or the resource, as mandated in [AEP-135][].
 
 ## Details
 
@@ -114,11 +114,11 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0135::response-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
   option (google.api.http) = {
     delete: "/v1/{name=publishers/*/books/*}"
@@ -129,5 +129,5 @@ rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

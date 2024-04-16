@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 192
+  aep: 192
   name: [core, '0192', no-markdown-tables]
   summary: Public comments should not include Markdown tables.
 permalink: /192/no-markdown-tables
@@ -11,7 +11,7 @@ redirect_from:
 # No Markdown tables
 
 This rule enforces that public comments for proto descriptors do not have
-Markdown tables, as mandated in [AIP-192][].
+Markdown tables, as mandated in [AEP-192][].
 
 ## Details
 
@@ -53,7 +53,7 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the descriptor.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // Fields on the book include:
@@ -63,12 +63,12 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 // `name`   | `string`
 // `author` | `string`
 // (-- api-linter: core::0192::no-markdown-tables=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   // The resource name of the book.
   string name = 1;
 }
 ```
 
-[aip-192]: https://aip.dev/192
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-192]: https://aep.dev/192
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

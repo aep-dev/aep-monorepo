@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 164
+  aep: 164
   name: [core, '0164', request-name-behavior]
   summary: |
     Undelete RPCs should annotate the `name` field with `google.api.field_behavior`.
@@ -13,7 +13,7 @@ redirect_from:
 
 This rule enforces that all `Undelete` methods have
 `google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
-mandated in [AIP-164][].
+mandated in [AEP-164][].
 
 ## Details
 
@@ -50,12 +50,12 @@ message UndeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message UndeleteBookRequest {
   // (-- api-linter: core::0164::request-name-behavior=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
@@ -65,5 +65,5 @@ message UndeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-164]: https://aip.dev/164
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-164]: https://aep.dev/164
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aep: 133
   name: [core, '0133', request-unknown-fields]
   summary: Create RPCs should not have unexpected fields in the request.
 permalink: /133/request-unknown-fields
@@ -11,17 +11,17 @@ redirect_from:
 # Create methods: Unknown fields
 
 This rule enforces that all `Create` standard methods do not have unexpected
-fields, as mandated in [AIP-133][].
+fields, as mandated in [AEP-133][].
 
 ## Details
 
 This rule looks at any message matching `Create*Request` and complains if it
 comes across any fields other than:
 
-- `string parent` ([AIP-133][])
-- `{Resource} {resource}` ([AIP-133][])
-- `string {resource}_id` ([AIP-133][])
-- `string request_id` ([AIP-155][])
+- `string parent` ([AEP-133][])
+- `{Resource} {resource}` ([AEP-133][])
+- `string {resource}_id` ([AEP-133][])
+- `string request_id` ([AEP-155][])
 
 ## Examples
 
@@ -51,7 +51,7 @@ message CreateBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message CreateBookRequest {
@@ -60,7 +60,7 @@ message CreateBookRequest {
   string book_id = 3;
 
   // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reasons. --)
+  //     aep.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 4;  // Non-standard field.
 }
 ```
@@ -68,6 +68,6 @@ message CreateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
-[aip-155]: https://aip.dev/155
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-133]: https://aep.dev/133
+[aep-155]: https://aep.dev/155
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

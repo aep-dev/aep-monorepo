@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 231
+  aep: 231
   name: [core, '0231', plural-method-name]
   summary: Batch Get methods must have plural names.
 permalink: /231/plural-method-name
@@ -11,7 +11,7 @@ redirect_from:
 # Batch Get methods: Plural method name
 
 This rule enforces that all `BatchGet` RPCs have a plural resource in the
-method name, as mandated in [AIP-231][].
+method name, as mandated in [AEP-231][].
 
 ## Details
 
@@ -46,11 +46,11 @@ rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0231::plural-method-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books:batchGet"
@@ -61,5 +61,5 @@ rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-231]: https://aip.dev/231
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-231]: https://aep.dev/231
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

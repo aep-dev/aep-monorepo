@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 165
+  aep: 165
   name: [core, '0165', http-method]
   summary: Purge methods must use the POST HTTP verb.
 permalink: /165/http-method
@@ -11,7 +11,7 @@ redirect_from:
 # Purge methods: POST HTTP verb
 
 This rule enforces that all `Purge` RPCs use the `POST` HTTP verb, as
-mandated in [AIP-165][].
+mandated in [AEP-165][].
 
 ## Details
 
@@ -55,11 +55,11 @@ rpc PurgeBooks(PurgeBooksRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0165::http-method=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc PurgeBooks(PurgeBooksRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books:purge"
@@ -74,5 +74,5 @@ rpc PurgeBooks(PurgeBooksRequest) returns (google.longrunning.Operation) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-165]: https://aip.dev/165
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-165]: https://aep.dev/165
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

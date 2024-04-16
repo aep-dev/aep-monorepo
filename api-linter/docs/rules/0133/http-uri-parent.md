@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aep: 133
   name: [core, '0133', http-uri-parent]
   summary: Create methods must map the parent field to the URI.
 permalink: /133/http-uri-parent
@@ -11,7 +11,7 @@ redirect_from:
 # Create methods: HTTP URI parent field
 
 This rule enforces that all `Create` RPCs map the `parent` field to the HTTP
-URI, as mandated in [AIP-133][].
+URI, as mandated in [AEP-133][].
 
 ## Details
 
@@ -61,11 +61,11 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0133::http-uri-parent=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CreateBook(CreateBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/publishers/*/books"
@@ -77,5 +77,5 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-133]: https://aep.dev/133
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

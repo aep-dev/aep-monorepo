@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 157
+  aep: 157
   name: [core, '0157', request-read-mask-field]
   summary: Request read mask fields must have the correct type.
 permalink: /157/request-read-mask-field
@@ -11,7 +11,7 @@ redirect_from:
 # Partial responses: Request read mask field
 
 This rule enforces that all `read_mask` fields in requests have the correct
-type, as mandated in [AIP-157][].
+type, as mandated in [AEP-157][].
 
 ## Details
 
@@ -52,7 +52,7 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message GetBookRequest {
@@ -62,7 +62,7 @@ message GetBookRequest {
   ];
 
   // (-- api-linter: core::0157::request-read-mask-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   string read_mask = 2;
 }
 ```
@@ -70,5 +70,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-157]: https://aip.dev/157
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-157]: https://aep.dev/157
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 136
+  aep: 136
   name: [core, '0136', verb-noun]
   summary: Custom methods should be named with the verb, then the noun.
 permalink: /136/verb-noun
@@ -11,7 +11,7 @@ redirect_from:
 # Custom methods: Verb and noun
 
 This rule enforces that custom methods are named according to `VerbNoun`, as
-mandated in [AIP-136][].
+mandated in [AEP-136][].
 
 ## Details
 
@@ -51,11 +51,11 @@ rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0136::verb-noun=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:checkout"
@@ -67,5 +67,5 @@ rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-136]: https://aip.dev/136
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-136]: https://aep.dev/136
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

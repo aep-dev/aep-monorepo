@@ -1,5 +1,5 @@
 ---
-aip_listing: 143
+aep_listing: 143
 permalink: /143/
 redirect_from:
   - /0143/
@@ -7,4 +7,4 @@ redirect_from:
 
 # Standardized codes
 
-{% include linter-aip-listing.md aip=143 %}
+{% include linter-aep-listing.md aep=143 %}

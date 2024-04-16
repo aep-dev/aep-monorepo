@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 192
+  aep: 192
   name: [core, '0192', deprecated-comment]
   summary: Deprecated elements must have a corresponding comment.
 permalink: /192/deprecated-comment
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that every element marked with the protobuf `deprecated`
 option has `"Deprecated: <reason>"` as the first line in the public leading
-comment, as mandated in [AIP-192][].
+comment, as mandated in [AEP-192][].
 
 ## Details
 
@@ -52,13 +52,13 @@ service Library {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the descriptor.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // A library service.
 service Library {
   // (-- api-linter: core::0192::deprecated-comment=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   // Incorrect.
   // Retrieves a book.
   rpc GetBook(GetBookRequest) returns (Book) {
@@ -67,5 +67,5 @@ service Library {
 }
 ```
 
-[aip-192]: https://aip.dev/192
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-192]: https://aep.dev/192
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

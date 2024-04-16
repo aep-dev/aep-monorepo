@@ -1,5 +1,5 @@
 ---
-aip_listing: 123
+aep_listing: 123
 permalink: /123/
 redirect_from:
   - /0123/
@@ -7,4 +7,4 @@ redirect_from:
 
 # Unified resource types
 
-{% include linter-aip-listing.md aip=123 %}
+{% include linter-aep-listing.md aep=123 %}

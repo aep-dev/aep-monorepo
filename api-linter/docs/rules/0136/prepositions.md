@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 136
+  aep: 136
   name: [core, '0136', prepositions]
   summary: Custom methods must not include prepositions in their names.
 permalink: /136/prepositions
@@ -11,7 +11,7 @@ redirect_from:
 # Custom methods: Prepositions
 
 This rule enforces that custom method names do not include most prepositions,
-as mandated in [AIP-136][].
+as mandated in [AEP-136][].
 
 ## Details
 
@@ -67,11 +67,11 @@ rpc CheckoutBook(CheckoutBookRequest) returns (Book) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0136::prepositions=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBookWithAuthor(GetBookWithAuthorRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}:getWithAuthor"
@@ -82,5 +82,5 @@ rpc GetBookWithAuthor(GetBookWithAuthorRequest) returns (Book) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-136]: https://aip.dev/136
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-136]: https://aep.dev/136
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 128
+  aep: 128
   name: [core, '0128', resource-reconciling-field]
   summary: Declarative-friendly resources must have a `reconciling` field.
 permalink: /128/resource-reconciling-field
@@ -11,7 +11,7 @@ redirect_from:
 # Declarative-friendly resources: Reconciling field
 
 This rule enforces that all declarative-friendly resources have a `bool
-reconciling` field, as mandated in [AIP-128][].
+reconciling` field, as mandated in [AEP-128][].
 
 ## Details
 
@@ -71,12 +71,12 @@ message Book {
 
 If you need to violate this rule, use a leading comment above the message (if
 the `reconciling` field is missing) or above the field (if it is the wrong
-type). Remember to also include an [aip.dev/not-precedent][] comment explaining
+type). Remember to also include an [aep.dev/not-precedent][] comment explaining
 why.
 
 ```proto
 // (-- api-linter: core::0128::resource-reconciling-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -91,5 +91,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-128]: https://aip.dev/128
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-128]: https://aep.dev/128
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

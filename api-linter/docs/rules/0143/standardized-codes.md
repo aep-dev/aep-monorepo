@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 143
+  aep: 143
   name: [core, '0143', standard-codes]
   summary: Fields representing concepts with standardized codes must use them.
 permalink: /143/standardized-codes
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule attempts to enforce that standard codes for concepts like language,
 currency, etc. are consistently used rather than any alternatives, as mandated
-in [AIP-143][].
+in [AEP-143][].
 
 ## Details
 
@@ -57,11 +57,11 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0143::standardized-codes=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
   string lang = 2;
@@ -71,5 +71,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-143]: https://aip.dev/143
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-143]: https://aep.dev/143
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 151
+  aep: 151
   name: [core, '0151', lro-metadata-reachable]
   summary: LRO metadata messages must be reachable.
 permalink: /151/lro-metadata-reachable
@@ -12,7 +12,7 @@ redirect_from:
 
 This rule enforces that methods returning long-running operations define their
 metadata messages in the same file or a directly-imported file, as mandated in
-[AIP-151][].
+[AEP-151][].
 
 ## Details
 
@@ -24,7 +24,7 @@ imported by the file.
 Because these message names are strings, and a string reference does not
 require an `import` statement, defining the metadata types elsewhere can cause
 problems for tooling. To prevent this, and also to maintain consistency with
-the file layout in [AIP-191][], the linter complains if the message is not
+the file layout in [AEP-191][], the linter complains if the message is not
 defined in the same file or a file directly imported by the file.
 
 ## Examples
@@ -129,11 +129,11 @@ message WriteBookMetadata {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0151::lro-metadata-reachable=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books}:write"
@@ -149,6 +149,6 @@ rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-151]: https://aip.dev/151
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-151]: https://aep.dev/151
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

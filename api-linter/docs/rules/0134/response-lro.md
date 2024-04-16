@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 134
+  aep: 134
   name: [core, '0134', response-lro]
   summary: |
     Declarative-friendly Update methods should use long-running operations.
@@ -12,7 +12,7 @@ redirect_from:
 # Long-running Update
 
 This rule enforces that declarative-friendly update methods use long-running
-operations, as mandated in [AIP-134][].
+operations, as mandated in [AEP-134][].
 
 ## Details
 
@@ -56,11 +56,11 @@ rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0134::response-lro=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBook(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
     patch: "/v1/{book.name=publishers/*/books/*}"
@@ -75,5 +75,5 @@ likely to expect strong consistency.
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-134]: https://aip.dev/134
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-134]: https://aep.dev/134
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

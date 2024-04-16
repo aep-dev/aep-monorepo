@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 135
+  aep: 135
   name: [core, '0135', request-name-required]
   summary: Delete RPCs must have a `name` field in the request.
 permalink: /135/request-name-required
@@ -11,7 +11,7 @@ redirect_from:
 # Delete methods: Name field
 
 This rule enforces that all `Delete` standard methods have a `string name`
-field in the request message, as mandated in [AIP-135][].
+field in the request message, as mandated in [AEP-135][].
 
 ## Details
 
@@ -42,11 +42,11 @@ message DeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0135::request-name-required=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 message DeleteBookRequest {
   string book = 1;
 }
@@ -55,5 +55,5 @@ message DeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-135]: https://aip.dev/135
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 122
+  aep: 122
   name: [core, '0122', resource-reference-type]
   summary: All resource references must be strings.
 permalink: /122/resource-reference-type
@@ -11,7 +11,7 @@ redirect_from:
 # Resource reference type
 
 This rule enforces that all fields with the `google.api.resource_reference`
-annotation are strings, as mandated in [AIP-122][].
+annotation are strings, as mandated in [AEP-122][].
 
 ## Details
 
@@ -61,14 +61,14 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   string name = 1;
 
   // (-- api-linter: core::0122::resource-reference-type=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   Author author = 2 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Author"
   }];
@@ -78,5 +78,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-122]: https://aip.dev/122
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-122]: https://aep.dev/122
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

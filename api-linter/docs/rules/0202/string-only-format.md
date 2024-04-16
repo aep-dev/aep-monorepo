@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 202
+  aep: 202
   name: [core, '0202', string-only-format]
   summary: Certain field formats can only be applied to a string field.
 permalink: /202/string-only-format
@@ -11,7 +11,7 @@ redirect_from:
 # String only format
 
 This rule enforces that the following format specifiers are used only on fields
-of type `string`, as mandated by [AIP-202][]:
+of type `string`, as mandated by [AEP-202][]:
 
 - `UUID4`
 - `IPV4`
@@ -54,14 +54,14 @@ message Book {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
   string name = 1;
 
   // (-- api-linter: core::0202::string-only-format=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  //     aep.dev/not-precedent: We need to do this because reasons. --)
   int32 edition = 2 [(google.api.field_info).format = UUID4];
 }
 ```
@@ -69,5 +69,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-202]: https://aip.dev/202
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-202]: https://aep.dev/202
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

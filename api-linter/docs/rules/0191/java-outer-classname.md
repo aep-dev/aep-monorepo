@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 191
+  aep: 191
   name: [core, '0191', java-outer-classname]
   summary: All proto files must set `option java_outer_classname`.
 permalink: /191/java-outer-classname
@@ -11,7 +11,7 @@ redirect_from:
 # Java outer classname
 
 This rule enforces that every proto file for a public API surface sets
-`option java_outer_classname`, as mandated in [AIP-191][].
+`option java_outer_classname`, as mandated in [AEP-191][].
 
 ## Details
 
@@ -54,11 +54,11 @@ message Book {}
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0191::java-outer-classname=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
 package google.example.v1;
@@ -69,5 +69,5 @@ option java_multiple_files = true;
 message Book {}
 ```
 
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

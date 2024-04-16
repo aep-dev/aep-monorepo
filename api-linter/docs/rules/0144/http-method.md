@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 144
+  aep: 144
   name: [core, '0144', http-method]
   summary: Add/Remove methods must use the POST HTTP verb.
 permalink: /144/http-method
@@ -11,7 +11,7 @@ redirect_from:
 # Add/Remove methods: POST HTTP verb
 
 This rule enforces that all `Add` and `Remove` RPCs use the `POST` HTTP verb, as
-mandated in [AIP-144][].
+mandated in [AEP-144][].
 
 ## Details
 
@@ -47,11 +47,11 @@ rpc AddAuthor(AddAuthorRequest) returns (AddAuthorResponse) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0144::http-method=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc AddAuthor(AddAuthorRequest) returns (AddAuthorResponse) {
   option (google.api.http) = {
     patch: "/v1/{book=publishers/*/books/*}:addAuthor" // Should be `post:`.
@@ -63,5 +63,5 @@ rpc AddAuthor(AddAuthorRequest) returns (AddAuthorResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-144]: https://aip.dev/144
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-144]: https://aep.dev/144
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 134
+  aep: 134
   name: [core, '0134', response-message-name]
   summary: Update methods must return the resource.
 permalink: /134/response-message-name
@@ -11,7 +11,7 @@ redirect_from:
 # Update methods: Resource response message
 
 This rule enforces that all `Update` RPCs have a response message of the
-resource, as mandated in [AIP-134][].
+resource, as mandated in [AEP-134][].
 
 ## Details
 
@@ -90,11 +90,11 @@ rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0134::response-message-name=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
   option (google.api.http) = {
     patch: "/v1/{book.name=publishers/*/books/*}"
@@ -106,5 +106,5 @@ rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-134]: https://aip.dev/134
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-134]: https://aep.dev/134
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

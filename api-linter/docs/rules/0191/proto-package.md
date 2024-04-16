@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 191
+  aep: 191
   name: [core, '0191', proto-package]
   summary: Proto package must match the directory structure.
 permalink: /191/proto-package
@@ -11,7 +11,7 @@ redirect_from:
 # Protobuf Package
 
 This rule attempts to enforce that the proto package and the directory structure
-match, as mandated in [AIP-191][].
+match, as mandated in [AEP-191][].
 
 ## Details
 
@@ -36,14 +36,14 @@ correspond.
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0191::proto-package=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aep.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 ```
 
-[aip-191]: https://aip.dev/191
-[aip.dev/not-precedent]: https://aip.dev/not-precedent
+[aep-191]: https://aep.dev/191
+[aep.dev/not-precedent]: https://aep.dev/not-precedent
 [Protobuf Style Guide]: https://developers.google.com/protocol-buffers/docs/style#packages
