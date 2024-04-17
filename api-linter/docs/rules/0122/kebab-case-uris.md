@@ -10,13 +10,14 @@ redirect_from:
 
 # HTTP URI case
 
-This rule enforces that the HTTP URI pattern only uses camel case for word
+This rule enforces that the HTTP URI pattern only uses kebab-case for word
 separation, as mandated in [AEP-122][].
 
 ## Details
 
-This rule scans all methods and ensures that the `_` character is not present
-in the URI.
+This rule scans all methods and ensures that the `_` character and no uppercase
+letters are present.
+
 
 ## Examples
 
@@ -26,8 +27,8 @@ in the URI.
 // Incorrect.
 rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
-    // Should be "electronicBooks", not "electronic_books".
-    get: "/v1/{name=publishers/*/electronic_books/*}"
+    // Should be "electronicBooks", not "electronnamethic_books".
+    get: "/v1/{path=publishers/*/electronicBooks/*}"
   };
 }
 ```
@@ -38,7 +39,7 @@ rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
 // Correct.
 rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/electronicBooks/*}"
+    get: "/v1/{path=publishers/*/electronic-books/*}"
   };
 }
 ```
@@ -53,8 +54,8 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
-    // Should be "electronicBooks", not "electronic_books".
-    get: "/v1/{name=publishers/*/electronic_books/*}"
+    // Should be "electronic-books", not "electronic_books".
+    get: "/v1/{path=publishers/*/electronic_books/*}"
   };
 }
 ```

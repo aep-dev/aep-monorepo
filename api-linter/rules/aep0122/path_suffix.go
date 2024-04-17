@@ -17,36 +17,23 @@ package aep0122
 import (
 	"strings"
 
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var nameSuffix = &lint.FieldRule{
-	Name: lint.NewRuleName(122, "name-suffix"),
+var pathSuffix = &lint.FieldRule{
+	Name: lint.NewRuleName(122, "path-suffix"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		n := f.GetName()
-		// Ignore `{prefix}_display_name` fields as this seems like a reasonable suffix.
-		return strings.HasSuffix(n, "_name") && !strings.HasSuffix(n, "_display_name")
+		return strings.HasSuffix(f.GetName(), "_path");
 	},
+
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		allowedNameFields := stringset.New(
-			"display_name",
-			"family_name",
-			"given_name",
-			"full_resource_name",
-			"crypto_key_name",
-			"cmek_key_name",
-		)
-		if n := f.GetName(); !allowedNameFields.Contains(n) {
-			return []lint.Problem{{
-				Message:    "Fields should not use the `_name` suffix.",
-				Suggestion: strings.TrimSuffix(n, "_name"),
-				Descriptor: f,
-				Location:   locations.DescriptorName(f),
-			}}
-		}
-		return nil
+		return []lint.Problem{{
+			Message:    "Fields should not use the `_path` suffix.",
+			Suggestion: strings.TrimSuffix(f.GetName(), "_path"),
+			Descriptor: f,
+			Location:   locations.DescriptorName(f),
+		}}
 	},
 }

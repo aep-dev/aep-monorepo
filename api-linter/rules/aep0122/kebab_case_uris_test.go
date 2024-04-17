@@ -27,7 +27,7 @@ func TestHttpUriField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "/v1/{name=publishers/*/books/*}:frob", testutils.Problems{}},
-		{"ValidCamelPattern", "/v1/{name=publishers/*/frobbableBooks/*}:frob", testutils.Problems{}},
+		{"InvalidCamelPattern", "/v1/{name=publishers/*/frobbableBooks/*}:frob", testutils.Problems{{Message: "HTTP URI patterns"}}},
 		{"InvalidSnakePattern", "/v1/{name=publishers/*/frobbable_books/*}:frob", testutils.Problems{{Message: "URI patterns"}}},
 		{"InvalidCamelVariable", "/v1/{bookName=publishers/*/books/*}:frob", testutils.Problems{{Message: "Variable names"}}},
 		{"ValidSnakeVariable", "/v1/{book_name=publishers/*/books/*}:frob", testutils.Problems{}},

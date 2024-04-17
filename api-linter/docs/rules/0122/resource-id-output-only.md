@@ -29,7 +29,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
   // Should have `(google.api.field_behavior) = OUTPUT_ONLY`.
   string book_id = 2;
   // Should have `(google.api.field_behavior) = OUTPUT_ONLY`.
@@ -46,7 +46,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
   string book_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
   string uid = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
@@ -62,7 +62,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
   // (-- api-linter: core::0122::resource-id-output-only=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)
   string book_id = 2;

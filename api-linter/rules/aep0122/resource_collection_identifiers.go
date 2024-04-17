@@ -17,7 +17,6 @@ package aep0122
 import (
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
@@ -46,12 +45,9 @@ var resourceCollectionIdentifiers = &lint.MessageRule{
 
 			segs := strings.Split(p, "/")
 			for _, seg := range segs {
-				// Get first rune of each pattern segment.
-				c := []rune(seg)[0]
-
-				if unicode.IsLetter(c) && unicode.IsUpper(c) {
+				if HasUpper(seg) || strings.Contains(seg, "_") {
 					problems = append(problems, lint.Problem{
-						Message:    "Resource patterns must use lowerCamelCase for collection identifiers.",
+						Message:    "Resource patterns must use kebab-case for collection identifiers.",
 						Descriptor: m,
 						Location:   locations.MessageResource(m),
 					})

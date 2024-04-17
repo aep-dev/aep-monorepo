@@ -29,7 +29,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
 
   // Incorrect. Resources should contain self-links.
   string self_link = 2;
@@ -45,7 +45,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
 }
 ```
 
@@ -61,7 +61,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
-  string name = 1;
+  string path = 1;
 
   // (-- api-linter: core::0122::no-self-links=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)

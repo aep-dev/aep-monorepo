@@ -16,6 +16,7 @@ package aep0122
 
 import (
 	"strings"
+	"unicode"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
@@ -25,13 +26,21 @@ import (
 
 // HTTP URL pattern shouldn't include underscore("_")
 var httpURICase = &lint.MethodRule{
-	Name: lint.NewRuleName(122, "camel-case-uris"),
+	Name: lint.NewRuleName(122, "kebab-case-uris"),
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		// Establish that the URI does not include a `_` character.
 		for _, httpRule := range utils.GetHTTPRules(m) {
+			if(HasUpper(httpRule.GetPlainURI())) {
+				problems = append(problems, lint.Problem{
+					Message:    "HTTP URI patterns should use kebab-case, not camelCase.",
+					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
+				})
+			}
+
 			if strings.Contains(httpRule.GetPlainURI(), "_") {
 				problems = append(problems, lint.Problem{
-					Message:    "HTTP URI patterns should use camel case, not snake case.",
+					Message:    "HTTP URI patterns should use kebab-case, not snake case.",
 					Descriptor: m,
 					Location:   locations.MethodHTTPRule(m),
 				})
@@ -54,4 +63,13 @@ var httpURICase = &lint.MethodRule{
 		}
 		return
 	},
+}
+
+func HasUpper(s string) bool {
+    for _, r := range s {
+        if unicode.IsUpper(r) && unicode.IsLetter(r) {
+            return true;
+        }
+    }
+    return false;
 }

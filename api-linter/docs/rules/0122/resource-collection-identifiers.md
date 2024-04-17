@@ -29,10 +29,10 @@ lowerCamelCase form and must start with a lowercase letter.
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
-    // Collection identifiers must be lowerCamelCase.
-    pattern: "Publishers/{publisher}/Books/{book}"
+    // Collection identifiers must be kebab-case.
+    pattern: "Publishers/{publisher}/publishedBooks/{book}"
   };
-  string name = 1;
+  string path = 1;
 }
 ```
 
@@ -42,9 +42,9 @@ message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
     // Collection identifiers must begin with a lower-cased letter.
-    pattern: "/publishers/{publisher}/Books/{book}"
+    pattern: "/publishers/{publisher}/Published-books/{book}"
   };
-  string name = 1;
+  string path = 1;
 }
 ```
 
@@ -55,9 +55,9 @@ message Book {
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
-    pattern: "publishers/{publisher}/books/{book}"
+    pattern: "publishers/{publisher}/published-books/{book}"
   };
-  string name = 1;
+  string path = 1;
 }
 ```
 
@@ -73,7 +73,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "Publishers/{publisher}/Books/{book}"
   };
-  string name = 1;
+  string path = 1;
 }
 ```
 

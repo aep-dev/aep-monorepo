@@ -25,7 +25,7 @@ that has a type other than `string`.
 ```proto
 // Incorrect.
 message Book {
-  string name = 1;
+  string path = 1;
 
   // Resource references should be strings.
   Author author = 2 [(google.api.resource_reference) = {
@@ -39,7 +39,7 @@ message Book {
 ```proto
 // Correct.
 message Book {
-  string name = 1;
+  string path = 1;
 
   string author = 2 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Author"
@@ -50,7 +50,7 @@ message Book {
 ```proto
 // Correct.
 message Book {
-  string name = 1;
+  string path = 1;
 
   // If "author" is not a first-class resource, then it may be a composite
   // field within the book.
@@ -65,7 +65,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
-  string name = 1;
+  string path = 1;
 
   // (-- api-linter: core::0122::resource-reference-type=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)
