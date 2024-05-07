@@ -67,6 +67,10 @@ var descriptorDisableChecks = []func(d desc.Descriptor) bool{
 // augment the set of commentLines.
 func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location,
 	aliasMap map[string]string, ignoreCommentDisables bool) bool {
+	if(rule.GetRuleType() == MustRule) {
+		return false;
+	}
+
 	// If the rule is disabled because of something on the descriptor itself
 	// (e.g. a deprecated annotation), address that.
 	for _, mustDisable := range descriptorDisableChecks {
@@ -98,6 +102,7 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Loca
 // ruleIsDisabledByComments returns true if the rule has been disabled
 // by comments in the file or leading the element.
 func ruleIsDisabledByComments(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
+	// Must rules cannot be disabled by the linter.
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
@@ -126,4 +131,10 @@ func ruleIsDisabledByComments(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCo
 	}
 
 	return false
+}
+
+func NewRuleType(rt RuleType) *RuleType {
+	p := new(RuleType);
+	*p = rt;
+	return p;
 }
