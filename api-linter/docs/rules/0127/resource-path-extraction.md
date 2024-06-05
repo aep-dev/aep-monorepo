@@ -1,16 +1,16 @@
 ---
 rule:
   aep: 127
-  name: [core, '0127', resource-name-extraction]
-  summary: HTTP annotations should extract full resource names into variables.
-permalink: /127/resource-name-extraction
+  name: [core, '0127', resource-path-extraction]
+  summary: HTTP annotations should extract full resource paths into variables.
+permalink: /127/resource-path-extraction
 redirect_from:
-  - /0127/resource-name-extraction
+  - /0127/resource-path-extraction
 ---
 
 # HTTP URI case
 
-This rule enforces that HTTP annotations pull whole resource names into
+This rule enforces that HTTP annotations pull whole resource paths into
 variables, and not just the ID components, as mandated in [AEP-127][].
 
 ## Details
@@ -25,7 +25,7 @@ whose value is `*`.
 ```proto
 // Incorrect.
 rpc GetBook(GetBookRequest) returns (Book) {
-  // Should be /v1/{name=publishers/*/books/*}
+  // Should be /v1/{path=publishers/*/books/*}
   get: "/v1/publishers/{publisher_id}/books/{book_id}"
 }
 ```
@@ -33,7 +33,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 ```proto
 // Incorrect.
 rpc GetBook(GetBookRequest) returns (Book) {
-  // Should be /v1/{name=publishers/*/books/*}
+  // Should be /v1/{path=publishers/*/books/*}
   get: "/v1/publishers/{publisher_id=*}/books/{book_id=*}"
 }
 ```
@@ -44,7 +44,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 // Correct.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}"
+    get: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -55,7 +55,7 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0127::resource-name-extraction=disabled
+// (-- api-linter: core::0127::resource-path-extraction=disabled
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
   get: "/v1/publishers/{publisher_id}/books/{book_id}"

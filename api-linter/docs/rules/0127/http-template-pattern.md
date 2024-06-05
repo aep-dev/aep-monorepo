@@ -18,7 +18,7 @@ match one of the pattern strings defined by that resource, as mandated in
 ## Details
 
 This rule ensures that `google.api.http` path template variables that represent
-a resource name match one of the resource name patterns of the resource that the
+a resource path match one of the resource path patterns of the resource that the
 field being referenced represents.
 
 ## Examples
@@ -27,15 +27,15 @@ field being referenced represents.
 
 ```proto
 // Incorrect.
-// The template for the `name` variable in the `google.api.http` annotation
+// The template for the `path` variable in the `google.api.http` annotation
 // is missing segments from the Book message's `pattern`.
 rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
-        get: "v1/{name=shelves/*}"
+        get: "v1/{path=shelves/*}"
     };
 }
 message GetBookRequest {
-    string name = 1 [
+    string path = 1 [
         (google.api.resource_reference).type = "library.googleapis.com/Book"
     ];
 }
@@ -45,8 +45,8 @@ message Book {
         pattern: "shelves/{shelf}/books/{book}"
     };
 
-    // Book resource name.
-    string name = 1;
+    // Book resource path.
+    string path = 1;
 }
 ```
 
@@ -56,11 +56,11 @@ message Book {
 // Correct.
 rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
-        get: "v1/{name=shelves/*/books/*}"
+        get: "v1/{path=shelves/*/books/*}"
     };
 }
 message GetBookRequest {
-    string name = 1 [
+    string path = 1 [
         (google.api.resource_reference).type = "library.googleapis.com/Book"
     ];
 }
@@ -70,8 +70,8 @@ message Book {
         pattern: "shelves/{shelf}/books/{book}"
     };
 
-    // Book resource name.
-    string name = 1;
+    // Book resource path.
+    string path = 1;
 }
 ```
 
@@ -85,7 +85,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
-        get: "v1/{name=shelves/*}"
+        get: "v1/{path=shelves/*}"
     };
 }
 ```

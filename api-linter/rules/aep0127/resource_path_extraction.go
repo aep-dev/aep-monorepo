@@ -21,14 +21,14 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var resourceNameExtraction = &lint.MethodRule{
-	Name: lint.NewRuleName(127, "resource-name-extraction"),
+var resourcePathExtraction = &lint.MethodRule{
+	Name: lint.NewRuleName(127, "resource-path-extraction"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, rule := range utils.GetHTTPRules(m) {
 			for k, v := range rule.GetVariables() {
 				if v == "*" && k != "$api_version" {
 					return []lint.Problem{{
-						Message:    "Extract a full resource name into a variable, not just IDs.",
+						Message:    "Extract a full resource path into a variable, not just IDs.",
 						Descriptor: m,
 						Location:   locations.MethodHTTPRule(m),
 					}}

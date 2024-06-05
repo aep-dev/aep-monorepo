@@ -40,7 +40,7 @@ rpc GetBook(GetBookRequest) returns (Book);  // Missing `google.api.http`.
 // Correct.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}"
+    get: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -53,7 +53,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 // Incorrect.
 rpc EditBook(stream EditBookRequest) returns (stream EditBookResponse) {
   option (google.api.http) = {  // HTTP/1.1 not supported for bi-di streaming.
-    post: "/v1/{name=publishers/*/books/*}:edit"
+    post: "/v1/{path=publishers/*/books/*}:edit"
     body: "*"
   };
 }

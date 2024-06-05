@@ -21,15 +21,15 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestResourceNameExtraction(t *testing.T) {
+func TestResourcePathExtraction(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		uri      string
 		problems testutils.Problems
 	}{
-		{"Valid", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
-		{"VersioningTool", "/{$api_version}/{name=publishers/*/books/*}", testutils.Problems{}},
-		{"Invalid", "/v1/publishers/{publisher_id}/books/{book_id}", testutils.Problems{{Message: "full resource name"}}},
+		{"Valid", "/v1/{path=publishers/*/books/*}", testutils.Problems{}},
+		{"VersioningTool", "/{$api_version}/{path=publishers/*/books/*}", testutils.Problems{}},
+		{"Invalid", "/v1/publishers/{publisher_id}/books/{book_id}", testutils.Problems{{Message: "full resource path"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.ReplaceAll(`
@@ -45,7 +45,7 @@ func TestResourceNameExtraction(t *testing.T) {
 				message Book {}
 			`, "{{.URI}}", test.uri))
 			method := f.GetServices()[0].GetMethods()[0]
-			problems := resourceNameExtraction.Lint(f)
+			problems := resourcePathExtraction.Lint(f)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

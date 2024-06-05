@@ -26,8 +26,8 @@ with `/`.
 // Incorrect.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    // Should be /v1/{name=publishers/*/books/*}
-    get: "v1/{name=publishers/*/books/*}"
+    // Should be /v1/{path=publishers/*/books/*}
+    get: "v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -38,7 +38,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 // Correct.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}"
+    get: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```

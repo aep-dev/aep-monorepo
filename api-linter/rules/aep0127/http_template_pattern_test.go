@@ -28,30 +28,30 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 		problems        testutils.Problems
 	}{
 		// HTTP variable uses literals
-		{"LiteralMatchesSameLiteralInPattern", "/v1/{name=shelves}", "shelves", nil},
-		{"LiteralDoesNotMatchDifferentLiteral", "/v1/{name=shelves}", "books", testutils.Problems{{Message: "does not match"}}},
-		{"SuffixAfterHttpVariableIgnoredForMatch", "/v1/{name=shelves}/books", "shelves", nil},
+		{"LiteralMatchesSameLiteralInPattern", "/v1/{path=shelves}", "shelves", nil},
+		{"LiteralDoesNotMatchDifferentLiteral", "/v1/{path=shelves}", "books", testutils.Problems{{Message: "does not match"}}},
+		{"SuffixAfterHttpVariableIgnoredForMatch", "/v1/{path=shelves}/books", "shelves", nil},
 
 		// HTTP variable uses single wildcard
-		{"SingleWildcardMatchesAnyLiteralSegment", "/v1/{name=*}", "shelves", nil},
-		{"SingleWildcardMatchesAnyVariableSegment", "/v1/{name=*}", "{shelf}", nil},
-		{"SingleWildcardDoesNotMatchMultipleUrlSegments", "/v1/{name=*}", "shelves/{shelf}", testutils.Problems{{Message: "does not match"}}},
-		{"LiteralAndWildcardMatch", "/v1/{name=shelves/*}", "shelves/{shelf}", nil},
+		{"SingleWildcardMatchesAnyLiteralSegment", "/v1/{path=*}", "shelves", nil},
+		{"SingleWildcardMatchesAnyVariableSegment", "/v1/{path=*}", "{shelf}", nil},
+		{"SingleWildcardDoesNotMatchMultipleUrlSegments", "/v1/{path=*}", "shelves/{shelf}", testutils.Problems{{Message: "does not match"}}},
+		{"LiteralAndWildcardMatch", "/v1/{path=shelves/*}", "shelves/{shelf}", nil},
 		// This case is only theoretical, as "{shelf}" represents a resource ID,
-		// rather than a resource name. It should not be observed in practice.
-		{"ImplicitWildcardMatches", "/v1/{name}/books", "{shelf}", nil},
-		{"MulitpleWildcardsMatches", "/v1/{name=shelves/*/books/*}", "shelves/{shelf}/books/{book}", nil},
+		// rather than a resource path. It should not be observed in practice.
+		{"ImplicitWildcardMatches", "/v1/{path}/books", "{shelf}", nil},
+		{"MulitpleWildcardsMatches", "/v1/{path=shelves/*/books/*}", "shelves/{shelf}/books/{book}", nil},
 
 		// HTTP variable uses double wildcard
-		{"DoubleWildcardMatchesZeroSegments", "/v1/{name=**}", "", nil},
-		{"DoubleWildcardMatchesOneLiteralSegment", "/v1/{name=**}", "shelves", nil},
-		{"DoubleWildcardMatchesMultipleLiteralSegments", "/v1/{name=**}", "my/shelves", nil},
-		{"DoubleWildcardMatchesOneVariableSegment", "/v1/{name=**}", "{shelf}", nil},
-		{"DoubleWildcardMatchesMultipleVariableSegments", "/v1/{name=**}", "{shelf}/{book}", nil},
-		{"DoubleWildcardMatchesMixedLiteralVariableSegments", "/v1/{name=**}", "shelves/{shelf}", nil},
-		{"DoubleWildcardPrecededByLiteralMatches", "/v1/{name=shelves/**}", "shelves/{shelf}", nil},
-		{"DoubleWildcardFollowedByLiteralMatches", "/v1/{name=**/shelves/*}", "my/shelves/{shelf}", nil},
-		{"DoubleWildcardMissingLiteralDoesNotMatch", "/v1/{name=shelves/**}", "{shelf}", testutils.Problems{{Message: "does not match"}}},
+		{"DoubleWildcardMatchesZeroSegments", "/v1/{path=**}", "", nil},
+		{"DoubleWildcardMatchesOneLiteralSegment", "/v1/{path=**}", "shelves", nil},
+		{"DoubleWildcardMatchesMultipleLiteralSegments", "/v1/{path=**}", "my/shelves", nil},
+		{"DoubleWildcardMatchesOneVariableSegment", "/v1/{path=**}", "{shelf}", nil},
+		{"DoubleWildcardMatchesMultipleVariableSegments", "/v1/{path=**}", "{shelf}/{book}", nil},
+		{"DoubleWildcardMatchesMixedLiteralVariableSegments", "/v1/{path=**}", "shelves/{shelf}", nil},
+		{"DoubleWildcardPrecededByLiteralMatches", "/v1/{path=shelves/**}", "shelves/{shelf}", nil},
+		{"DoubleWildcardFollowedByLiteralMatches", "/v1/{path=**/shelves/*}", "my/shelves/{shelf}", nil},
+		{"DoubleWildcardMissingLiteralDoesNotMatch", "/v1/{path=shelves/**}", "{shelf}", testutils.Problems{{Message: "does not match"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -67,14 +67,14 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 				}
 				message GetBookRequest {
 					// Format: shelves/{shelf}/books/{book}
-					string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
+					string path = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 				}
 				message Book {
 					option (google.api.resource) = {
 						type: "library.googleapis.com/Book"
 						pattern: "{{.ResourcePattern}}"
 					};
-					string name = 1;
+					string path = 1;
 				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
@@ -93,9 +93,9 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 		ResourcePattern2 string
 		problems         testutils.Problems
 	}{
-		{"MatchesIfFirstPatternMatches", "/v1/{name=shelves}", "shelves", "books", nil},
-		{"MatchesIfSecondPatternMatches", "/v1/{name=shelves}", "books", "shelves", nil},
-		{"FailsIfNeitherPatternMatches", "/v1/{name=shelves}", "books", "bins", testutils.Problems{{Message: "does not match"}}},
+		{"MatchesIfFirstPatternMatches", "/v1/{path=shelves}", "shelves", "books", nil},
+		{"MatchesIfSecondPatternMatches", "/v1/{path=shelves}", "books", "shelves", nil},
+		{"FailsIfNeitherPatternMatches", "/v1/{path=shelves}", "books", "bins", testutils.Problems{{Message: "does not match"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -110,7 +110,7 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 					}
 				}
 				message GetBookRequest {
-					string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
+					string path = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 				}
 				message Book {
 					option (google.api.resource) = {
@@ -118,7 +118,7 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 						pattern: "{{.ResourcePattern1}}"
 						pattern: "{{.ResourcePattern2}}"
 					};
-					string name = 1;
+					string path = 1;
 				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
@@ -137,13 +137,13 @@ func TestHttpTemplatePattern_SkipCheckIfNoHTTPRules(t *testing.T) {
 				rpc GetBook(GetBookRequest) returns (Book) {}
 			}
 			message GetBookRequest {
-				string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
+				string path = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 			}
 			message Book {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
-				string name = 1;
+				string path = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {
@@ -163,13 +163,13 @@ func TestHttpTemplatePattern_SkipCheckIfHTTPRuleHasNoVariables(t *testing.T) {
 				}
 			}
 			message GetBookRequest {
-				string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
+				string path = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 			}
 			message Book {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
-				string name = 1;
+				string path = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {
@@ -184,18 +184,18 @@ func TestHttpTemplatePattern_SkipCheckIfFieldPathMissingResourceAnnotation(t *te
 			service Library {
 				rpc GetBook(GetBookRequest) returns (Book) {
 					option (google.api.http) = {
-						get: "/v1/{name=shelves}"
+						get: "/v1/{path=shelves}"
 					};
 				}
 			}
 			message GetBookRequest {
-				string name = 1;
+				string path = 1;
 			}
 			message Book {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
-				string name = 1;
+				string path = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {
