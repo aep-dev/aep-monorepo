@@ -150,6 +150,19 @@ git commit --allow-empty -m 'feat: new minor release'
 git commit --allow-empty -m 'fix: new patch release'
 ```
 
+## Migrating rules
+
+Rules in this linter need to be ported from the AIP standard to the AEP standard.
+
+When making a conversion PR, the following steps should be taken:
+
+1. Copy over new rules (and previously deleted rules) from the AIP linter.
+2. Change all references of the `name` field to `path` in the documentation.
+3. Remove any rules that no longer apply.
+4. For each existing AIP rule, check the AEPs and see what changes (if any) are necessary.
+5. Denote each rule with a Should/Must tag.
+6. Run tests with `go test ./...` and fix any issues.
+
 <!-- prettier-ignore-start -->
 [aep]: https://aep.dev/
 [go]: https://golang.org/
