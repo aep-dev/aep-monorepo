@@ -20,10 +20,12 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestNameReference = &lint.FieldRule{
-	Name: lint.NewRuleName(131, "request-name-reference"),
+// Get request should have a string path field.
+var requestPathField = &lint.FieldRule{
+	Name: lint.NewRuleName(131, "request-path-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsGetRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return utils.IsGetRequestMessage(f.GetOwner()) && f.GetName() == "path"
 	},
-	LintField: utils.LintFieldResourceReference,
+	LintField: utils.LintSingularStringField,
+	RuleType: lint.NewRuleType(lint.MustRule),
 }

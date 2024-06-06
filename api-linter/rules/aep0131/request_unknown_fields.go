@@ -25,7 +25,7 @@ import (
 )
 
 var allowedFields = stringset.New(
-	"name",       // AEP-131
+	"path",       // AEP-131
 	"request_id", // AEP-155
 	"read_mask",  // AEP-157
 	"view",       // AEP-157
@@ -37,6 +37,7 @@ var unknownFields = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return utils.IsGetRequestMessage(f.GetOwner())
 	},
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		if !allowedFields.Contains(field.GetName()) {
 			return []lint.Problem{{

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,25 +15,16 @@
 package aep0131
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestNameReferenceType = &lint.FieldRule{
-	Name: lint.NewRuleName(131, "request-name-reference-type"),
+var requestPathReference = &lint.FieldRule{
+	Name: lint.NewRuleName(131, "request-path-reference"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsGetRequestMessage(f.GetOwner()) && f.GetName() == "name" && utils.GetResourceReference(f) != nil
+		return utils.IsGetRequestMessage(f.GetOwner()) && f.GetName() == "path"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if ref := utils.GetResourceReference(f); ref.GetType() == "" {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("The `%s` field `google.api.resource_reference` annotation should be a direct `type` reference.", f.GetName()),
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintFieldResourceReference,
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 }

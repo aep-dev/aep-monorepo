@@ -23,13 +23,14 @@ import (
 )
 
 // The Get standard method should have some required fields.
-var requestNameRequired = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-name-required"),
+var requestPathRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(131, "request-path-required"),
 	OnlyIf: utils.IsGetRequestMessage,
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		if m.FindFieldByName("name") == nil {
+		if m.FindFieldByName("path") == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Message:    fmt.Sprintf("Method %q has no `path` field", m.GetName()),
 				Descriptor: m,
 			}}
 		}
