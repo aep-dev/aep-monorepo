@@ -25,7 +25,7 @@ suggests a `_count` suffix instead.
 ```proto
 // Incorrect.
 message Book {
-  string name = 1;
+  string path = 1;
   int32 num_pages = 2;  // Should be `page_count`.
 }
 ```
@@ -35,7 +35,7 @@ message Book {
 ```proto
 // Correct.
 message Book {
-  string name = 1;
+  string path = 1;
   int32 page_count = 2;
 }
 ```
@@ -49,7 +49,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0141::count-suffix=disabled
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
-  string name = 1;
+  string path = 1;
   int32 num_pages = 2;
 }
 ```

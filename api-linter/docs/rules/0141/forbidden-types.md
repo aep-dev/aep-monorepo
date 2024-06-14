@@ -32,7 +32,7 @@ It suggests use of `int32` or `int64` instead.
 ```proto
 // Incorrect.
 message Book {
-  string name = 1;
+  string path = 1;
   uint32 page_count = 2;  // Should be `int32`.
 }
 ```
@@ -42,7 +42,7 @@ message Book {
 ```proto
 // Correct.
 message Book {
-  string name = 1;
+  string path = 1;
   int32 page_count = 2;
 }
 ```
@@ -54,7 +54,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message Book {
-  string name = 1;
+  string path = 1;
   // (-- api-linter: core::0141::forbidden-types=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)
   uint32 page_count = 2;

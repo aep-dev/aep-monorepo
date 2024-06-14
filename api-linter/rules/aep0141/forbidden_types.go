@@ -26,6 +26,7 @@ import (
 
 var forbiddenTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "forbidden-types"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		nope := stringset.New("fixed32", "fixed64", "uint32", "uint64")
 		if typeName := utils.GetTypeName(f); nope.Contains(typeName) {

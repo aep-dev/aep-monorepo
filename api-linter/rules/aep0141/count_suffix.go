@@ -25,6 +25,7 @@ import (
 
 var count = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "count-suffix"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if n := f.GetName(); strings.HasPrefix(n, "num_") {
 			want := pluralize.NewClient().Singular(n[4:]) + "_count"
