@@ -26,7 +26,7 @@ the field may represent time, and indicates that the
 ```proto
 // Incorrect.
 message Book {
-  string name = 1;
+  string path = 1;
   int32 publish_time_sec = 2;  // Should use `google.protobuf.Timestamp`.
 }
 ```
@@ -36,7 +36,7 @@ message Book {
 ```proto
 // Correct.
 message Book {
-  string name = 1;
+  string path = 1;
   google.protobuf.Timestamp publish_time = 2;
 }
 ```
@@ -50,7 +50,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0142::time-field-type=disabled
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 message Book {
-  string name = 1;
+  string path = 1;
   int32 publish_time_sec = 2;
 }
 ```

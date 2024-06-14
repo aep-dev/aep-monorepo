@@ -26,6 +26,7 @@ import (
 
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-field-type"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		tokens := strings.Split(f.GetName(), "_")
 		suffix := tokens[len(tokens)-1]
