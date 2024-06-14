@@ -29,7 +29,6 @@ func AddRules(r lint.RuleRegistry) error {
 		144,
 		httpBody,
 		httpMethod,
-		requestMessageName,
 	)
 }
 
