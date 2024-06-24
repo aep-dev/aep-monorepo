@@ -26,7 +26,8 @@ import (
 )
 
 var noPrepositions = &lint.MethodRule{
-	Name: lint.NewRuleName(136, "prepositions"),
+	Name:     lint.NewRuleName(136, "prepositions"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		for _, word := range strings.Split(strcase.SnakeCase(m.GetName()), "_") {
 			if data.Prepositions.Contains(word) {

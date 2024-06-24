@@ -30,7 +30,7 @@ of a custom method.
 // Assuming that book is declarative-friendly...
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -48,7 +48,7 @@ tooling. This can be indicated to the linter using the comment shown below.
 // (-- Imperative only. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -64,7 +64,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -78,5 +78,5 @@ top of the file.
 
 [aep-136]: https://aep.dev/136
 [aep.dev/not-precedent]: https://aep.dev/not-precedent
-[http-name-variable]: ./http-name-variable.md
+[http-path-variable]: ./http-path-variable.md
 [http-parent-variable]: ./http-parent-variable.md

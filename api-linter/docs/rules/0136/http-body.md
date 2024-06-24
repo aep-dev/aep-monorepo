@@ -16,7 +16,7 @@ advised in [AEP-136][].
 ## Details
 
 This rule looks at any method that is not a standard method, and complains if
-the HTTP `body` field is not set to `"*"`. It also permits the name of the
+the HTTP `body` field is not set to `"*"`. It also permits the path of the
 resource.
 
 ## Examples
@@ -27,7 +27,7 @@ resource.
 // Incorrect.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:checkout"
+    post: "/v1/{path=publishers/*/books}:checkout"
     // `body: "*"` should be included.
   };
 }
@@ -39,7 +39,7 @@ rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
 // Correct.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:checkout"
+    post: "/v1/{path=publishers/*/books}:checkout"
     body: "*"
   };
 }
@@ -55,7 +55,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:checkout"
+    post: "/v1/{path=publishers/*/books}:checkout"
   };
 }
 ```

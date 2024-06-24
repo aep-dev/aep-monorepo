@@ -32,7 +32,6 @@ func AddRules(r lint.RuleRegistry) error {
 		httpMethod,
 		noPrepositions,
 		standardMethodsOnly,
-		uriSuffix,
 		verbNoun,
 		// These rules are disabled as they have no matching AEP guidance.
 		// See https://github.com/aep-dev/google.aep.dev/issues/955 for details.

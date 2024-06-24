@@ -30,7 +30,7 @@ this rule just attempts to catch common, easy to spot errors. It complains if:
 // Incorrect.
 rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {  // No noun.
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -42,7 +42,7 @@ rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {  // No noun.
 // Correct.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -58,7 +58,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }

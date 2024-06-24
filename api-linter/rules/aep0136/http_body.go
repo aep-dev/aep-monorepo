@@ -26,13 +26,14 @@ import (
 )
 
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-body"),
-	OnlyIf: isCustomMethod,
+	Name:     lint.NewRuleName(136, "http-body"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
+	OnlyIf:   isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			noBody := stringset.New("GET", "DELETE")
 			if !noBody.Contains(httpRule.Method) {
-				// Determine the name of the resource.
+				// Determine the path of the resource.
 				// This entails some guessing; we assume that the verb is a single
 				// word and that the resource is everything else.
 				resource := strings.Join(strings.Split(strcase.SnakeCase(m.GetName()), "_")[1:], "_")

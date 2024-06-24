@@ -27,7 +27,7 @@ additional bindings if they are present.
 // Incorrect.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    put: "/v1/{name=publishers/*/books/*}:checkout"  // Should be `post:`.
+    put: "/v1/{path=publishers/*/books/*}:checkout"  // Should be `post:`.
     body: "*"
   };
 }
@@ -39,7 +39,7 @@ rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
 // Correct.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -55,7 +55,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    put: "/v1/{name=publishers/*/books/*}:checkout"
+    put: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }

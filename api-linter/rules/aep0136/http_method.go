@@ -24,8 +24,9 @@ import (
 )
 
 var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-method"),
-	OnlyIf: isCustomMethod,
+	Name:     lint.NewRuleName(136, "http-method"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
+	OnlyIf:   isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// DeleteFooRevision is still a custom method, but delete is expected
 		// (enforced in AEP-162 rules).

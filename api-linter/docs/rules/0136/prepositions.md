@@ -29,7 +29,7 @@ it sees any of the following words in the method's name:
 // This RPC includes "with", which indicates a potential design concern.
 rpc GetBookWithAuthor(GetBookWithAuthorRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}:getWithAuthor"
+    get: "/v1/{path=publishers/*/books/*}:getWithAuthor"
   };
 }
 ```
@@ -46,7 +46,7 @@ conceptual change:
 // The "FromLibrary" suffix is vestigial and should be removed.
 rpc CheckoutBookFromLibrary(CheckoutBookFromLibraryRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkoutFromLibrary"
+    post: "/v1/{path=publishers/*/books/*}:checkoutFromLibrary"
     body: "*"
   };
 }
@@ -58,7 +58,7 @@ rpc CheckoutBookFromLibrary(CheckoutBookFromLibraryRequest) returns (Book) {
 // Correct.
 rpc CheckoutBook(CheckoutBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{path=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -74,7 +74,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBookWithAuthor(GetBookWithAuthorRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}:getWithAuthor"
+    get: "/v1/{path=publishers/*/books/*}:getWithAuthor"
   };
 }
 ```
