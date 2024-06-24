@@ -28,7 +28,7 @@ This rule looks at any method with a return type of
 // Incorrect.
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:write"
+    post: "/v1/{path=publishers/*/books}:write"
     body: "*"
   };
   // There should be a google.longrunning.operation_info annotation.
@@ -41,7 +41,7 @@ rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
 // Correct.
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:write"
+    post: "/v1/{path=publishers/*/books}:write"
     body: "*"
   };
   option (google.longrunning.operation_info) = {
@@ -61,7 +61,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:write"
+    post: "/v1/{path=publishers/*/books}:write"
     body: "*"
   };
 }

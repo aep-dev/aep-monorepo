@@ -21,8 +21,9 @@ import (
 )
 
 var lroMetadataReachable = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-metadata-reachable"),
-	OnlyIf: isAnnotatedLRO,
+	Name:     lint.NewRuleName(151, "lro-metadata-reachable"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		// See lro_response_reachable.go for `checkReachable` method.
 		return checkReachable(m, utils.GetOperationInfo(m).GetMetadataType())

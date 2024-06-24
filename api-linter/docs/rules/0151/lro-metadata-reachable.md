@@ -38,7 +38,7 @@ In `library_service.proto`:
 service Library {
   rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{name=publishers/*/books}:write"
+      post: "/v1/{path=publishers/*/books}:write"
       body: "*"
     };
     option (google.longrunning.operation_info) = {
@@ -71,7 +71,7 @@ Same file:
 service Library {
   rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{name=publishers/*/books}:write"
+      post: "/v1/{path=publishers/*/books}:write"
       body: "*"
     };
     option (google.longrunning.operation_info) = {
@@ -102,7 +102,7 @@ import "operations.proto";
 service Library {
   rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{name=publishers/*/books}:write"
+      post: "/v1/{path=publishers/*/books}:write"
       body: "*"
     };
     option (google.longrunning.operation_info) = {
@@ -136,7 +136,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books}:write"
+    post: "/v1/{path=publishers/*/books}:write"
     body: "*"
   };
   option (google.longrunning.operation_info) = {

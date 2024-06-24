@@ -25,8 +25,9 @@ import (
 )
 
 var lroResponse = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-response-type"),
-	OnlyIf: isAnnotatedLRO,
+	Name:     lint.NewRuleName(151, "lro-response-type"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		lro := utils.GetOperationInfo(m)
 
