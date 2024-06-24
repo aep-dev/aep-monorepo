@@ -24,6 +24,7 @@ import (
 // This should be the only variable in the URI path.
 var httpURIParent = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-parent"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		// The response type of a Standard Create method must be the resource
 		// itself, unless it is an LRO, in which case, the operation_info field

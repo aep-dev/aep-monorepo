@@ -27,6 +27,7 @@ import (
 var outputName = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "response-message-name"),
 	OnlyIf: utils.IsCreateMethod,
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		want := utils.GetResourceMessageName(m, "Create")
 

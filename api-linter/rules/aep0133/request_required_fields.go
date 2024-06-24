@@ -16,28 +16,25 @@ package aep0133
 
 import (
 	"fmt"
-	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
 // The create request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "request-required-fields"),
 	OnlyIf: utils.IsCreateMethod,
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
-		r := utils.GetResource(ot)
-		resourceMsgName := utils.GetResourceSingular(r)
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New(
 			"parent",
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
+			"id",
 		)
 
 		problems := []lint.Problem{}

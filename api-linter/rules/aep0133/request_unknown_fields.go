@@ -16,18 +16,17 @@ package aep0133
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	"github.com/stoewer/go-strcase"
 )
 
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-unknown-fields"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
@@ -37,7 +36,7 @@ var unknownFields = &lint.MessageRule{
 			"parent":        nil, // AEP-133
 			"request_id":    nil, // AEP-155
 			"validate_only": nil, // AEP-163
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
+			"id":            nil,
 		}
 
 		for _, field := range m.GetFields() {

@@ -25,6 +25,7 @@ import (
 // parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "resource-reference-type"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		ot := utils.GetResponseType(m)
 		// Unresolvable response_type for an Operation results in nil here.

@@ -27,6 +27,7 @@ import (
 // in the resource definition.
 var httpURIResource = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-resource"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		return utils.IsCreateMethod(m) && len(utils.GetHTTPRules(m)) > 0
 	},

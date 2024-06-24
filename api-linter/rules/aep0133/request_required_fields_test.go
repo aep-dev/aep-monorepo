@@ -45,7 +45,7 @@ func TestRequiredFieldTests(t *testing.T) {
 		},
 		{
 			"ValidWithSingularAndIdField",
-			"string book_shelf_id = 3 [(google.api.field_behavior) = OPTIONAL];",
+			"string id = 3 [(google.api.field_behavior) = OPTIONAL];",
 			"",
 			"bookShelf",
 			nil,

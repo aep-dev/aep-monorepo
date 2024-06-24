@@ -28,6 +28,7 @@ import (
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "http-body"),
 	OnlyIf: utils.IsCreateMethod,
+	RuleType: lint.NewRuleType(lint.MustRule),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resourceMsgName := utils.GetResourceMessageName(m, "Create")
 		resourceFieldName := strings.ToLower(resourceMsgName)

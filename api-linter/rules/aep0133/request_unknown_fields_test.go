@@ -55,7 +55,7 @@ func TestUnknownFields(t *testing.T) {
 			"CreateBookRequest",
 			[]field{
 				{"book", builder.FieldTypeMessage(builder.NewMessage("Book"))},
-				{"book_id", builder.FieldTypeString()},
+				{"id", builder.FieldTypeString()},
 			},
 			testutils.Problems{},
 			nil,
@@ -63,7 +63,7 @@ func TestUnknownFields(t *testing.T) {
 		{
 			"ResourceRelatedField",
 			"CreateBookStoreRequest",
-			[]field{{"book_store_id", builder.FieldTypeString()}},
+			[]field{{"id", builder.FieldTypeString()}},
 			testutils.Problems{},
 			nil,
 		},

@@ -27,6 +27,7 @@ import (
 // The create request message should have resource field.
 var resourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-resource-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgNameFromReq(m)

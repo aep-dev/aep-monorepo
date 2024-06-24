@@ -22,6 +22,7 @@ import (
 
 var requestResourceBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(133, "request-resource-behavior"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		message := f.GetOwner()
 		if !utils.IsCreateRequestMessage(message) {

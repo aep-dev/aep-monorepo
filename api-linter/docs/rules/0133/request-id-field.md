@@ -44,7 +44,7 @@ message CreateBookRequest {
     child_type: "library.googleapis.com/Book"
   }];
 
-  string book_id = 2;
+  string id = 2;
 
   Book book = 3;
 

@@ -37,6 +37,7 @@ var requestParentRequired = &lint.MessageRule{
 
 		return nil
 	},
+	RuleType: lint.NewRuleType(lint.MustRule),
 }
 
 func hasNoParent(m *desc.MessageDescriptor) bool {

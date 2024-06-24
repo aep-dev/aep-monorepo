@@ -21,16 +21,17 @@ import (
 )
 
 func TestRequestIDField(t *testing.T) {
-	problems := testutils.Problems{{Message: "`string book_id`"}}
+	problems := testutils.Problems{{Message: "`string id`"}}
 	for _, test := range []struct {
 		name     string
 		IDField  string
 		problems testutils.Problems
 	}{
-		{"Valid", "string book_id = 2;", nil},
+		{"Valid", "string id = 2;", nil},
 		{"InvalidMissing", "", problems},
-		{"InvalidType", "bytes book_id = 2;", problems},
-		{"InvalidRepeated", "repeated string book_id = 2;", problems},
+		{"InvalidWrong", "string book_id = 2;", problems},
+		{"InvalidType", "bytes id = 2;", problems},
+		{"InvalidRepeated", "repeated string id = 2;", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

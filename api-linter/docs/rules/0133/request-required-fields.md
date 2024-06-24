@@ -44,7 +44,7 @@ message CreateBookRequest {
 message CreateBookRequest {
   string parent = 1;
   Book book = 2;
-  string book_id = 3;
+  string id = 3;
   string validate_only = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 ```
@@ -58,7 +58,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 message CreateBookRequest {
   string parent = 1;
   Book book = 2;
-  string book_id = 3;
+  string id = 3;
 
   // (-- api-linter: core::0133::request-required-fields=disabled
   //     aep.dev/not-precedent: We really need this field to be required because

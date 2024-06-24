@@ -27,4 +27,5 @@ var requestParentField = &lint.FieldRule{
 		return utils.IsCreateRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
 	LintField: utils.LintSingularStringField,
+	RuleType: lint.NewRuleType(lint.MustRule),
 }
