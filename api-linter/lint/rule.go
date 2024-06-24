@@ -22,13 +22,14 @@ import (
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
-type RuleType = int;
+type RuleType = int
 
 const (
 	// TODO: Remove NotCategorized once all rules have categories.
 	NotCategorizedRule RuleType = iota
 	MustRule
 	ShouldRule
+	MayRule // TODO: what should we do with may rules?
 )
 
 // ProtoRule defines a lint rule that checks Google Protobuf APIs.
@@ -70,10 +71,10 @@ type FileRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *FileRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -112,10 +113,10 @@ type MessageRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *MessageRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -159,10 +160,10 @@ type FieldRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *FieldRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -208,10 +209,10 @@ type ServiceRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *ServiceRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -252,10 +253,10 @@ type MethodRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *MethodRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -298,10 +299,10 @@ type EnumRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *EnumRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -344,10 +345,10 @@ type EnumValueRule struct {
 
 // GetRuleType returns the type of a rule.
 func (r *EnumValueRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.
@@ -390,16 +391,16 @@ type DescriptorRule struct {
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
-	
+
 	RuleType *RuleType
 }
 
 // GetRuleType returns the type of a rule.
 func (r *DescriptorRule) GetRuleType() RuleType {
-	if(r.RuleType == nil) {
-		return NotCategorizedRule;
+	if r.RuleType == nil {
+		return NotCategorizedRule
 	}
-	return *r.RuleType;
+	return *r.RuleType
 }
 
 // GetName returns the name of the rule.

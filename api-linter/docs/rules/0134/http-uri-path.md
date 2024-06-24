@@ -1,22 +1,22 @@
 ---
 rule:
   aep: 134
-  name: [core, '0134', http-uri-name]
-  summary: Update methods must map the resource's name field to the URI.
-permalink: /134/http-uri-name
+  name: [core, '0134', http-uri-path]
+  summary: Update methods must map the resource's path field to the URI.
+permalink: /134/http-uri-path
 redirect_from:
-  - /0134/http-uri-name
+  - /0134/http-uri-path
 ---
 
-# Update methods: HTTP URI name field
+# Update methods: HTTP URI path field
 
-This rule enforces that all `Update` RPCs map the `name` field from the
+This rule enforces that all `Update` RPCs map the `path` field from the
 resource object to the HTTP URI, as mandated in [AEP-134][].
 
 ## Details
 
 This rule looks at any message matching beginning with `Update`, and complains
-if the `name` variable from the resource (not the request message) is not
+if the `path` variable from the resource (not the request message) is not
 included in the URI. It _does_ check additional bindings if they are present.
 
 Additionally, if the resource uses multiple words, it ensures that word
@@ -30,7 +30,7 @@ separation uses `snake_case`.
 // Incorrect.
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"  // Should be `book.name`.
+    post: "/v1/{path=publishers/*/books/*}"  // Should be `book.path`.
     body: "book"
   };
 }
@@ -42,7 +42,7 @@ rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
 // Correct.
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{book.name=publishers/*/books/*}"
+    post: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -54,11 +54,11 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0134::http-uri-name=disabled
+// (-- api-linter: core::0134::http-uri-path=disabled
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"
+    post: "/v1/{path=publishers/*/books/*}"
     body: "book"
   };
 }

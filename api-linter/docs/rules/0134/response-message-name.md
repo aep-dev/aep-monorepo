@@ -35,7 +35,7 @@ prefix `Update` removed.
 // Should be `Book`.
 rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
   option (google.api.http) = {
-    patch: "/v1/{book.name=publishers/*/books/*}"
+    patch: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -47,7 +47,7 @@ rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
 // Correct.
 rpc UpdateBook(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    patch: "/v1/{book.name=publishers/*/books/*}"
+    patch: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -61,7 +61,7 @@ rpc UpdateBook(UpdateBookRequest) returns (Book) {
 // Incorrect.
 rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    patch: "/v1/{book.name=publishers/*/books/*}"
+    patch: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
   option (google.longrunning.operation_info) = {
@@ -77,7 +77,7 @@ rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
 // Correct.
 rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    patch: "/v1/{book.name=publishers/*/books/*}"
+    patch: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
   option (google.longrunning.operation_info) = {
@@ -97,7 +97,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
   option (google.api.http) = {
-    patch: "/v1/{book.name=publishers/*/books/*}"
+    patch: "/v1/{book.path=publishers/*/books/*}"
     body: "book"
   };
 }

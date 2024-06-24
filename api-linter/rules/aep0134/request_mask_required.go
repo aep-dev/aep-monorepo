@@ -21,8 +21,9 @@ import (
 )
 
 var requestMaskRequired = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-mask-required"),
-	OnlyIf: utils.IsUpdateRequestMessage,
+	Name:     lint.NewRuleName(134, "request-mask-required"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   utils.IsUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")
 		if updateMask == nil {

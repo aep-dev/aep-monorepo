@@ -21,7 +21,8 @@ import (
 )
 
 var requestMaskField = &lint.FieldRule{
-	Name: lint.NewRuleName(134, "request-mask-field"),
+	Name:     lint.NewRuleName(134, "request-mask-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return utils.IsUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
 	},

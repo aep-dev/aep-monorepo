@@ -25,8 +25,9 @@ import (
 
 // The update request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "request-required-fields"),
-	OnlyIf: utils.IsUpdateMethod,
+	Name:     lint.NewRuleName(134, "request-required-fields"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   utils.IsUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		ot := utils.GetResponseType(m)
 		it := m.GetInputType()

@@ -25,7 +25,8 @@ import (
 
 // Update methods should use the word "update", not synonyms.
 var synonyms = &lint.MethodRule{
-	Name: lint.NewRuleName(134, "synonyms"),
+	Name:     lint.NewRuleName(134, "synonyms"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		return m.GetName() != "SetIamPolicy"
 	},

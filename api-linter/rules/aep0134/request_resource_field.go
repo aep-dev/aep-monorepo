@@ -26,7 +26,8 @@ import (
 
 // The resource field in a update method should named properly.
 var requestResourceField = &lint.FieldRule{
-	Name: lint.NewRuleName(134, "request-resource-field"),
+	Name:     lint.NewRuleName(134, "request-resource-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		message := f.GetOwner()
 		return utils.IsUpdateRequestMessage(message) &&

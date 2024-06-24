@@ -25,8 +25,9 @@ import (
 
 // Update methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "http-uri-name"),
-	OnlyIf: utils.IsUpdateMethod,
+	Name:     lint.NewRuleName(134, "http-uri-path"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   utils.IsUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		want := fmt.Sprintf("%s.path", fieldName)
