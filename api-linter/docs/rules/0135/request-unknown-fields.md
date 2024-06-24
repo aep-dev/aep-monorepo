@@ -18,7 +18,7 @@ fields, as mandated in [AEP-135][].
 This rule looks at any message matching `Delete*Request` and complains if it
 comes across any fields other than:
 
-- `string name` ([AEP-135][])
+- `string path` ([AEP-135][])
 - `bool allow_missing` ([AEP-135][])
 - `bool force` ([AEP-135][])
 - `string etag` ([AEP-154][])
@@ -32,7 +32,7 @@ comes across any fields other than:
 ```proto
 // Incorrect.
 message DeleteBookRequest {
-  string name = 1;
+  string path = 1;
   string library_id = 2;  // Non-standard field.
 }
 ```
@@ -42,7 +42,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1;
+  string path = 1;
 }
 ```
 
@@ -53,7 +53,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
-  string name = 1;
+  string path = 1;
 
   // (-- api-linter: core::0135::request-unknown-fields=disabled
   //     aep.dev/not-precedent: We really need this field because reasons. --)

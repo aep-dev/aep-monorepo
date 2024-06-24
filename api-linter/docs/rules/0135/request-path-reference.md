@@ -1,23 +1,23 @@
 ---
 rule:
   aep: 135
-  name: [core, '0135', request-name-reference]
+  name: [core, '0135', request-path-reference]
   summary: |
-    Delete RPCs should annotate the `name` field with `google.api.resource_reference`.
-permalink: /135/request-name-reference
+    Delete RPCs should annotate the `path` field with `google.api.resource_reference`.
+permalink: /135/request-path-reference
 redirect_from:
-  - /0135/request-name-reference
+  - /0135/request-path-reference
 ---
 
 # Delete methods: Resource reference
 
 This rule enforces that all `Delete` standard methods have
-`google.api.resource_reference` on their `string name` field, as mandated in
+`google.api.resource_reference` on their `string path` field, as mandated in
 [AEP-135][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Delete*Request`
+This rule looks at the `path` field of any message matching `Delete*Request`
 and complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -28,7 +28,7 @@ and complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message DeleteBookRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string path = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -37,7 +37,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1 [
+  string path = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -51,9 +51,9 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
-  // (-- api-linter: core::0135::request-name-reference=disabled
+  // (-- api-linter: core::0135::request-path-reference=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string path = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 

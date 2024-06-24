@@ -22,6 +22,7 @@ import (
 // Delete methods should use the HTTP DELETE method.
 var httpMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(135, "http-method"),
+	RuleType:   lint.NewRuleType(lint.MustRule),
 	OnlyIf:     utils.IsDeleteMethod,
 	LintMethod: utils.LintHTTPMethod("DELETE"),
 }

@@ -18,7 +18,7 @@ required fields, as mandated in [AEP-135][].
 This rule looks at any message matching `Delete*Request` and complains if it
 comes across any required fields other than:
 
-- `string name` ([AEP-135][])
+- `string path` ([AEP-135][])
 
 ## Examples
 
@@ -27,7 +27,7 @@ comes across any required fields other than:
 ```proto
 // Incorrect.
 message DeleteBookRequest {
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string path = 1 [(google.api.field_behavior) = REQUIRED];
   // Non-standard required field.
   bool allow_missing = 4 [(google.api.field_behavior) = REQUIRED];
 }
@@ -38,7 +38,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string path = 1 [(google.api.field_behavior) = REQUIRED];
   bool allow_missing = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 ```
@@ -50,7 +50,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string path = 1 [(google.api.field_behavior) = REQUIRED];
   // (-- api-linter: core::0135::request-required-fields=disabled
   //     aep.dev/not-precedent: We really need this field to be required because
   // reasons. --)

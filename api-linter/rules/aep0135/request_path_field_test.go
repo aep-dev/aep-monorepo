@@ -22,27 +22,27 @@ import (
 
 func TestRequestNameField(t *testing.T) {
 	tests := []struct {
-		name        string
+		path        string
 		MessageName string
 		FieldType   string
 		FieldName   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "DeleteBookRequest", "string", "name", nil},
-		{"Invalid", "DeleteBookRequest", "bytes", "name", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantMessage", "RemoveBookRequest", "bytes", "name", nil},
+		{"Valid", "DeleteBookRequest", "string", "path", nil},
+		{"Invalid", "DeleteBookRequest", "bytes", "path", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantMessage", "RemoveBookRequest", "bytes", "path", nil},
 		{"IrrelevantField", "DeleteBookRequest", "bytes", "title", nil},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.path, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				message {{.MessageName}} {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := requestNameField.Lint(f)
+			problems := requestPathField.Lint(f)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}

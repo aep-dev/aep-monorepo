@@ -3,7 +3,7 @@ rule:
   aep: 135
   name: [core, '0135', method-signature]
   summary: |
-    Delete RPCs should annotate a method signature of "name".
+    Delete RPCs should annotate a method signature of "path".
 permalink: /135/method-signature
 redirect_from:
   - /0135/method-signature
@@ -12,14 +12,14 @@ redirect_from:
 # Delete methods: Method signature
 
 This rule enforces that all `Delete` standard methods have a
-`google.api.method_signature` annotation with a value of `"name"`, as mandated
+`google.api.method_signature` annotation with a value of `"path"`, as mandated
 in [AEP-135][].
 
 ## Details
 
 This rule looks at any method beginning with `Delete`, and complains if the
 `google.api.method_signature` annotation is missing, or if it is set to any
-value other than `"name"`. Additional method signatures, if present, are
+value other than `"path"`. Additional method signatures, if present, are
 ignored.
 
 ## Examples
@@ -36,7 +36,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
 ```proto
 // Incorrect.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
-  option (google.api.method_signature) = "book";  // Should be "name".
+  option (google.api.method_signature) = "book";  // Should be "path".
 }
 ```
 
@@ -45,7 +45,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
 ```proto
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
-  option (google.api.method_signature) = "name";
+  option (google.api.method_signature) = "path";
 }
 ```
 

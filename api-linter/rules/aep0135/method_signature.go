@@ -26,13 +26,14 @@ import (
 )
 
 var methodSignature = &lint.MethodRule{
-	Name:   lint.NewRuleName(135, "method-signature"),
-	OnlyIf: utils.IsDeleteMethod,
+	Name:     lint.NewRuleName(135, "method-signature"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
+	OnlyIf:   utils.IsDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 		in := m.GetInputType()
 
-		fields := []string{"name"}
+		fields := []string{"path"}
 		if etag := in.FindFieldByName("etag"); etag != nil {
 			fields = append(fields, etag.GetName())
 		}
@@ -53,10 +54,10 @@ var methodSignature = &lint.MethodRule{
 		}
 
 		// Check if the signature contains a disallowed field or doesn't contain
-		// "name".
+		// "path".
 		first := signatures[0]
 		fieldSet := stringset.New(fields...)
-		if !fieldSet.Contains(first...) || !stringset.New(first...).Contains("name") {
+		if !fieldSet.Contains(first...) || !stringset.New(first...).Contains("path") {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The method signature for Delete methods should be %q.", want),
 				Suggestion: fmt.Sprintf("option (google.api.method_signature) = %q;", want),

@@ -29,7 +29,7 @@ var unknownFields = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"name":          {}, // AEP-135
+			"path":          {}, // AEP-135
 			"force":         {}, // AEP-135
 			"allow_missing": {}, // AEP-135
 			"etag":          {}, // AEP-154

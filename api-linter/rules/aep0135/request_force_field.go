@@ -21,7 +21,8 @@ import (
 )
 
 var requestForceField = &lint.FieldRule{
-	Name: lint.NewRuleName(135, "request-force-field"),
+	Name:     lint.NewRuleName(135, "request-force-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "force"
 	},

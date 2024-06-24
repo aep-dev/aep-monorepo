@@ -37,7 +37,7 @@ or the name of the RPC with the prefix `Delete` removed.
 // Should be `google.protobuf.Empty` or the resource.
 rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -48,7 +48,7 @@ rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -57,7 +57,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -73,7 +73,7 @@ permitted as a return type (and therefore only the second example is valid).
 // Incorrect.
 rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
   option (google.longrunning.operation_info) = {
     // Should be "google.protobuf.Empty" or "Book".
@@ -89,7 +89,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
   option (google.longrunning.operation_info) = {
     response_type: "google.protobuf.Empty"
@@ -102,7 +102,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
   option (google.longrunning.operation_info) = {
     response_type: "Book"
@@ -121,7 +121,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```

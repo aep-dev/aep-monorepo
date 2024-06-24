@@ -22,7 +22,8 @@ import (
 )
 
 var responseLRO = &lint.MethodRule{
-	Name: lint.NewRuleName(135, "response-lro"),
+	Name:     lint.NewRuleName(135, "response-lro"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		return utils.IsDeleteMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
 	},

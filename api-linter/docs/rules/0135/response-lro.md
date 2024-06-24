@@ -30,7 +30,7 @@ and complains if it does not use long-running operations.
 // return a long-running operation.
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -42,7 +42,7 @@ rpc DeleteBook(DeleteBookRequest) returns (Book) {
 // Assuming that Book is styled declarative-friendly...
 rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
   option (google.longrunning.operation_info) = {
     response_type: "Book"
@@ -61,7 +61,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```

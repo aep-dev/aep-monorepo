@@ -44,7 +44,7 @@ func TestForceField(t *testing.T) {
 						pattern: "publishers/{publisher}/books/{book}"
 					};
 	
-					string name = 1;
+					string path = 1;
 				}
 
 				message Publisher {
@@ -53,11 +53,11 @@ func TestForceField(t *testing.T) {
 						pattern: "publishers/{publisher}"
 					};
 	
-					string name = 1;
+					string path = 1;
 				}
 
 				message DeleteResourceRequest {
-					string name = 1 [(google.api.resource_reference){{.Reference}}];
+					string path = 1 [(google.api.resource_reference){{.Reference}}];
 
 					bool {{.BoolField}} = 2;
 				}

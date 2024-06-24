@@ -17,13 +17,12 @@ package aep0135
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-var requestNameReference = &lint.FieldRule{
-	Name: lint.NewRuleName(135, "request-name-reference"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
-	},
-	LintField: utils.LintFieldResourceReference,
+// Delete methods should have a proper HTTP pattern.
+var httpPathField = &lint.MethodRule{
+	Name:       lint.NewRuleName(135, "http-uri-path"),
+	RuleType:   lint.NewRuleType(lint.MustRule),
+	OnlyIf:     utils.IsDeleteMethod,
+	LintMethod: utils.LintHTTPURIHasPathVariable,
 }

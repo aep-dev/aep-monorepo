@@ -20,10 +20,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestNameBehavior = &lint.FieldRule{
-	Name: lint.NewRuleName(135, "request-name-behavior"),
+var requestPathBehavior = &lint.FieldRule{
+	Name:     lint.NewRuleName(135, "request-path-behavior"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "path"
 	},
 	LintField: utils.LintRequiredField,
 }

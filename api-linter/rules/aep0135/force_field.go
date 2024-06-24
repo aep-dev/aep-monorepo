@@ -22,9 +22,10 @@ import (
 
 // Delete methods for resources that are parents should have a bool force field.
 var forceField = &lint.MessageRule{
-	Name: lint.NewRuleName(135, "force-field"),
+	Name:     lint.NewRuleName(135, "force-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		name := m.FindFieldByName("name")
+		name := m.FindFieldByName("path")
 		ref := utils.GetResourceReference(name)
 		validRef := ref != nil && ref.GetType() != "" && utils.FindResource(ref.GetType(), m.GetFile()) != nil
 
@@ -32,7 +33,7 @@ var forceField = &lint.MessageRule{
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		force := m.FindFieldByName("force")
-		name := m.FindFieldByName("name")
+		name := m.FindFieldByName("path")
 		ref := utils.GetResourceReference(name)
 		res := utils.FindResource(ref.GetType(), m.GetFile())
 

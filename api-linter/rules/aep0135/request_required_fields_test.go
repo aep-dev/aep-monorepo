@@ -67,7 +67,7 @@ func TestRequiredFieldTests(t *testing.T) {
 				service Library {
 					rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 						option (google.api.http) = {
-						    delete: "/v1/{name=publishers/*/books/*}"
+						    delete: "/v1/{path=publishers/*/books/*}"
 						};
 						option (google.longrunning.operation_info) = {
 							response_type: "google.protobuf.Empty"
@@ -77,7 +77,7 @@ func TestRequiredFieldTests(t *testing.T) {
 				}
 
 				message DeleteBookRequest {
-					string name = 1 [
+					string path = 1 [
 						(google.api.field_behavior) = REQUIRED
 					];
 					{{.Fields}}

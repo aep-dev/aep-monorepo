@@ -28,7 +28,7 @@ RPC with the suffix `Request` appended.
 // Should be `DeleteBookRequest`.
 rpc DeleteBook(Book) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -39,7 +39,7 @@ rpc DeleteBook(Book) returns (google.protobuf.Empty) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -54,7 +54,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(Book) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}"
+    get: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```

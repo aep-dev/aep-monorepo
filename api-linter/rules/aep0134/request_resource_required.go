@@ -10,8 +10,9 @@ import (
 
 // The create request message should have resource field.
 var requestResourceRequired = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-resource-required"),
-	OnlyIf: utils.IsUpdateRequestMessage,
+	Name:     lint.NewRuleName(134, "request-resource-required"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf:   utils.IsUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resourceMsgName := extractResource(m.GetName())
 		for _, fieldDesc := range m.GetFields() {

@@ -27,7 +27,7 @@ bindings if they are present.
 // Incorrect.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"  // Should be `delete:`.
+    post: "/v1/{path=publishers/*/books/*}"  // Should be `delete:`.
   };
 }
 ```
@@ -38,7 +38,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```
@@ -53,7 +53,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"
+    post: "/v1/{path=publishers/*/books/*}"
   };
 }
 ```

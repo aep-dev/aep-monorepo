@@ -22,6 +22,7 @@ import (
 // Delete messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(135, "request-message-name"),
+	RuleType:   lint.NewRuleType(lint.MustRule),
 	OnlyIf:     utils.IsDeleteMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

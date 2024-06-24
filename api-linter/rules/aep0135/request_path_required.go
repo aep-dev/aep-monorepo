@@ -15,15 +15,23 @@
 package aep0135
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestNameField = &lint.FieldRule{
-	Name: lint.NewRuleName(135, "request-name-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
+var requestPathRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(135, "request-path-required"),
+	OnlyIf: utils.IsDeleteRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		if m.FindFieldByName("path") == nil {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("Method %q has no `path` field", m.GetName()),
+				Descriptor: m,
+			}}
+		}
+		return nil
 	},
-	LintField: utils.LintSingularStringField,
 }
