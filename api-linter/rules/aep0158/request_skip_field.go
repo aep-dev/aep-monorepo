@@ -22,7 +22,8 @@ import (
 )
 
 var requestSkipField = &lint.FieldRule{
-	Name: lint.NewRuleName(158, "request-skip-field"),
+	Name:     lint.NewRuleName(158, "request-skip-field"),
+	RuleType: lint.NewRuleType(lint.MayRule),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isPaginatedRequestMessage(f.GetOwner()) && f.GetName() == "skip"
 	},

@@ -27,12 +27,11 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		158,
-		requestPaginationPageSize,
+		requestPaginationMaxPageSize,
 		requestPaginationPageToken,
 		requestSkipField,
 		responsePaginationNextPageToken,
 		responseRepeatedFirstField,
-		responsePluralFirstField,
 		responseUnary,
 	)
 }

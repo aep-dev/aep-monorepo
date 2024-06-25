@@ -21,6 +21,7 @@ import (
 
 var responsePaginationNextPageToken = &lint.MessageRule{
 	Name:        lint.NewRuleName(158, "response-next-page-token-field"),
+	RuleType:    lint.NewRuleType(lint.MustRule),
 	OnlyIf:      isPaginatedResponseMessage,
 	LintMessage: utils.LintFieldPresentAndSingularString("next_page_token"),
 }

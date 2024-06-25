@@ -1,8 +1,8 @@
 ---
 rule:
   aep: 158
-  name: [core, '0158', request-page-size-field]
-  summary: Paginated RPCs must have a `page_size` field in the request.
+  name: [core, '0158', request-max-page-size-field]
+  summary: Paginated RPCs must have a `max_page_size` field in the request.
 permalink: /158/request-page-size-field
 redirect_from:
   - /0158/request-page-size-field
@@ -26,7 +26,7 @@ other than `int32`.
 ```proto
 // Incorrect.
 message ListBooksRequest {
-  string name = 1;
+  string path = 1;
   int32 limit = 2;  // Field name should be `page_size`.
   string page_token = 3;
 }
@@ -36,7 +36,7 @@ message ListBooksRequest {
 // Incorrect.
 message ListBooksRequest {
   string parent = 1;
-  uint32 page_size = 2;  // Field type should be `int32`.
+  uint32 max_page_size = 2;  // Field type should be `int32`.
   string page_token = 3;
 }
 ```
@@ -47,7 +47,7 @@ message ListBooksRequest {
 // Correct.
 message ListBooksRequest {
   string parent = 1;
-  int32 page_size = 2;
+  int32 max_page_size = 2;
   string page_token = 3;
 }
 ```
@@ -62,7 +62,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0158::request-page-size-field=disabled
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
-  string name = 1;
+  string path = 1;
   int32 limit = 2;
   string page_token = 3;
 }

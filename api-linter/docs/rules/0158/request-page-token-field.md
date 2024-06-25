@@ -26,8 +26,8 @@ other than `string`.
 ```proto
 // Incorrect.
 message ListBooksRequest {
-  string name = 1;
-  int32 page_size = 2;
+  string path = 1;
+  int32 max_page_size = 2;
   string offset = 3;  // Field name should be `page_token`.
 }
 ```
@@ -36,7 +36,7 @@ message ListBooksRequest {
 // Incorrect.
 message ListBooksRequest {
   string parent = 1;
-  int32 page_size = 2;
+  int32 max_page_size = 2;
   bytes page_token = 3;  // Field type should be `string`.
 }
 ```
@@ -47,7 +47,7 @@ message ListBooksRequest {
 // Correct.
 message ListBooksRequest {
   string parent = 1;
-  int32 page_size = 2;
+  int32 max_page_size = 2;
   string page_token = 3;
 }
 ```
@@ -63,7 +63,7 @@ Remember to also include an [aep.dev/not-precedent][] comment explaining why.
 //     aep.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
   string name = 1;
-  int32 page_size = 2;
+  int32 max_page_size = 2;
   string offset = 3;
 }
 ```

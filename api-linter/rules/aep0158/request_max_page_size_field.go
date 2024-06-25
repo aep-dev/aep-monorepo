@@ -21,11 +21,12 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var requestPaginationPageSize = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "request-page-size-field"),
-	OnlyIf: isPaginatedRequestMessage,
+var requestPaginationMaxPageSize = &lint.MessageRule{
+	Name:     lint.NewRuleName(158, "request-max-page-size-field"),
+	RuleType: lint.NewRuleType(lint.ShouldRule),
+	OnlyIf:   isPaginatedRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		f, problems := utils.LintFieldPresent(m, "page_size")
+		f, problems := utils.LintFieldPresent(m, "max_page_size")
 		if len(problems) > 0 {
 			return problems
 		}

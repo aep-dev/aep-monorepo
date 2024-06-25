@@ -36,7 +36,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 		{
 			"Valid",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
+			[]field{{"max_page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
 			false,
 			testutils.Problems{},
 			nil,
@@ -46,17 +46,17 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			"ListFooRequest",
 			[]field{{"page_token", builder.FieldTypeString()}},
 			false,
-			testutils.Problems{{Message: "page_size"}},
+			testutils.Problems{{Message: "max_page_size"}},
 			nil,
 		},
 		{
 			"InvalidType",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeDouble()}},
+			[]field{{"max_page_size", builder.FieldTypeDouble()}},
 			false,
 			testutils.Problems{{Suggestion: "int32"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("page_size")
+				return m.FindFieldByName("max_page_size")
 			},
 		},
 		{
@@ -70,11 +70,11 @@ func TestRequestPaginationPageSize(t *testing.T) {
 		{
 			"InvalidIsOneof",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeInt32()}},
+			[]field{{"max_page_size", builder.FieldTypeInt32()}},
 			/* isOneof */ true,
 			testutils.Problems{{Message: "oneof"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("page_size")
+				return m.FindFieldByName("max_page_size")
 			},
 		},
 	}
@@ -106,7 +106,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageSize.Lint(message.GetFile())
+			problems := requestPaginationMaxPageSize.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

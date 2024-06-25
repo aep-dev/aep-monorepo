@@ -29,7 +29,7 @@ message ListBooksRequest {
     (google.api.field_behavior) = REQUIRED
   ];
 
-  int32 page_size = 2;
+  int32 max_page_size = 2;
 
   string page_token = 3;
 
@@ -46,7 +46,7 @@ message ListBooksRequest {
     (google.api.field_behavior) = REQUIRED
   ];
 
-  int32 page_size = 2;
+  int32 max_page_size = 2;
 
   string page_token = 3;
 
@@ -66,7 +66,7 @@ message ListBooksRequest {
     (google.api.field_behavior) = REQUIRED
   ];
 
-  int32 page_size = 2;
+  int32 max_page_size = 2;
 
   string page_token = 3;
 
