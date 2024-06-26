@@ -11,7 +11,7 @@ redirect_from:
 # Hardcoded hyphen segments
 
 This rule enforces that URIs do not "hard-code" a segment of `-` in their URIs,
-as mandated in [AEP-159][].
+as mandated in [AIP-159][].
 
 ## Details
 
