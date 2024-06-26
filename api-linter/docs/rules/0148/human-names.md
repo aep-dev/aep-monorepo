@@ -11,7 +11,7 @@ redirect_from:
 # Human names
 
 This rule encourages terms for human names (`given_name` and `family_name`)
-that are more accurate across cultures, as mandated in [AEP-148][].
+that are more accurate across cultures, as mandated in [AIP-148][].
 
 ## Details
 

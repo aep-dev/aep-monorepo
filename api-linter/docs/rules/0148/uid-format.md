@@ -11,7 +11,7 @@ redirect_from:
 # `uid` format annotation
 
 This rule encourages the use of the `UUID4` format annotation on the `uid`
-field, as mandated in [AEP-148][].
+field, as mandated in [AIP-148][].
 
 ## Details
 
@@ -31,7 +31,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+  string path = 1 [(google.api.field_behavior) = IDENTIFIER];
   string uid = 2; // missing (google.api.field_info).format = UUID4
 }
 ```
@@ -46,7 +46,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+  string path = 1 [(google.api.field_behavior) = IDENTIFIER];
   string uid = 2 [(google.api.field_info).format = UUID4];
 }
 ```
@@ -64,7 +64,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+  string path = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // (-- api-linter: core::0148::uid-format=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)

@@ -11,7 +11,7 @@ redirect_from:
 # Declarative-friendly fields
 
 This rule requires certain standard fields on declarative-friendly resources,
-as mandated in [AEP-148][].
+as mandated in [AIP-148][].
 
 ## Details
 
@@ -19,7 +19,7 @@ This rule looks at any resource with a `google.api.resource` annotation that
 includes `style: DECLARATIVE_FRIENDLY`, and complains if it does not include
 all of the following fields:
 
-- `string name`
+- `string path`
 - `string uid`
 - `string display_name`
 - `google.protobuf.Timestamp create_time`
@@ -39,7 +39,7 @@ message Book {
     style: DECLARATIVE_FRIENDLY
   };
 
-  string name = 1;
+  string path = 1;
   // string uid should be included!
   string display_name = 2;
   google.protobuf.Timestamp create_time = 3;
@@ -59,7 +59,7 @@ message Book {
     style: DECLARATIVE_FRIENDLY
   };
 
-  string name = 1;
+  string path = 1;
   string uid = 2;
   string display_name = 3;
   google.protobuf.Timestamp create_time = 4;
@@ -83,7 +83,7 @@ message Book {
     style: DECLARATIVE_FRIENDLY
   };
 
-  string name = 1;
+  string path = 1;
   // string uid should be included!
   string display_name = 2;
   google.protobuf.Timestamp create_time = 3;

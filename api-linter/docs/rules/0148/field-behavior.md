@@ -11,7 +11,7 @@ redirect_from:
 # Standard resource fields: Field behavior
 
 This rule enforces that all standard resource fields have the correct
-`google.api.field_behavior`, as mandated in [AEP-148][].
+`google.api.field_behavior`, as mandated in [AIP-148][].
 
 ## Details
 
@@ -36,7 +36,7 @@ message Book {
     pattern: "publishers/{publisher}/books/{book}"
   };
 
-  string name = 1;
+  string path = 1;
 
   // The `google.api.field_behavior` annotation should be `OUTPUT_ONLY`.
   google.protobuf.Timestamp create_time = 2;
@@ -62,7 +62,7 @@ message Book {
     pattern: "publishers/{publisher}/books/{book}"
   };
 
-  string name = 1;
+  string path = 1;
 
   google.protobuf.Timestamp create_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -86,7 +86,7 @@ message Book {
     pattern: "publishers/{publisher}/books/{book}"
   };
 
-  string name = 1;
+  string path = 1;
 
   // (-- api-linter: core::0148::field-behavior=disabled
   //     aep.dev/not-precedent: We need to do this because reasons. --)
