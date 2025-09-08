@@ -1,9 +1,24 @@
 {
-  "name": "aep-lib-ts",
-  "version": "1.0.0",
+  "name": "@aep_dev/aep-lib-ts",
+  "version": "0.0.1",
   "description": "Utility libraries for AEP TypeScript-based tools including case conversion, OpenAPI utilities, and API clients",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "keywords": [
+    "aep",
+    "openapi",
+    "typescript",
+    "case-conversion",
+    "api-client"
+  ],
+  "homepage": "https://github.com/aep-dev/aep-lib-ts#readme",
+  "bugs": {
+    "url": "https://github.com/aep-dev/aep-lib-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aep-dev/aep-lib-ts.git"
+  },
+  "license": "MIT",
+  "author": "AEP Team",
   "type": "module",
   "exports": {
     ".": {
@@ -15,6 +30,8 @@
       "types": "./dist/*.d.ts"
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "src",
@@ -28,15 +45,6 @@
     "prepublishOnly": "npm run clean && npm run build && npm run test",
     "dev": "tsc --watch"
   },
-  "keywords": [
-    "aep",
-    "openapi",
-    "typescript",
-    "case-conversion",
-    "api-client"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "winston": "^3.11.0",
     "axios": "^1.6.0",
