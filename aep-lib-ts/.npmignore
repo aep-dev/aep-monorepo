@@ -1,0 +1,25 @@
+# Source files and tests
+src/**/*.test.ts
+
+# Development files
+jest.config.js
+tsconfig.json
+.nyc_output
+
+# IDE files
+.vscode/
+.idea/
+
+# CI/CD files
+.github/
+
+# Coverage reports
+coverage/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
