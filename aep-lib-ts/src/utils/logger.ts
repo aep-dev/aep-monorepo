@@ -1,21 +1,9 @@
-import winston from 'winston';
+import { Logger } from 'tslog';
 
-export const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json()
-  ),
-  defaultMeta: { service: 'aep-lib-ts' },
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
-  ]
+export const logger = new Logger({
+  name: 'aep-lib-ts',
+  minLevel: 2, // 0: silly, 1: trace, 2: debug, 3: info, 4: warn, 5: error, 6: fatal
+  type: 'pretty',
 });
 
 export default logger;

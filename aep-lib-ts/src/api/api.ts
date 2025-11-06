@@ -131,7 +131,7 @@ export class APIClient {
           if (response) {
             const respSchema = getSchemaFromResponse(response, openAPI);
             if (!respSchema) {
-              console.warn(
+              logger.warn(
                 `Resource ${path} has a LIST method with a response schema, but the response schema is null.`
               );
             } else {
@@ -161,7 +161,7 @@ export class APIClient {
                   }
                 }
               } else {
-                console.warn(
+                logger.warn(
                   `Resource ${path} has a LIST method with a response schema, but the items field is not present or is not an array.`
                 );
               }
