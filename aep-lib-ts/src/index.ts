@@ -10,7 +10,6 @@ export { logger } from './utils/logger.js';
 // Re-export types with explicit naming to avoid conflicts
 export type {
   API,
-  Contact,
   CustomMethod,
   CreateMethod,
   DeleteMethod,
@@ -19,11 +18,11 @@ export type {
   UpdateMethod,
   Resource,
   PatternInfo,
-  APISchema
 } from './api/types.js';
 
 export type {
   Components,
+  Contact,
   Info,
   MediaType,
   OpenAPI,
@@ -32,6 +31,7 @@ export type {
   PathItem,
   RequestBody,
   Response,
+  Schema,
   Server,
   ServerVariable,
   XAEPResource,

@@ -1,42 +1,4 @@
-import { APISchema } from "./types.js";
-
-export interface Resource {
-  singular: string;
-  plural: string;
-  parents: Resource[];
-  children: Resource[];
-  patternElems: string[];
-  schema: APISchema;
-  getMethod?: GetMethod;
-  listMethod?: ListMethod;
-  createMethod?: CreateMethod;
-  updateMethod?: UpdateMethod;
-  deleteMethod?: DeleteMethod;
-  customMethods: CustomMethod[];
-}
-
-export interface GetMethod {}
-
-export interface ListMethod {
-  hasUnreachableResources: boolean;
-  supportsFilter: boolean;
-  supportsSkip: boolean;
-}
-
-export interface CreateMethod {
-  supportsUserSettableCreate: boolean;
-}
-
-export interface UpdateMethod {}
-
-export interface DeleteMethod {}
-
-export interface CustomMethod {
-  name: string;
-  method: string;
-  request: APISchema | null;
-  response: APISchema | null;
-}
+import type { Resource } from "./types.js";
 
 export function getPattern(resource: Resource): string {
   return resource.patternElems.join("/");

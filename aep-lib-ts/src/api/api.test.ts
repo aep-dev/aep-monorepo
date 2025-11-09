@@ -1,5 +1,6 @@
 /// <reference types="jest" />
-import { API, Contact, OpenAPI, Resource, APISchema } from "./types.js";
+import { API, Resource } from "./types.js";
+import { Contact, OpenAPI, Schema } from "../openapi/types.js";
 import { APIClient } from "./api.js";
 import { fetchOpenAPI, OpenAPIImpl } from "../openapi/openapi.js";
 import yargs from "yargs";
@@ -314,7 +315,7 @@ describe("APIClient", () => {
               properties: {
                 name: { type: "string" },
               },
-              xAEPResource: {
+              "x-aep-resource": {
                 singular: "widget",
                 plural: "widgets",
                 patterns: ["/widgets/{widget}"],

@@ -1,11 +1,13 @@
 import {
   API,
-  Contact,
-  OpenAPI,
   Resource,
-  APISchema,
   ListMethod,
 } from "./types.js";
+import {
+  Contact,
+  OpenAPI,
+  Schema,
+} from "../openapi/types.js";
 import {
   convertToOpenAPI,
   generateParentPatternsWithParams,
@@ -160,7 +162,7 @@ describe("convertToOpenAPI", () => {
         const schema = openAPI.components.schemas[resource.singular];
         expect(schema).toBeDefined();
         expect(schema.type).toBe(resource.schema.type);
-        expect(schema.xAEPResource?.singular).toBe(resource.singular);
+        expect(schema["x-aep-resource"]?.singular).toBe(resource.singular);
       }
 
       // Verify operations exist and have correct operationIds
@@ -209,7 +211,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: { resource: "publisher" },
+                "x-aep-resource-reference": { resource: "publisher" },
               },
               {
                 in: "query",
@@ -245,7 +247,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: { resource: "publisher" },
+                "x-aep-resource-reference": { resource: "publisher" },
               },
               {
                 name: "id",
@@ -265,7 +267,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: {
+                "x-aep-resource-reference": {
                   resource: "publisher",
                 },
               },
@@ -285,7 +287,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: {
+                "x-aep-resource-reference": {
                   resource: "publisher",
                 },
               },
@@ -313,7 +315,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: {
+                "x-aep-resource-reference": {
                   resource: "publisher",
                 },
               },
@@ -341,7 +343,7 @@ describe("convertToOpenAPI", () => {
                 name: "publisher",
                 required: true,
                 schema: { type: "string" },
-                xAEPResourceRef: {
+                "x-aep-resource-reference": {
                   resource: "publisher",
                 },
               },
@@ -492,7 +494,7 @@ describe("convertToOpenAPI", () => {
               name: "database",
               required: true,
               schema: { type: "string" },
-              xAEPResourceRef: { resource: "database" },
+              "x-aep-resource-reference": { resource: "database" },
             },
           ],
         },
@@ -543,14 +545,14 @@ describe("convertToOpenAPI", () => {
               name: "account",
               required: true,
               schema: { type: "string" },
-              xAEPResourceRef: { resource: "account" },
+              "x-aep-resource-reference": { resource: "account" },
             },
             {
               in: "path",
               name: "database",
               required: true,
               schema: { type: "string" },
-              xAEPResourceRef: { resource: "database" },
+              "x-aep-resource-reference": { resource: "database" },
             },
           ],
         },
