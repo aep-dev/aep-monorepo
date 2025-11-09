@@ -134,7 +134,8 @@ describe("convertToOpenAPI", () => {
       // Verify basic OpenAPI structure
       expect(openAPI.openapi).toBe("3.1.0");
       expect(openAPI.info.title).toBe(exampleAPI.name);
-      expect(openAPI.servers[0].url).toBe(exampleAPI.serverURL);
+      expect(openAPI.servers).toBeDefined();
+      expect(openAPI.servers![0].url).toBe(exampleAPI.serverURL);
 
       // Verify Contact information
       if (exampleAPI.contact == null) {
@@ -158,8 +159,9 @@ describe("convertToOpenAPI", () => {
       }
 
       // Verify schemas exist
+      expect(openAPI.components).toBeDefined();
       for (const [key, resource] of Object.entries(exampleAPI.resources)) {
-        const schema = openAPI.components.schemas[resource.singular];
+        const schema = openAPI.components!.schemas[resource.singular];
         expect(schema).toBeDefined();
         expect(schema.type).toBe(resource.schema.type);
         expect(schema["x-aep-resource"]?.singular).toBe(resource.singular);
