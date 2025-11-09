@@ -1,16 +1,17 @@
 import {
   API,
-  Contact,
-  OpenAPI,
   PatternInfo,
   Resource,
-  APISchema,
-  Response as OpenAPIResponse,
-  RequestBody as OpenAPIRequestBody,
   CustomMethod,
 } from "./types.js";
+import {
+  Contact,
+  OpenAPI,
+  Schema,
+  Response as OpenAPIResponse,
+  RequestBody as OpenAPIRequestBody,
+} from "../openapi/types.js";
 import { pascalCaseToKebabCase } from "../cases/cases.js";
-import { Schema } from "../openapi/types.js";
 import { logger } from "../utils/logger.js";
 
 export class APIClient {
@@ -43,7 +44,7 @@ export class APIClient {
         continue;
       }
 
-      let schemaRef: APISchema | null = null;
+      let schemaRef: Schema | null = null;
       const r: Partial<Resource> = {};
 
       if (patternInfo.customMethodName && patternInfo.isResourcePattern) {
@@ -53,7 +54,7 @@ export class APIClient {
         }
 
         if (pathItem.post) {
-          const response = pathItem.post.responses["200"];
+          const response = pathItem.post.responses?.["200"];
           if (response) {
             const schema = getSchemaFromResponse(response, openAPI);
             const responseSchema = schema
@@ -81,7 +82,7 @@ export class APIClient {
         }
 
         if (pathItem.get) {
-          const response = pathItem.get.responses["200"];
+          const response = pathItem.get.responses?.["200"];
           if (response) {
             const schema = getSchemaFromResponse(response, openAPI);
             const responseSchema = schema
@@ -101,14 +102,14 @@ export class APIClient {
           r.deleteMethod = {};
         }
         if (pathItem.get) {
-          const response = pathItem.get.responses["200"];
+          const response = pathItem.get.responses?.["200"];
           if (response) {
             schemaRef = getSchemaFromResponse(response, openAPI);
             r.getMethod = {};
           }
         }
         if (pathItem.patch) {
-          const response = pathItem.patch.responses["200"];
+          const response = pathItem.patch.responses?.["200"];
           if (response) {
             schemaRef = getSchemaFromResponse(response, openAPI);
             r.updateMethod = {};
@@ -116,7 +117,7 @@ export class APIClient {
         }
       } else {
         if (pathItem.post) {
-          const response = pathItem.post.responses["200"];
+          const response = pathItem.post.responses?.["200"];
           if (response) {
             schemaRef = getSchemaFromResponse(response, openAPI);
             const supportsUserSettableCreate =
@@ -127,7 +128,7 @@ export class APIClient {
         }
 
         if (pathItem.get) {
-          const response = pathItem.get.responses["200"];
+          const response = pathItem.get.responses?.["200"];
           if (response) {
             const respSchema = getSchemaFromResponse(response, openAPI);
             if (!respSchema) {
@@ -218,7 +219,7 @@ export class APIClient {
     }
 
     if (!serverURL) {
-      serverURL = openAPI.servers[0]?.url + pathPrefix;
+      serverURL = openAPI.servers?.[0]?.url + pathPrefix;
     }
 
     if (serverURL == "" || serverURL == "undefined") {
@@ -226,8 +227,8 @@ export class APIClient {
     }
 
     // Add non-resource schemas to API's schemas
-    const schemas: Record<string, APISchema> = {};
-    for (const [key, schema] of Object.entries(openAPI.components.schemas)) {
+    const schemas: Record<string, Schema> = {};
+    for (const [key, schema] of Object.entries(openAPI.components?.schemas || {})) {
       if (!resourceBySingular[key]) {
         schemas[key] = schema;
       }
@@ -322,7 +323,7 @@ async function getOrPopulateResource(
   if (schema) {
     if (schema["x-aep-resource"] && schema["x-aep-resource"].parents) {
       for (const parentSingular of schema["x-aep-resource"].parents) {
-        const parentSchema = openAPI.components.schemas[parentSingular];
+        const parentSchema = openAPI.components?.schemas[parentSingular];
         if (!parentSchema) {
           throw new Error(
             `Resource "${singular}" parent "${parentSingular}" not found`
@@ -357,7 +358,7 @@ function getContact(contact?: Contact): Contact | null {
 function getSchemaFromResponse(
   response: OpenAPIResponse,
   openAPI: OpenAPI
-): APISchema | null {
+): Schema | null {
   if (openAPI.openapi === "2.0") {
     return response.schema || null;
   }
@@ -367,7 +368,7 @@ function getSchemaFromResponse(
 function getSchemaFromRequestBody(
   requestBody: OpenAPIRequestBody,
   openAPI: OpenAPI
-): APISchema {
+): Schema {
   if (openAPI.openapi === "2.0") {
     return requestBody.schema!;
   }
@@ -375,9 +376,9 @@ function getSchemaFromRequestBody(
 }
 
 async function dereferenceSchema(
-  schema: APISchema,
+  schema: Schema,
   openAPI: OpenAPI
-): Promise<APISchema> {
+): Promise<Schema> {
   if (!schema.$ref) {
     return schema;
   }
@@ -389,7 +390,7 @@ async function dereferenceSchema(
     if (!response.ok) {
       throw new Error(`Failed to fetch external schema: ${schema.$ref}`);
     }
-    const externalSchema = await response.json() as APISchema;
+    const externalSchema = await response.json() as Schema;
     logger.debug(
       `Final schema fetched from ${schema.$ref}: ${JSON.stringify(externalSchema)}`);
     return dereferenceSchema(externalSchema, openAPI);
@@ -397,12 +398,12 @@ async function dereferenceSchema(
 
   const parts = schema.$ref.split("/");
   const key = parts[parts.length - 1];
-  let childSchema: APISchema;
+  let childSchema: Schema;
 
   if (openAPI.openapi === "2.0") {
     childSchema = openAPI.definitions![key];
   } else {
-    childSchema = openAPI.components.schemas[key];
+    childSchema = openAPI.components!.schemas[key];
   }
 
   if (!childSchema) {

@@ -1,23 +1,25 @@
 import {
   API,
-  Contact,
-  OpenAPI,
-  PathItem as OpenAPIPathItem,
   PathWithParams,
   Resource,
-  APISchema,
+} from "./types.js";
+import {
+  Contact,
+  OpenAPI,
+  PathItem,
+  Schema,
   Operation,
   RequestBody,
   Parameter,
   Response,
-} from "./types.js";
+} from "../openapi/types.js";
 import { collectionName } from "./resource.js";
 import { kebabToPascalCase } from "../cases/cases.js";
 
 export function convertToOpenAPI(api: API): OpenAPI {
-  const paths: Record<string, OpenAPIPathItem> = {};
+  const paths: Record<string, PathItem> = {};
   const components = {
-    schemas: {} as Record<string, APISchema>,
+    schemas: {} as Record<string, Schema>,
   };
 
   for (const r of Object.values(api.resources)) {
@@ -63,7 +65,7 @@ export function convertToOpenAPI(api: API): OpenAPI {
 
       if (r.listMethod) {
         const listPath = `${pwp.pattern}${collection}`;
-        const responseProperties: Record<string, APISchema> = {
+        const responseProperties: Record<string, Schema> = {
           results: {
             type: "array",
             items: { $ref: schemaRef },
@@ -260,7 +262,7 @@ export function convertToOpenAPI(api: API): OpenAPI {
     }
 
     const parents = r.parents.map((p) => p.singular);
-    schema.xAEPResource = {
+    schema["x-aep-resource"] = {
       singular: r.singular,
       plural: r.plural,
       patterns,
@@ -339,7 +341,7 @@ export function generateParentPatternsWithParams(
       name: singular,
       required: true,
       schema: { type: "string" },
-      xAEPResourceRef: { resource: singular },
+      "x-aep-resource-reference": { resource: singular },
     };
 
     if (parent.parents.length === 0) {
@@ -361,7 +363,7 @@ export function generateParentPatternsWithParams(
 }
 
 function addMethodToPath(
-  paths: Record<string, OpenAPIPathItem>,
+  paths: Record<string, PathItem>,
   path: string,
   method: string,
   methodInfo: any
@@ -391,113 +393,6 @@ function addMethodToPath(
   }
 }
 
-export interface PathItem {
-  get?: {
-    parameters?: Array<{
-      in: string;
-      name: string;
-      required: boolean;
-      schema: APISchema;
-      xAEPResourceRef?: {
-        resource: string;
-      };
-    }>;
-    responses: Record<
-      string,
-      {
-        description: string;
-        content?: {
-          "application/json": {
-            schema: APISchema;
-          };
-        };
-      }
-    >;
-  };
-  post?: {
-    parameters?: Array<{
-      in: string;
-      name: string;
-      required: boolean;
-      schema: APISchema;
-      xAEPResourceRef?: {
-        resource: string;
-      };
-    }>;
-    requestBody?: {
-      required: boolean;
-      content: {
-        "application/json": {
-          schema: APISchema;
-        };
-      };
-    };
-    responses: Record<
-      string,
-      {
-        description: string;
-        content?: {
-          "application/json": {
-            schema: APISchema;
-          };
-        };
-      }
-    >;
-  };
-  patch?: {
-    parameters?: Array<{
-      in: string;
-      name: string;
-      required: boolean;
-      schema: APISchema;
-      xAEPResourceRef?: {
-        resource: string;
-      };
-    }>;
-    requestBody?: {
-      required: boolean;
-      content: {
-        "application/json": {
-          schema: APISchema;
-        };
-      };
-    };
-    responses: Record<
-      string,
-      {
-        description: string;
-        content?: {
-          "application/json": {
-            schema: APISchema;
-          };
-        };
-      }
-    >;
-  };
-  delete?: {
-    parameters?: Array<{
-      in: string;
-      name: string;
-      required: boolean;
-      schema: APISchema;
-      xAEPResourceRef?: {
-        resource: string;
-      };
-    }>;
-    responses: Record<
-      string,
-      {
-        description: string;
-        content?: {
-          "application/json": {
-            schema: APISchema;
-          };
-        };
-      }
-    >;
-  };
-}
-
 export function parseOpenAPI(openapi: OpenAPI): OpenAPI {
   return openapi;
 }
@@ -509,12 +404,12 @@ export function getPathItem(
   return openapi.paths[path];
 }
 
-export function getSchema(schema: APISchema | undefined): APISchema {
+export function getSchema(schema: Schema | undefined): Schema {
   if (!schema) {
     return { type: "object", properties: {} };
   }
   if ("$ref" in schema && schema.$ref) {
-    const refSchema: APISchema = {
+    const refSchema: Schema = {
       type: "object",
       properties: {},
       $ref: schema.$ref,
@@ -543,17 +438,7 @@ export function getParameters(
   openapi: OpenAPI,
   path: string,
   method: string
-):
-  | Array<{
-      in: string;
-      name: string;
-      required: boolean;
-      schema: APISchema;
-      xAEPResourceRef?: {
-        resource: string;
-      };
-    }>
-  | undefined {
+): Parameter[] | undefined {
   const methodItem = getMethod(openapi, path, method);
   if (!methodItem || !("parameters" in methodItem)) {
     return undefined;
@@ -575,19 +460,7 @@ export function getResponses(
   openapi: OpenAPI,
   path: string,
   method: string
-):
-  | Record<
-      string,
-      {
-        description: string;
-        content?: {
-          "application/json": {
-            schema: APISchema;
-          };
-        };
-      }
-    >
-  | undefined {
+): Record<string, Response> | undefined {
   const methodItem = getMethod(openapi, path, method);
   if (!methodItem || !("responses" in methodItem)) {
     return undefined;
