@@ -82,3 +82,13 @@ To start with, the following tests will be created:
 - aep-135-delete-resource: Delete a resource and verify it was deleted.
 - aep-135-delete-nonexistent-resource: Attempt to delete a non-existent
   resource and verify it returns 404 not found.
+
+## Global setup
+
+When running the test suite over and over again, improper cleanup may result in garbage being collected in the collection-under-test.
+
+To avoid the friction with having to clean up the collection manually, a global setup and teardown will be run once before and after the test suite is run.
+
+The global setup and teardown would include, but not be limited to:
+
+- List, then delete all resources in the collection.
