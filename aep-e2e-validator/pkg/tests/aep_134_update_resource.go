@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
 )
 
 var TestAEP134UpdateResource = Test{
@@ -21,7 +23,7 @@ func setupUpdateResource(v ValidationActions, ctx *ValidationContext) error {
 }
 
 func testUpdateResource(v ValidationActions, ctx *ValidationContext) error {
-	updatePayload, err := GenerateCreatePayload(ctx.Resource)
+	updatePayload, err := utils.GenerateCreatePayload(ctx.Resource)
 	if err != nil {
 		return fmt.Errorf("failed to generate update payload: %w", err)
 	}

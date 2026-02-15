@@ -2,16 +2,19 @@ package tests
 
 import (
 	"fmt"
+
+	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
 )
 
 var TestAEP132ListResourcesLimit1 = Test{
-	Name: "aep-132-list-resources-limit-1",
-	Run:  testListResourcesLimit1,
+	Name:     "aep-132-list-resources-limit-1",
+	Setup:    setupListResources,
+	Run:      testListResourcesLimit1,
+	Teardown: testDeleteResource,
 }
 
 func testListResourcesLimit1(v ValidationActions, ctx *ValidationContext) error {
-	listURL := fmt.Sprintf("%s?page_size=1", ctx.CollectionURL)
-	listResp, err := v.List(listURL)
+	listResp, err := utils.FetchList(v, ctx.CollectionURL, "", 1)
 	if err != nil {
 		return err
 	}

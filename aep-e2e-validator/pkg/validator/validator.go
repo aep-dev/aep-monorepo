@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/aep-dev/aep-e2e-validator/pkg/tests"
+	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
 	"github.com/aep-dev/aep-lib-go/pkg/api"
 	"github.com/aep-dev/aep-lib-go/pkg/openapi"
 )
@@ -115,6 +116,13 @@ func (v *Validator) validateResource(r *api.Resource) int {
 		}
 	}
 
+	// Global Setup: clean up collection
+	fmt.Println("Running Global Setup...")
+	if err := v.cleanupCollection(r); err != nil {
+		fmt.Printf("   Global Setup failed: %v\n", err)
+		return ExitCodeSetupFailed
+	}
+
 	for i, test := range testsToRun {
 		fmt.Printf("%d. %s...\n", i+1, test.Name)
 
@@ -161,7 +169,56 @@ func (v *Validator) validateResource(r *api.Resource) int {
 		}
 	}
 
+	// Global Teardown: clean up collection
+	fmt.Println("Running Global Teardown...")
+	if err := v.cleanupCollection(r); err != nil {
+		fmt.Printf("   Global Teardown failed: %v\n", err)
+		return ExitCodeTeardownFailed
+	}
+
 	return ExitCodeSuccess
+}
+
+func (v *Validator) cleanupCollection(r *api.Resource) error {
+	collectionURL := fmt.Sprintf("%s/%s", r.API.ServerURL, r.Plural)
+	pageToken := ""
+
+	for {
+		listResp, err := utils.FetchList(v, collectionURL, pageToken, 0)
+		if err != nil {
+			// If 404, the collection likely doesn't exist, which is fine (empty).
+			// But List should return 200 with 0 items usually.
+			// Let's Log strict error for now.
+			return fmt.Errorf("failed to list resources: %w", err)
+		}
+
+		for _, resource := range listResp.Resources {
+			rName, ok := resource["name"].(string)
+			if !ok || rName == "" {
+				rName, _ = resource["path"].(string)
+			}
+			if rName == "" {
+				// Skipping resource without name/path
+				continue
+			}
+
+			delURL := fmt.Sprintf("%s/%s", r.API.ServerURL, rName)
+			// We try to delete. If it fails, we log but maybe don't abort entire cleanup?
+			// Ideally we want to clean everything.
+			if err := v.Delete(delURL); err != nil {
+				if strings.Contains(err.Error(), "status 404") {
+					continue
+				}
+				fmt.Printf("   Warning: failed to delete during cleanup %s: %v\n", rName, err)
+			}
+		}
+
+		pageToken = listResp.NextPageToken
+		if pageToken == "" {
+			break
+		}
+	}
+	return nil
 }
 
 func (v *Validator) CreateResource(r *api.Resource, collectionURL string, payload map[string]interface{}) (map[string]interface{}, error) {
@@ -277,7 +334,7 @@ func (v *Validator) Delete(url string) error {
 	return nil
 }
 
-func (v *Validator) List(url string) (*tests.ListResponse, error) {
+func (v *Validator) List(url string) (*utils.ListResponse, error) {
 	resp, err := v.getReq(url)
 	if err != nil {
 		return nil, err
@@ -313,7 +370,7 @@ func (v *Validator) List(url string) (*tests.ListResponse, error) {
 		}
 	}
 
-	return &tests.ListResponse{
+	return &utils.ListResponse{
 		Resources:     resources,
 		NextPageToken: nextToken,
 	}, nil

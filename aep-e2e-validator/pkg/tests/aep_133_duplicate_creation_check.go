@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
 )
 
 var TestAEP133DuplicateCreationCheck = Test{
@@ -29,7 +31,7 @@ func testDuplicateCreationCheck(v ValidationActions, ctx *ValidationContext) err
 			r1Name, _ = ctx.Resources[0]["path"].(string)
 		}
 		r1ID := getIDFromResourceName(r1Name)
-		createPayload, _ := GenerateCreatePayload(r)
+		createPayload, _ := utils.GenerateCreatePayload(r)
 
 		urlWithID := fmt.Sprintf("%s?id=%s", ctx.CollectionURL, r1ID)
 		resp, err := v.Post(urlWithID, createPayload)
