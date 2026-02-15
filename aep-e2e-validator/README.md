@@ -1,4 +1,5 @@
 # aep-e2e-validator
+
 An AEP validator that ensures compatibility of AEP HTTP APIs end-to-end.
 
 ## Goals
@@ -9,4 +10,10 @@ Other tools, such as [aep-openapi-linter](https://github.com/aep-dev/aep-openapi
 
 ## Caution: please run against staging / development APIs
 
-End-to-end validation requires the creation, deletion, list, and so on of the APIs that is being tested. As such, *it is not recommended* to run this tool against a production API. Instead, it is recommended to run this against a staging API instead, possibly as an automated test in a CI/CD pipeline.
+End-to-end validation requires the creation, deletion, list, and so on of the APIs that is being tested. As such, _it is not recommended_ to run this tool against a production API. Instead, it is recommended to run this against a staging API instead, possibly as an automated test in a CI/CD pipeline.
+
+## User Guide
+
+```
+go run main.go validate --config "http://localhost:8000/openapi.json" --collection shelves
+```
