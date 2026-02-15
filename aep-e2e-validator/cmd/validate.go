@@ -2,15 +2,17 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/aep-dev/aep-e2e-validator/pkg/validator"
 	"github.com/spf13/cobra"
 )
 
 var (
-	configPath    string
-	collection    string
+	configPath     string
+	collection     string
 	allCollections bool
+	testNames      []string
 )
 
 var validateCmd = &cobra.Command{
@@ -24,6 +26,10 @@ var validateCmd = &cobra.Command{
 		if collection == "" && !allCollections {
 			return fmt.Errorf("either collection or all-collections must be specified")
 		}
+		if collection != "" && allCollections {
+			return fmt.Errorf("cannot specify both collection and all-collections")
+		}
+
 		fmt.Printf("Validating with config: %s\n", configPath)
 		if allCollections {
 			fmt.Println("Validating all collections")
@@ -31,8 +37,12 @@ var validateCmd = &cobra.Command{
 			fmt.Printf("Validating collection: %s\n", collection)
 		}
 
-		v := validator.NewValidator(configPath, collection, allCollections)
-		return v.Run()
+		v := validator.NewValidator(configPath, collection, allCollections, testNames)
+		exitCode := v.Run()
+		if exitCode != validator.ExitCodeSuccess {
+			os.Exit(exitCode)
+		}
+		return nil
 	},
 }
 
@@ -42,6 +52,7 @@ func init() {
 	validateCmd.Flags().StringVar(&configPath, "config", "", "Path to the OpenAPI spec file")
 	validateCmd.Flags().StringVar(&collection, "collection", "", "Name of the collection to validate")
 	validateCmd.Flags().BoolVar(&allCollections, "all-collections", false, "Validate all collections in the spec")
+	validateCmd.Flags().StringSliceVar(&testNames, "tests", []string{}, "Comma-separated list of tests to run (e.g. aep-133-create)")
 
 	validateCmd.MarkFlagRequired("config")
 }

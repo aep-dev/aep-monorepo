@@ -12,6 +12,9 @@ The code is written Go, leveraging the shared functionality in the [aep-lib-go r
 
 The code is organized under individual rules, which can be referenced by the AEP that they are validating, along with the semantic behavior (e.g. `aep-133-create`). Each individual test is located inside of it's own file.
 
+Each test is composed of precondition, setup, test, and teardown function calls and
+hooks, mapped to a common struct.
+
 The various common exit codes (precondition failed, teardown failed, etc.) are defined in the `pkg/validator/exit_codes.go` file.
 
 ### Interface
@@ -62,6 +65,7 @@ At the end of the test, the mutations applied on the collection will be attempte
 1. Test failed.
 2. Precondition not met.
 3. Teardown failed.
+4. Setup failed
 
 ### Tests to be created
 
