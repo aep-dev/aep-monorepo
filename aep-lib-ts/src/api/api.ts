@@ -1,9 +1,4 @@
-import {
-  API,
-  PatternInfo,
-  Resource,
-  CustomMethod,
-} from "./types.js";
+import { API, PatternInfo, Resource, CustomMethod } from "./types.js";
 import {
   Contact,
   OpenAPI,
@@ -24,11 +19,11 @@ export class APIClient {
   static async fromOpenAPI(
     openAPI: OpenAPI,
     serverURL: string = "",
-    pathPrefix: string = ""
+    pathPrefix: string = "",
   ): Promise<APIClient> {
     if (!openAPI.openapi && !openAPI.openapi) {
       throw new Error(
-        "Unable to detect OAS openapi. Please add an openapi field or a openapi field"
+        "Unable to detect OAS openapi. Please add an openapi field or a openapi field",
       );
     }
     logger.info(`reading openapi file: ${openAPI.openapi}`);
@@ -63,13 +58,13 @@ export class APIClient {
 
             if (!pathItem.post.requestBody) {
               throw new Error(
-                `Custom method ${patternInfo.customMethodName} has a POST response but no request body`
+                `Custom method ${patternInfo.customMethodName} has a POST response but no request body`,
               );
             }
 
             const requestSchema = await dereferenceSchema(
               getSchemaFromRequestBody(pathItem.post.requestBody, openAPI),
-              openAPI
+              openAPI,
             );
 
             customMethodsByPattern[pattern].push({
@@ -133,16 +128,16 @@ export class APIClient {
             const respSchema = getSchemaFromResponse(response, openAPI);
             if (!respSchema) {
               logger.warn(
-                `Resource ${path} has a LIST method with a response schema, but the response schema is null.`
+                `Resource ${path} has a LIST method with a response schema, but the response schema is null.`,
               );
             } else {
               const resolvedSchema = await dereferenceSchema(
                 respSchema,
-                openAPI
+                openAPI,
               );
               const arrayProperty = Object.entries(
-                resolvedSchema.properties || {}
-              ).find(([_, prop]) => prop.type === "array");
+                resolvedSchema.properties || {},
+              ).find(([, prop]) => prop.type === "array");
 
               if (arrayProperty) {
                 schemaRef = arrayProperty[1].items || null;
@@ -163,7 +158,7 @@ export class APIClient {
                 }
               } else {
                 logger.warn(
-                  `Resource ${path} has a LIST method with a response schema, but the items field is not present or is not an array.`
+                  `Resource ${path} has a LIST method with a response schema, but the items field is not present or is not an array.`,
                 );
               }
             }
@@ -195,7 +190,7 @@ export class APIClient {
           pattern,
           dereferencedSchema,
           resourceBySingular,
-          openAPI
+          openAPI,
         );
 
         if (r.getMethod) resource.getMethod = r.getMethod;
@@ -208,10 +203,10 @@ export class APIClient {
 
     // Map custom methods to resources
     for (const [pattern, customMethods] of Object.entries(
-      customMethodsByPattern
+      customMethodsByPattern,
     )) {
       const resource = Object.values(resourceBySingular).find(
-        (r) => r.patternElems.join("/") === pattern
+        (r) => r.patternElems.join("/") === pattern,
       );
       if (resource) {
         resource.customMethods = customMethods;
@@ -228,7 +223,9 @@ export class APIClient {
 
     // Add non-resource schemas to API's schemas
     const schemas: Record<string, Schema> = {};
-    for (const [key, schema] of Object.entries(openAPI.components?.schemas || {})) {
+    for (const [key, schema] of Object.entries(
+      openAPI.components?.schemas || {},
+    )) {
       if (!resourceBySingular[key]) {
         schemas[key] = schema;
       }
@@ -289,7 +286,7 @@ async function getOrPopulateResource(
   pattern: string[],
   schema: Schema,
   resourceBySingular: Record<string, Resource>,
-  openAPI: OpenAPI
+  openAPI: OpenAPI,
 ): Promise<Resource> {
   if (resourceBySingular[singular]) {
     return resourceBySingular[singular];
@@ -304,7 +301,9 @@ async function getOrPopulateResource(
       // Parents will be set later on.
       parents: [],
       children: [],
-      patternElems: schema["x-aep-resource"].patterns![0].split("/").filter(Boolean),
+      patternElems: schema["x-aep-resource"]
+        .patterns![0].split("/")
+        .filter(Boolean),
       schema,
       customMethods: [],
     };
@@ -326,7 +325,7 @@ async function getOrPopulateResource(
         const parentSchema = openAPI.components?.schemas[parentSingular];
         if (!parentSchema) {
           throw new Error(
-            `Resource "${singular}" parent "${parentSingular}" not found`
+            `Resource "${singular}" parent "${parentSingular}" not found`,
           );
         }
 
@@ -335,7 +334,7 @@ async function getOrPopulateResource(
           [],
           parentSchema,
           resourceBySingular,
-          openAPI
+          openAPI,
         );
 
         resource.parents.push(parentResource);
@@ -357,7 +356,7 @@ function getContact(contact?: Contact): Contact | null {
 
 function getSchemaFromResponse(
   response: OpenAPIResponse,
-  openAPI: OpenAPI
+  openAPI: OpenAPI,
 ): Schema | null {
   if (openAPI.openapi === "2.0") {
     return response.schema || null;
@@ -367,7 +366,7 @@ function getSchemaFromResponse(
 
 function getSchemaFromRequestBody(
   requestBody: OpenAPIRequestBody,
-  openAPI: OpenAPI
+  openAPI: OpenAPI,
 ): Schema {
   if (openAPI.openapi === "2.0") {
     return requestBody.schema!;
@@ -377,22 +376,22 @@ function getSchemaFromRequestBody(
 
 async function dereferenceSchema(
   schema: Schema,
-  openAPI: OpenAPI
+  openAPI: OpenAPI,
 ): Promise<Schema> {
   if (!schema.$ref) {
     return schema;
   }
 
   if (schema.$ref.startsWith("http://") || schema.$ref.startsWith("https://")) {
-    logger.debug(
-      `Fetching external schema from ${schema.$ref}...`);
+    logger.debug(`Fetching external schema from ${schema.$ref}...`);
     const response = await fetch(schema.$ref);
     if (!response.ok) {
       throw new Error(`Failed to fetch external schema: ${schema.$ref}`);
     }
-    const externalSchema = await response.json() as Schema;
+    const externalSchema = (await response.json()) as Schema;
     logger.debug(
-      `Final schema fetched from ${schema.$ref}: ${JSON.stringify(externalSchema)}`);
+      `Final schema fetched from ${schema.$ref}: ${JSON.stringify(externalSchema)}`,
+    );
     return dereferenceSchema(externalSchema, openAPI);
   }
 

@@ -1,10 +1,6 @@
-/// <reference types="jest" />
-import { API, Resource } from "./types.js";
-import { Contact, OpenAPI, Schema } from "../openapi/types.js";
+import { API } from "./types.js";
+import { OpenAPI } from "../openapi/types.js";
 import { APIClient } from "./api.js";
-import { fetchOpenAPI, OpenAPIImpl } from "../openapi/openapi.js";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
 
 const basicOpenAPI: OpenAPI = {
   openapi: "3.1.0",
@@ -240,7 +236,7 @@ describe("APIClient", () => {
   describe("fromOpenAPI", () => {
     it("should handle basic resource with CRUD operations", async () => {
       const client = await APIClient.fromOpenAPI(basicOpenAPI);
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
 
       expect(api.serverURL).toBe("https://api.example.com");
 
@@ -259,16 +255,16 @@ describe("APIClient", () => {
 
     it("should handle non-resource schemas", async () => {
       const client = await APIClient.fromOpenAPI(basicOpenAPI);
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
       expect(api.schemas["Account"]).toBeDefined();
     });
 
     it("should handle server URL override", async () => {
       const client = await APIClient.fromOpenAPI(
         basicOpenAPI,
-        "https://override.example.com"
+        "https://override.example.com",
       );
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
       expect(api.serverURL).toBe("https://override.example.com");
     });
 
@@ -327,7 +323,7 @@ describe("APIClient", () => {
       };
 
       const client = await APIClient.fromOpenAPI(openAPI);
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
       const widget = api.resources["widget"];
       expect(widget).toBeDefined();
       expect(widget.singular).toBe("widget");
@@ -350,7 +346,7 @@ describe("APIClient", () => {
       };
 
       await expect(APIClient.fromOpenAPI(invalidOpenAPI)).rejects.toThrow(
-        "No server URL found in openapi, and none was provided"
+        "No server URL found in openapi, and none was provided",
       );
     });
 
@@ -400,7 +396,7 @@ describe("APIClient", () => {
       };
 
       const client = await APIClient.fromOpenAPI(openAPI);
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
       const widget = api.resources["widget"];
       expect(widget).toBeDefined();
       expect(widget.createMethod?.supportsUserSettableCreate).toBeTruthy();
@@ -408,7 +404,7 @@ describe("APIClient", () => {
 
     it("should handle contact information", async () => {
       const client = await APIClient.fromOpenAPI(basicOpenAPI);
-      const api = (client as any).api;
+      const api = (client as unknown as { api: API }).api;
       expect(api.contact).toBeDefined();
       expect(api.contact?.name).toBe("John Doe");
       expect(api.contact?.email).toBe("john.doe@example.com");

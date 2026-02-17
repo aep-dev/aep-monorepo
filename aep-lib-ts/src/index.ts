@@ -1,11 +1,11 @@
 // Main exports for the aep-lib-ts package
-export * from './cases/cases.js';
-export * from './api/api.js';
-export * from './api/resource.js';
-export * from './openapi/openapi.js';
-export * from './client/client.js';
-export * from './constants/constants.js';
-export { logger } from './utils/logger.js';
+export * from "./cases/cases.js";
+export * from "./api/api.js";
+export * from "./api/resource.js";
+export * from "./openapi/openapi.js";
+export * from "./client/client.js";
+export * from "./constants/constants.js";
+export { logger } from "./utils/logger.js";
 
 // Re-export types with explicit naming to avoid conflicts
 export type {
@@ -18,7 +18,7 @@ export type {
   UpdateMethod,
   Resource,
   PatternInfo,
-} from './api/types.js';
+} from "./api/types.js";
 
 export type {
   Components,
@@ -35,5 +35,5 @@ export type {
   Server,
   ServerVariable,
   XAEPResource,
-  XAEPResourceRef
-} from './openapi/types.js';
+  XAEPResourceRef,
+} from "./openapi/types.js";

@@ -1,10 +1,5 @@
+import { API, PathWithParams, Resource } from "./types.js";
 import {
-  API,
-  PathWithParams,
-  Resource,
-} from "./types.js";
-import {
-  Contact,
   OpenAPI,
   PathItem,
   Schema,
@@ -227,19 +222,16 @@ export function convertToOpenAPI(api: API): OpenAPI {
       for (const custom of r.customMethods) {
         const methodType = custom.method.toLowerCase();
         const cmPath = `${resourcePath}:${custom.name}`;
-        const methodInfo = {
-          operationId: `:${kebabToPascalCase(custom.name)}${kebabToPascalCase(
-            singular
-          )}`,
+        const methodInfo: Operation = {
+          operationId: `:${kebabToPascalCase(custom.name)}${kebabToPascalCase(singular)}`,
           description: `Custom method ${custom.name} for ${singular}`,
           parameters: [...pwp.params, idParam],
-          requestBody: {},
           responses: {
             "200": {
               description: "Successful response",
               content: {
                 "application/json": {
-                  schema: custom.response,
+                  schema: custom.response || undefined,
                 },
               },
             },
@@ -251,7 +243,7 @@ export function convertToOpenAPI(api: API): OpenAPI {
             required: true,
             content: {
               "application/json": {
-                schema: custom.request,
+                schema: custom.request || undefined,
               },
             },
           };
@@ -299,13 +291,11 @@ export function convertToOpenAPI(api: API): OpenAPI {
 }
 
 export function generateParentPatternsWithParams(
-  resource: Resource
+  resource: Resource,
 ): [string, PathWithParams[]] {
   if (resource.patternElems.length > 0) {
-    const collection = `/${
-      resource.patternElems[resource.patternElems.length - 2]
-    }`;
-    const params: any[] = [];
+    const collection = `/${resource.patternElems[resource.patternElems.length - 2]}`;
+    const params: PathWithParams["params"] = [];
     for (let i = 0; i < resource.patternElems.length - 2; i += 2) {
       const pElem = resource.patternElems[i + 1];
       params.push({
@@ -350,7 +340,7 @@ export function generateParentPatternsWithParams(
         params: [baseParam],
       });
     } else {
-      const [_, parentPWPS] = generateParentPatternsWithParams(parent);
+      const [, parentPWPS] = generateParentPatternsWithParams(parent);
       for (const parentPWP of parentPWPS) {
         const params = [...parentPWP.params, baseParam];
         const pattern = `${parentPWP.pattern}${basePattern}`;
@@ -366,7 +356,7 @@ function addMethodToPath(
   paths: Record<string, PathItem>,
   path: string,
   method: string,
-  methodInfo: any
+  methodInfo: PathItem[keyof PathItem],
 ): void {
   let methods = paths[path];
   if (!methods) {
@@ -399,7 +389,7 @@ export function parseOpenAPI(openapi: OpenAPI): OpenAPI {
 
 export function getPathItem(
   openapi: OpenAPI,
-  path: string
+  path: string,
 ): PathItem | undefined {
   return openapi.paths[path];
 }
@@ -425,7 +415,7 @@ export function getSchema(schema: Schema | undefined): Schema {
 export function getMethod(
   openapi: OpenAPI,
   path: string,
-  method: string
+  method: string,
 ): PathItem[keyof PathItem] | undefined {
   const pathItem = getPathItem(openapi, path);
   if (!pathItem) {
@@ -437,7 +427,7 @@ export function getMethod(
 export function getParameters(
   openapi: OpenAPI,
   path: string,
-  method: string
+  method: string,
 ): Parameter[] | undefined {
   const methodItem = getMethod(openapi, path, method);
   if (!methodItem || !("parameters" in methodItem)) {
@@ -447,7 +437,7 @@ export function getParameters(
 }
 
 export function getRequestBody(
-  methodInfo: PathItem[keyof PathItem]
+  methodInfo: PathItem[keyof PathItem],
 ): RequestBody | undefined {
   if (!methodInfo || !("requestBody" in methodInfo)) {
     return undefined;
@@ -459,7 +449,7 @@ export function getRequestBody(
 export function getResponses(
   openapi: OpenAPI,
   path: string,
-  method: string
+  method: string,
 ): Record<string, Response> | undefined {
   const methodItem = getMethod(openapi, path, method);
   if (!methodItem || !("responses" in methodItem)) {

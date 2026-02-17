@@ -1,8 +1,16 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
 import { Resource } from "../api/types.js";
 
-type RequestLoggingFunction = (ctx: any, req: any, ...args: any[]) => void;
-type ResponseLoggingFunction = (ctx: any, resp: any, ...args: any[]) => void;
+type RequestLoggingFunction = (
+  ctx: unknown,
+  req: AxiosRequestConfig,
+  ...args: unknown[]
+) => void;
+type ResponseLoggingFunction = (
+  ctx: unknown,
+  resp: unknown,
+  ...args: unknown[]
+) => void;
 
 export class Client {
   private headers: Record<string, string>;
@@ -10,7 +18,12 @@ export class Client {
   private requestLoggingFunction: RequestLoggingFunction;
   private responseLoggingFunction: ResponseLoggingFunction;
 
-  constructor(client: AxiosInstance, headers: Record<string, string>, requestLoggingFunction: RequestLoggingFunction, responseLoggingFunction: ResponseLoggingFunction) {
+  constructor(
+    client: AxiosInstance,
+    headers: Record<string, string>,
+    requestLoggingFunction: RequestLoggingFunction,
+    responseLoggingFunction: ResponseLoggingFunction,
+  ) {
     this.client = client;
     this.headers = headers;
     this.requestLoggingFunction = requestLoggingFunction;
@@ -18,12 +31,12 @@ export class Client {
   }
 
   async create(
-    ctx: any,
+    ctx: unknown,
     resource: Resource,
     serverUrl: string,
-    body: Record<string, any>,
-    parameters: Record<string, string>
-  ): Promise<Record<string, any>> {
+    body: Record<string, unknown>,
+    parameters: Record<string, string>,
+  ): Promise<Record<string, unknown>> {
     let suffix = "";
     if (resource.createMethod?.supportsUserSettableCreate) {
       const id = body.id;
@@ -41,11 +54,11 @@ export class Client {
   }
 
   async list(
-    ctx: any,
+    ctx: unknown,
     resource: Resource,
     serverUrl: string,
-    parameters: Record<string, string>
-  ): Promise<Record<string, any>[]> {
+    parameters: Record<string, string>,
+  ): Promise<Record<string, unknown>[]> {
     const url = this.basePath(ctx, resource, serverUrl, parameters, "");
     const response = await this.makeRequest(ctx, "GET", url);
 
@@ -57,7 +70,9 @@ export class Client {
 
     for (const key of possibleKeys) {
       if (response[key] && Array.isArray(response[key])) {
-        return response[key].filter((item: any) => typeof item === "object");
+        return response[key].filter(
+          (item: unknown) => typeof item === "object",
+        ) as Record<string, unknown>[];
       }
     }
 
@@ -65,44 +80,44 @@ export class Client {
   }
 
   async get(
-    ctx: any,
+    ctx: unknown,
     serverUrl: string,
-    path: string
-  ): Promise<Record<string, any>> {
+    path: string,
+  ): Promise<Record<string, unknown>> {
     const url = `${serverUrl}/${path.replace(/^\//, "")}`;
     return this.makeRequest(ctx, "GET", url);
   }
 
   async getWithFullUrl(
-    ctx: any,
-    url: string
-  ): Promise<Record<string, any>> {
+    ctx: unknown,
+    url: string,
+  ): Promise<Record<string, unknown>> {
     return this.makeRequest(ctx, "GET", url);
   }
 
-  async delete(ctx: any, serverUrl: string, path: string): Promise<void> {
+  async delete(ctx: unknown, serverUrl: string, path: string): Promise<void> {
     const url = `${serverUrl}/${path.replace(/^\//, "")}`;
     await this.makeRequest(ctx, "DELETE", url);
   }
 
   async update(
-    ctx: any,
+    ctx: unknown,
     serverUrl: string,
     path: string,
-    body: Record<string, any>
-  ): Promise<Record<string, any>> {
+    body: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const url = `${serverUrl}/${path.replace(/^\//, "")}`;
     return this.makeRequest(ctx, "PATCH", url, body);
   }
 
   private async makeRequest(
-    ctx: any,
+    ctx: unknown,
     method: string,
     url: string,
-    body?: Record<string, any>
-  ): Promise<Record<string, any>> {
+    body?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     if (body) {
-      Object.keys(body).forEach(key => {
+      Object.keys(body).forEach((key) => {
         if (body[key] === null) {
           delete body[key];
         }
@@ -124,29 +139,29 @@ export class Client {
       const data = response.data;
       this.checkErrors(data);
       return data;
-    } catch (error: any) {
-      if (error.response) {
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response) {
         this.responseLoggingFunction(ctx, error.response);
         throw new Error(
-          `Request failed: ${JSON.stringify(error.response.data)} for request ${JSON.stringify(config)}`
+          `Request failed: ${JSON.stringify(error.response.data)} for request ${JSON.stringify(config)}`,
         );
       }
       throw error;
     }
   }
 
-  private checkErrors(response: Record<string, any>): void {
+  private checkErrors(response: Record<string, unknown>): void {
     if (response.error) {
       throw new Error(`Returned errors: ${JSON.stringify(response.error)}`);
     }
   }
 
   private basePath(
-    ctx: any,
+    ctx: unknown,
     resource: Resource,
     serverUrl: string,
     parameters: Record<string, string>,
-    suffix: string
+    suffix: string,
   ): string {
     serverUrl = serverUrl.replace(/\/$/, "");
     const urlElems = [serverUrl];
@@ -160,9 +175,7 @@ export class Client {
         const value = parameters[paramName];
         if (!value) {
           throw new Error(
-            `Parameter ${paramName} not found in parameters ${JSON.stringify(
-              parameters
-            )}`
+            `Parameter ${paramName} not found in parameters ${JSON.stringify(parameters)}`,
           );
         }
 

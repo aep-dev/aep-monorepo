@@ -1,8 +1,4 @@
-import type {
-  Contact,
-  Schema,
-  XAEPResourceRef,
-} from "../openapi/types.js";
+import type { Contact, Schema, XAEPResourceRef } from "../openapi/types.js";
 
 export interface API {
   serverURL: string;
@@ -27,8 +23,7 @@ export interface Resource {
   customMethods: CustomMethod[];
 }
 
-export interface GetMethod {}
-
+export type GetMethod = object;
 export interface ListMethod {
   hasUnreachableResources: boolean;
   supportsFilter: boolean;
@@ -39,9 +34,8 @@ export interface CreateMethod {
   supportsUserSettableCreate: boolean;
 }
 
-export interface UpdateMethod {}
-
-export interface DeleteMethod {}
+export type UpdateMethod = object;
+export type DeleteMethod = object;
 
 export interface CustomMethod {
   name: string;

@@ -43,7 +43,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "npm run clean && npm run build && npm run test",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js --fix",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "fix": "npm run lint:fix && npm run prettier:fix"
   },
   "dependencies": {
     "axios": "^1.6.0",
@@ -54,8 +59,14 @@
     "@types/jest": "^29.5.0",
     "@types/js-yaml": "^4.0.0",
     "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "jest": "^29.7.0",
     "nock": "^13.4.0",
+    "prettier": "^3.8.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.3.0",
     "yargs": "^17.7.0"
