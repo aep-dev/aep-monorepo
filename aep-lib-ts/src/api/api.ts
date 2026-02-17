@@ -49,7 +49,9 @@ export class APIClient {
         }
 
         if (pathItem.post) {
-          const response = pathItem.post.responses?.["200"];
+          const response =
+            pathItem.post.responses?.["200"] ||
+            pathItem.post.responses?.["201"];
           if (response) {
             const schema = getSchemaFromResponse(response, openAPI);
             const responseSchema = schema
@@ -112,7 +114,9 @@ export class APIClient {
         }
       } else {
         if (pathItem.post) {
-          const response = pathItem.post.responses?.["200"];
+          const response =
+            pathItem.post.responses?.["200"] ||
+            pathItem.post.responses?.["201"];
           if (response) {
             schemaRef = getSchemaFromResponse(response, openAPI);
             const supportsUserSettableCreate =

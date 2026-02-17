@@ -410,5 +410,40 @@ describe("APIClient", () => {
       expect(api.contact?.email).toBe("john.doe@example.com");
       expect(api.contact?.url).toBe("https://example.com");
     });
+    it("should handle create method with 201 response", async () => {
+      const openAPI: OpenAPI = {
+        openapi: "3.1.0",
+        servers: [{ url: "https://api.example.com" }],
+        info: { title: "Test API", version: "1.0.0", description: "Test API" },
+        paths: {
+          "/widgets": {
+            post: {
+              operationId: "CreateWidget",
+              responses: {
+                "201": {
+                  description: "Created",
+                  content: {
+                    "application/json": {
+                      schema: { $ref: "#/components/schemas/Widget" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        components: {
+          schemas: {
+            Widget: { type: "object" },
+          },
+        },
+      };
+
+      const client = await APIClient.fromOpenAPI(openAPI);
+      const api = (client as unknown as { api: API }).api;
+      const widget = api.resources["widget"];
+      expect(widget).toBeDefined();
+      expect(widget.createMethod).toBeDefined();
+    });
   });
 });
