@@ -5,7 +5,12 @@ import { Resource } from "../api/types.js";
 
 describe("Client", () => {
   const baseUrl = "http://localhost:8081";
-  const client = new Client(axios.create(), {}, () => {}, () => {});
+  const client = new Client(
+    axios.create(),
+    {},
+    () => {},
+    () => {},
+  );
 
   beforeEach(() => {
     nock.cleanAll();
@@ -22,13 +27,13 @@ describe("Client", () => {
         schema: {
           type: "object",
           properties: {
-            price: { type: "string" }
-          }
+            price: { type: "string" },
+          },
         },
         createMethod: {
-          supportsUserSettableCreate: false
+          supportsUserSettableCreate: false,
         },
-        customMethods: []
+        customMethods: [],
       };
 
       const body = {
@@ -48,7 +53,7 @@ describe("Client", () => {
         resource,
         baseUrl,
         body,
-        parameters
+        parameters,
       );
       expect(result.path).toBe("/publishers/my-pub/books/1");
     });
@@ -64,13 +69,13 @@ describe("Client", () => {
           type: "object",
           properties: {
             price: { type: "string" },
-            id: { type: "string" }
-          }
+            id: { type: "string" },
+          },
         },
         createMethod: {
-          supportsUserSettableCreate: true
+          supportsUserSettableCreate: true,
         },
-        customMethods: []
+        customMethods: [],
       };
 
       const body = {
@@ -91,7 +96,7 @@ describe("Client", () => {
         resource,
         baseUrl,
         body,
-        parameters
+        parameters,
       );
       expect(result.path).toBe("/publishers/my-pub/books/my-book");
     });
@@ -106,7 +111,7 @@ describe("Client", () => {
       const result = await client.get(
         {},
         baseUrl,
-        "/publishers/my-pub/books/1"
+        "/publishers/my-pub/books/1",
       );
       expect(result.path).toBe("/publishers/my-pub/books/1");
     });
@@ -117,7 +122,7 @@ describe("Client", () => {
       nock(baseUrl).delete("/publishers/my-pub/books/1").reply(200);
 
       await expect(
-        client.delete({}, baseUrl, "/publishers/my-pub/books/1")
+        client.delete({}, baseUrl, "/publishers/my-pub/books/1"),
       ).resolves.not.toThrow();
     });
   });
@@ -134,7 +139,7 @@ describe("Client", () => {
         .reply(200, { path: "/publishers/my-pub/books/1", price: "2" });
 
       await expect(
-        client.update({}, baseUrl, "/publishers/my-pub/books/1", body)
+        client.update({}, baseUrl, "/publishers/my-pub/books/1", body),
       ).resolves.not.toThrow();
     });
   });
@@ -150,15 +155,15 @@ describe("Client", () => {
         schema: {
           type: "object",
           properties: {
-            price: { type: "string" }
-          }
+            price: { type: "string" },
+          },
         },
         listMethod: {
           hasUnreachableResources: false,
           supportsFilter: false,
-          supportsSkip: false
+          supportsSkip: false,
         },
-        customMethods: []
+        customMethods: [],
       };
 
       const parameters = {

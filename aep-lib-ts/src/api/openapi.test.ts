@@ -1,13 +1,4 @@
-import {
-  API,
-  Resource,
-  ListMethod,
-} from "./types.js";
-import {
-  Contact,
-  OpenAPI,
-  Schema,
-} from "../openapi/types.js";
+import { API, Resource } from "./types.js";
 import {
   convertToOpenAPI,
   generateParentPatternsWithParams,
@@ -160,7 +151,7 @@ describe("convertToOpenAPI", () => {
 
       // Verify schemas exist
       expect(openAPI.components).toBeDefined();
-      for (const [key, resource] of Object.entries(exampleAPI.resources)) {
+      for (const [, resource] of Object.entries(exampleAPI.resources)) {
         const schema = openAPI.components!.schemas[resource.singular];
         expect(schema).toBeDefined();
         expect(schema.type).toBe(resource.schema.type);
@@ -380,7 +371,7 @@ describe("convertToOpenAPI", () => {
           expect(actualOp).toBeDefined();
           if (!("operationId" in actualOp!)) {
             throw new Error(
-              `operationId not found in actualOp for ${path} ${method}`
+              `operationId not found in actualOp for ${path} ${method}`,
             );
           }
           expect(actualOp!.operationId).toBe(expectedOp.operationId);
@@ -388,7 +379,7 @@ describe("convertToOpenAPI", () => {
           if ("parameters" in expectedOp) {
             if (!("parameters" in actualOp!)) {
               throw new Error(
-                `Expected 'parameters' in actualOp for ${path} ${method}`
+                `Expected 'parameters' in actualOp for ${path} ${method}`,
               );
             }
             console.log(path + " " + method);
@@ -398,7 +389,7 @@ describe("convertToOpenAPI", () => {
           if ("requestBody" in expectedOp) {
             if (!("requestBody" in actualOp!)) {
               throw new Error(
-                `Expected 'requestBody' in actualOp for ${path} ${method}`
+                `Expected 'requestBody' in actualOp for ${path} ${method}`,
               );
             }
             expect(actualOp!.requestBody).toEqual(expectedOp.requestBody);

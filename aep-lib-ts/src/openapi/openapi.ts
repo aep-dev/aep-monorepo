@@ -74,7 +74,9 @@ export async function fetchOpenAPI(pathOrURL: string): Promise<OpenAPI> {
     const body = await readFileOrURL(pathOrURL);
     return parseYAML(body);
   } catch (error) {
-    throw new Error(`Failed to fetch or parse OpenAPI schema from ${pathOrURL}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to fetch or parse OpenAPI schema from ${pathOrURL}: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
