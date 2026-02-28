@@ -12,6 +12,14 @@ Other tools, such as [aep-openapi-linter](https://github.com/aep-dev/aep-openapi
 
 End-to-end validation requires the creation, deletion, list, and so on of the APIs that is being tested. As such, _it is not recommended_ to run this tool against a production API. Instead, it is recommended to run this against a staging API instead, possibly as an automated test in a CI/CD pipeline.
 
+## Installation
+
+In the future, proper packages and releases will be available. For now, you can install it using `go install`:
+
+```
+go install github.com/aep-dev/aep-e2e-validator@latest
+```
+
 ## User Guide
 
 Validate a single collection:
