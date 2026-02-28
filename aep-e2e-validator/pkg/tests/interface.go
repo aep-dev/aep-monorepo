@@ -27,6 +27,7 @@ type ValidationContext struct {
 
 type Test struct {
 	Name         string
+	URL          string
 	Precondition func(*ValidationContext) error
 	Setup        func(ValidationActions, *ValidationContext) error
 	Run          func(ValidationActions, *ValidationContext) error

@@ -123,7 +123,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		fmt.Printf("   Global Setup failed: %v\n", err)
 		results := make([]TestResult, len(testsToRun))
 		for i, t := range testsToRun {
-			results[i] = TestResult{Name: t.Name, Status: StatusError, Detail: fmt.Sprintf("global setup failed: %v", err)}
+			results[i] = TestResult{Name: t.Name, URL: t.URL, Status: StatusError, Detail: fmt.Sprintf("global setup failed: %v", err)}
 		}
 		return results
 	}
@@ -138,7 +138,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		if test.Precondition != nil {
 			if err := test.Precondition(ctx); err != nil {
 				fmt.Printf("   Skipped: %v\n", err)
-				results = append(results, TestResult{Name: test.Name, Status: StatusSkip, Detail: err.Error(), Duration: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusSkip, Detail: err.Error(), Duration: time.Since(testStart)})
 				continue
 			}
 		}
@@ -150,7 +150,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 				if test.Teardown != nil {
 					_ = test.Teardown(v, ctx)
 				}
-				results = append(results, TestResult{Name: test.Name, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), Duration: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), Duration: time.Since(testStart)})
 				continue
 			}
 		}
@@ -161,7 +161,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 			if test.Teardown != nil {
 				_ = test.Teardown(v, ctx)
 			}
-			results = append(results, TestResult{Name: test.Name, Status: StatusFail, Detail: err.Error(), Duration: time.Since(testStart)})
+			results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusFail, Detail: err.Error(), Duration: time.Since(testStart)})
 			continue
 		}
 
@@ -169,12 +169,12 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 			if err := test.Teardown(v, ctx); err != nil {
 				fmt.Printf("   Teardown failed: %v\n", err)
 				v.client.printLogs()
-				results = append(results, TestResult{Name: test.Name, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), Duration: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), Duration: time.Since(testStart)})
 				continue
 			}
 		}
 
-		results = append(results, TestResult{Name: test.Name, Status: StatusPass, Duration: time.Since(testStart)})
+		results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusPass, Duration: time.Since(testStart)})
 	}
 
 	// Global Teardown: clean up collection

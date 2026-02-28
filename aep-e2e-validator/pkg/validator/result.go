@@ -21,6 +21,7 @@ const (
 
 type TestResult struct {
 	Name     string
+	URL      string
 	Status   TestStatus
 	Detail   string
 	Duration time.Duration
@@ -51,42 +52,63 @@ func yellowStyle() lipgloss.Style {
 
 func printSummary(results []TestResult, totalDuration time.Duration) {
 	fmt.Println()
-	fmt.Println(centerLine("test results", '='))
 
+	var passedTests []TestResult
+	var failedTests []TestResult
 	maxNameLen := 0
 	for _, r := range results {
 		if len(r.Name) > maxNameLen {
 			maxNameLen = len(r.Name)
 		}
-	}
-
-	for _, r := range results {
-		icon := statusIcon(r.Status)
-		fmt.Printf(" %s  %-*s  %s\n", icon, maxNameLen, r.Name, r.Duration.Round(time.Millisecond))
-		if r.Detail != "" {
-			for _, line := range strings.Split(r.Detail, "\n") {
-				fmt.Printf("         %s\n", line)
-			}
+		if r.Status == StatusPass || r.Status == StatusSkip {
+			passedTests = append(passedTests, r)
+		} else {
+			failedTests = append(failedTests, r)
 		}
 	}
 
-	passed, failed, skipped, errored := countByStatus(results)
+	if len(passedTests) > 0 {
+		fmt.Println(centerLine("passed tests", '='))
+		for _, r := range passedTests {
+			icon := statusIcon(r.Status)
+			fmt.Printf(" %s  %-*s  %s\n", icon, maxNameLen, r.Name, r.Duration.Round(time.Millisecond))
+		}
+		fmt.Println()
+	}
+
+	if len(failedTests) > 0 {
+		fmt.Println(centerLine("failed tests", '='))
+		for _, r := range failedTests {
+			icon := statusIcon(r.Status)
+			fmt.Printf(" %s  %-*s  %s\n", icon, maxNameLen, r.Name, r.Duration.Round(time.Millisecond))
+			if r.Detail != "" {
+				for _, line := range strings.Split(r.Detail, "\n") {
+					fmt.Printf("    %s\n", line)
+				}
+			}
+			if r.URL != "" {
+				fmt.Printf("    see %s\n", r.URL)
+			}
+		}
+		fmt.Println()
+	}
+
+	passedCount, failedCount, skippedCount, erroredCount := countByStatus(results)
 	var parts []string
-	if passed > 0 {
-		parts = append(parts, greenStyle().Render(fmt.Sprintf("%d passed", passed)))
+	if passedCount > 0 {
+		parts = append(parts, greenStyle().Render(fmt.Sprintf("%d passed", passedCount)))
 	}
-	if failed > 0 {
-		parts = append(parts, redStyle().Render(fmt.Sprintf("%d failed", failed)))
+	if failedCount > 0 {
+		parts = append(parts, redStyle().Render(fmt.Sprintf("%d failed", failedCount)))
 	}
-	if skipped > 0 {
-		parts = append(parts, yellowStyle().Render(fmt.Sprintf("%d skipped", skipped)))
+	if skippedCount > 0 {
+		parts = append(parts, yellowStyle().Render(fmt.Sprintf("%d skipped", skippedCount)))
 	}
-	if errored > 0 {
-		parts = append(parts, redStyle().Render(fmt.Sprintf("%d error", errored)))
+	if erroredCount > 0 {
+		parts = append(parts, redStyle().Render(fmt.Sprintf("%d error", erroredCount)))
 	}
 	summary := strings.Join(parts, ", ")
 	summary = fmt.Sprintf("%s in %s", summary, totalDuration.Round(time.Millisecond))
-	fmt.Println()
 	fmt.Println(centerLine(summary, '='))
 }
 

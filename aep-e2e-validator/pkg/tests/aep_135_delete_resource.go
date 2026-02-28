@@ -6,6 +6,7 @@ import (
 
 var TestAEP135DeleteResource = Test{
 	Name:  "aep-135-delete-resource",
+	URL:   "https://aep.dev/135",
 	Setup: setupDeleteResource,
 	Run:   testDeleteResource,
 }

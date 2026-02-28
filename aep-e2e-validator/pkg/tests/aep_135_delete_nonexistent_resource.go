@@ -7,6 +7,7 @@ import (
 
 var TestAEP135DeleteNonExistentResource = Test{
 	Name: "aep-135-delete-nonexistent-resource",
+	URL:  "https://aep.dev/135",
 	Run:  testDeleteNonExistentResource,
 }
 

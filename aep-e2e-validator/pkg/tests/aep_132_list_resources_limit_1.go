@@ -8,6 +8,7 @@ import (
 
 var TestAEP132ListResourcesLimit1 = Test{
 	Name:     "aep-132-list-resources-limit-1",
+	URL:      "https://aep.dev/132",
 	Setup:    setupListResources,
 	Run:      testListResourcesLimit1,
 	Teardown: testDeleteResource,

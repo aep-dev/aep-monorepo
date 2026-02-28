@@ -10,6 +10,7 @@ import (
 
 var TestAEP134UpdateResource = Test{
 	Name:     "aep-134-update-resource",
+	URL:      "https://aep.dev/134",
 	Setup:    setupUpdateResource,
 	Run:      testUpdateResource,
 	Teardown: testDeleteResource,

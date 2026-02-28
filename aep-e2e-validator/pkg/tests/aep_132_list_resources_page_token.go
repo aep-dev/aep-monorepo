@@ -8,6 +8,7 @@ import (
 
 var TestAEP132ListResourcesPageToken = Test{
 	Name:     "aep-132-list-resources-page-token",
+	URL:      "https://aep.dev/132",
 	Setup:    setupListResources,
 	Run:      testListResourcesPageToken,
 	Teardown: testDeleteResource,

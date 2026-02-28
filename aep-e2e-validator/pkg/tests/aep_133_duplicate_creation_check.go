@@ -10,6 +10,7 @@ import (
 
 var TestAEP133DuplicateCreationCheck = Test{
 	Name:     "aep-133-duplicate-creation-check",
+	URL:      "https://aep.dev/133",
 	Setup:    setupDuplicateCreationCheck,
 	Run:      testDuplicateCreationCheck,
 	Teardown: testDeleteResource, // Clean up the one created in Setup

@@ -6,6 +6,7 @@ import (
 
 var TestAEP133Create = Test{
 	Name:     "aep-133-create",
+	URL:      "https://aep.dev/133",
 	Run:      testCreateResource,
 	Teardown: testDeleteResource,
 }
