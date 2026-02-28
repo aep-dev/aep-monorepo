@@ -36,6 +36,8 @@ func NewValidator(configPath, collection string, allCollections bool, tests []st
 }
 
 func (v *Validator) Run() int {
+	start := time.Now()
+
 	doc, err := openapi.FetchOpenAPI(v.configPath)
 	if err != nil {
 		log.Printf("failed to fetch OpenAPI spec: %v", err)
@@ -58,14 +60,14 @@ func (v *Validator) Run() int {
 		return ExitCodePreconditionFailed
 	}
 
+	var allResults []TestResult
+
 	if v.allCollections {
 		for _, r := range aepAPI.Resources {
 			// Only validate top-level resources
 			if len(r.Parents) == 0 {
-				if code := v.validateResource(r); code != ExitCodeSuccess {
-					log.Printf("Validation failed for resource %s", r.Singular)
-					return code
-				}
+				results := v.validateResource(r)
+				allResults = append(allResults, results...)
 			}
 		}
 	} else {
@@ -80,15 +82,15 @@ func (v *Validator) Run() int {
 			log.Printf("collection %s not found in API", v.collection)
 			return ExitCodePreconditionFailed
 		}
-		if code := v.validateResource(targetResource); code != ExitCodeSuccess {
-			return code
-		}
+		results := v.validateResource(targetResource)
+		allResults = append(allResults, results...)
 	}
 
-	return ExitCodeSuccess
+	printSummary(allResults, time.Since(start))
+	return worstExitCode(allResults)
 }
 
-func (v *Validator) validateResource(r *api.Resource) int {
+func (v *Validator) validateResource(r *api.Resource) []TestResult {
 	fmt.Printf("Starting validation for resource: %s\n", r.Singular)
 	ctx := &tests.ValidationContext{
 		Resource:      r,
@@ -111,7 +113,6 @@ func (v *Validator) validateResource(r *api.Resource) int {
 				testsToRun = append(testsToRun, t)
 			} else {
 				log.Printf("Test %s not found", name)
-				return ExitCodePreconditionFailed // Or warning?
 			}
 		}
 	}
@@ -120,63 +121,64 @@ func (v *Validator) validateResource(r *api.Resource) int {
 	fmt.Println("Running Global Setup...")
 	if err := v.cleanupCollection(r); err != nil {
 		fmt.Printf("   Global Setup failed: %v\n", err)
-		return ExitCodeSetupFailed
+		results := make([]TestResult, len(testsToRun))
+		for i, t := range testsToRun {
+			results[i] = TestResult{Name: t.Name, Status: StatusError, Detail: fmt.Sprintf("global setup failed: %v", err)}
+		}
+		return results
 	}
 
+	var results []TestResult
 	for i, test := range testsToRun {
 		fmt.Printf("%d. %s...\n", i+1, test.Name)
+		testStart := time.Now()
 
 		if test.Precondition != nil {
 			if err := test.Precondition(ctx); err != nil {
-				fmt.Printf("   Precondition failed: %v\n", err)
-				return ExitCodePreconditionFailed
+				fmt.Printf("   Skipped: %v\n", err)
+				results = append(results, TestResult{Name: test.Name, Status: StatusSkip, Detail: err.Error(), Duration: time.Since(testStart)})
+				continue
 			}
 		}
 
 		if test.Setup != nil {
 			if err := test.Setup(v, ctx); err != nil {
 				fmt.Printf("   Setup failed: %v\n", err)
-				// Attempt teardown if setup fail
 				if test.Teardown != nil {
-					if err := test.Teardown(v, ctx); err != nil {
-						fmt.Printf("   Teardown failed: %v\n", err)
-						return ExitCodeTeardownFailed
-					}
+					_ = test.Teardown(v, ctx)
 				}
-				return ExitCodeSetupFailed
+				results = append(results, TestResult{Name: test.Name, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), Duration: time.Since(testStart)})
+				continue
 			}
 		}
 
 		if err := test.Run(v, ctx); err != nil {
 			fmt.Printf("   Failed: %v\n", err)
-
-			// Attempt teardown if test fail
 			if test.Teardown != nil {
-				if err := test.Teardown(v, ctx); err != nil {
-					fmt.Printf("   Teardown failed: %v\n", err)
-					return ExitCodeTeardownFailed
-				}
+				_ = test.Teardown(v, ctx)
 			}
-
-			return ExitCodeTestFailed
+			results = append(results, TestResult{Name: test.Name, Status: StatusFail, Detail: err.Error(), Duration: time.Since(testStart)})
+			continue
 		}
 
 		if test.Teardown != nil {
 			if err := test.Teardown(v, ctx); err != nil {
 				fmt.Printf("   Teardown failed: %v\n", err)
-				return ExitCodeTeardownFailed
+				results = append(results, TestResult{Name: test.Name, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), Duration: time.Since(testStart)})
+				continue
 			}
 		}
+
+		results = append(results, TestResult{Name: test.Name, Status: StatusPass, Duration: time.Since(testStart)})
 	}
 
 	// Global Teardown: clean up collection
 	fmt.Println("Running Global Teardown...")
 	if err := v.cleanupCollection(r); err != nil {
 		fmt.Printf("   Global Teardown failed: %v\n", err)
-		return ExitCodeTeardownFailed
 	}
 
-	return ExitCodeSuccess
+	return results
 }
 
 func (v *Validator) cleanupCollection(r *api.Resource) error {
@@ -351,22 +353,14 @@ func (v *Validator) List(url string) (*utils.ListResponse, error) {
 		return nil, err
 	}
 
-	// Attempt to find the list field. It should be the only array field or match plural name?
-	// We don't have convenient way to know the field name for list response here easily unless we pass it.
-	// Convention: it matches resource plural name (camel case).
-
-	// For now, looking for any array field.
 	var resources []map[string]interface{}
 	nextToken, _ := raw["next_page_token"].(string)
 
-	for _, val := range raw {
-		if list, ok := val.([]interface{}); ok {
-			for _, item := range list {
-				if r, ok := item.(map[string]interface{}); ok {
-					resources = append(resources, r)
-				}
+	if list, ok := raw["results"].([]interface{}); ok {
+		for _, item := range list {
+			if r, ok := item.(map[string]interface{}); ok {
+				resources = append(resources, r)
 			}
-			break // Assuming only one list field
 		}
 	}
 
