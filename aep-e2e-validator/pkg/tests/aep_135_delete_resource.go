@@ -35,6 +35,6 @@ func testDeleteResource(v ValidationActions, ctx *ValidationContext) error {
 	// Remove from context
 	ctx.Resources = ctx.Resources[1:]
 
-	fmt.Println("   Delete successful.")
+	v.Logger().Println("   Delete successful.")
 	return nil
 }

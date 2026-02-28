@@ -26,7 +26,7 @@ func setupDuplicateCreationCheck(v ValidationActions, ctx *ValidationContext) er
 func testDuplicateCreationCheck(v ValidationActions, ctx *ValidationContext) error {
 	r := ctx.Resource
 	if r.Methods.Create != nil && r.Methods.Create.SupportsUserSettableCreate {
-		fmt.Println("   Attempting duplicate creation...")
+		v.Logger().Println("   Attempting duplicate creation...")
 		r1Name, ok := ctx.Resources[0]["name"].(string)
 		if !ok || r1Name == "" {
 			r1Name, _ = ctx.Resources[0]["path"].(string)
@@ -43,9 +43,9 @@ func testDuplicateCreationCheck(v ValidationActions, ctx *ValidationContext) err
 		if resp.StatusCode != http.StatusConflict && resp.StatusCode != http.StatusBadRequest {
 			return fmt.Errorf("expected 409/400 for duplicate creation, got %d", resp.StatusCode)
 		}
-		fmt.Println("   Duplicate creation rejected as expected.")
+		v.Logger().Println("   Duplicate creation rejected as expected.")
 	} else {
-		fmt.Println("   Skipping duplicate check (client-assigned ID not supported or uncheckable).")
+		v.Logger().Println("   Skipping duplicate check (client-assigned ID not supported or uncheckable).")
 	}
 	return nil
 }

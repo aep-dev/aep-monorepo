@@ -3,8 +3,8 @@ package validator
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -15,19 +15,20 @@ type Header struct {
 }
 
 type RequestLog struct {
-	Method   string
-	URL      string
-	ReqBody  string
-	ReqType  string
-	RespCode int
-	RespBody string
-	RespType string
+	Method   string `json:"method"`
+	URL      string `json:"url"`
+	ReqBody  string `json:"request_body,omitempty"`
+	ReqType  string `json:"request_content_type,omitempty"`
+	RespCode int    `json:"response_code,omitempty"`
+	RespBody string `json:"response_body,omitempty"`
+	RespType string `json:"response_content_type,omitempty"`
 }
 
 type extendedClient struct {
 	inner   *http.Client
 	headers []Header
 	logs    []RequestLog
+	logger  *log.Logger
 }
 
 func (c *extendedClient) clearLogs() {
@@ -52,24 +53,24 @@ func (c *extendedClient) printLogs() {
 	if len(c.logs) == 0 {
 		return
 	}
-	fmt.Println("   --- Request/Response Logs ---")
+	c.logger.Println("   --- Request/Response Logs ---")
 	for i, l := range c.logs {
-		fmt.Printf("   Request %d:\n", i+1)
-		fmt.Printf("     %s %s\n", l.Method, l.URL)
+		c.logger.Printf("   Request %d:\n", i+1)
+		c.logger.Printf("     %s %s\n", l.Method, l.URL)
 		if l.ReqBody != "" {
-			fmt.Printf("     Body:\n     %s\n", prettyPrintBody(l.ReqBody, l.ReqType))
+			c.logger.Printf("     Body:\n     %s\n", prettyPrintBody(l.ReqBody, l.ReqType))
 		}
 		if l.RespCode != 0 {
-			fmt.Printf("   Response %d:\n", i+1)
-			fmt.Printf("     Status: %d\n", l.RespCode)
+			c.logger.Printf("   Response %d:\n", i+1)
+			c.logger.Printf("     Status: %d\n", l.RespCode)
 			if l.RespBody != "" {
-				fmt.Printf("     Body:\n     %s\n", prettyPrintBody(l.RespBody, l.RespType))
+				c.logger.Printf("     Body:\n     %s\n", prettyPrintBody(l.RespBody, l.RespType))
 			}
 		} else {
-			fmt.Printf("   Response %d: (No response)\n", i+1)
+			c.logger.Printf("   Response %d: (No response)\n", i+1)
 		}
 	}
-	fmt.Println("   -----------------------------")
+	c.logger.Println("   -----------------------------")
 }
 
 func (c *extendedClient) Do(req *http.Request) (*http.Response, error) {

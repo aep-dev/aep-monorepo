@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -20,11 +21,12 @@ const (
 )
 
 type TestResult struct {
-	Name     string
-	URL      string
-	Status   TestStatus
-	Detail   string
-	Duration time.Duration
+	Name        string        `json:"name"`
+	URL         string        `json:"url,omitempty"`
+	Status      TestStatus    `json:"status"`
+	Detail      string        `json:"detail,omitempty"`
+	RequestLogs []RequestLog  `json:"request_logs,omitempty"`
+	Duration    time.Duration `json:"duration"`
 }
 
 const summaryWidth = 60
@@ -48,6 +50,14 @@ func redStyle() lipgloss.Style {
 
 func yellowStyle() lipgloss.Style {
 	return getRenderer().NewStyle().Foreground(lipgloss.Color("3")).Bold(true)
+}
+
+func printJSON(results []TestResult) {
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(results); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to marshal json: %v\n", err)
+	}
 }
 
 func printSummary(results []TestResult, totalDuration time.Duration) {

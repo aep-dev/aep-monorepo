@@ -26,6 +26,6 @@ func testListResourcesLimit1(v ValidationActions, ctx *ValidationContext) error 
 		return fmt.Errorf("expected next_page_token")
 	}
 	ctx.ListResponse1 = listResp
-	fmt.Println("   Got 1 resource and next_page_token.")
+	v.Logger().Println("   Got 1 resource and next_page_token.")
 	return nil
 }

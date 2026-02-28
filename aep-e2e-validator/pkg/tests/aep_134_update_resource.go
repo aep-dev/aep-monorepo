@@ -44,6 +44,6 @@ func testUpdateResource(v ValidationActions, ctx *ValidationContext) error {
 		body, _ := io.ReadAll(respUpdate.Body)
 		return fmt.Errorf("update returned %d: %s", respUpdate.StatusCode, string(body))
 	}
-	fmt.Println("   Update successful.")
+	v.Logger().Println("   Update successful.")
 	return nil
 }

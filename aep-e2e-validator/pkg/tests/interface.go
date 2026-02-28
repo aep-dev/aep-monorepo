@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
@@ -16,6 +17,7 @@ type ValidationActions interface {
 	Delete(url string) error
 	DeleteReq(url string) (*http.Response, error)
 	GenerateID() string
+	Logger() *log.Logger
 }
 
 type ValidationContext struct {

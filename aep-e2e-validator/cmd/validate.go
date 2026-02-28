@@ -15,6 +15,7 @@ var (
 	allCollections bool
 	testNames      []string
 	headerFlags    []string
+	jsonOutput     bool
 )
 
 func parseHeaders(raw []string) ([]validator.Header, error) {
@@ -49,14 +50,16 @@ var validateCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Validating with config: %s\n", configPath)
-		if allCollections {
-			fmt.Println("Validating all collections")
-		} else {
-			fmt.Printf("Validating collection: %s\n", collection)
+		if !jsonOutput {
+			fmt.Printf("Validating with config: %s\n", configPath)
+			if allCollections {
+				fmt.Println("Validating all collections")
+			} else {
+				fmt.Printf("Validating collection: %s\n", collection)
+			}
 		}
 
-		v := validator.NewValidator(configPath, collection, allCollections, testNames, headers)
+		v := validator.NewValidator(configPath, collection, allCollections, testNames, headers, jsonOutput)
 		exitCode := v.Run()
 		if exitCode != validator.ExitCodeSuccess {
 			os.Exit(exitCode)
@@ -73,6 +76,7 @@ func init() {
 	validateCmd.Flags().BoolVar(&allCollections, "all-collections", false, "Validate all collections in the spec")
 	validateCmd.Flags().StringSliceVar(&testNames, "tests", []string{}, "Comma-separated list of tests to run (e.g. aep-133-create)")
 	validateCmd.Flags().StringArrayVarP(&headerFlags, "header", "H", []string{}, "Headers to include in every request (format: key=value, repeatable)")
+	validateCmd.Flags().BoolVar(&jsonOutput, "json", false, "Output results as JSON")
 
 	validateCmd.MarkFlagRequired("config")
 }

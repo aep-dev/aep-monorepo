@@ -38,6 +38,6 @@ func testListResourcesPageToken(v ValidationActions, ctx *ValidationContext) err
 	// Optional: Verify resources in page 2 are different or next in sequence?
 	// For now, just verifying we got a response is enough for the basic requirement.
 
-	fmt.Println("   Got second page successfully.")
+	v.Logger().Println("   Got second page successfully.")
 	return nil
 }

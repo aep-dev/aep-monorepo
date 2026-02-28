@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -23,16 +24,29 @@ type Validator struct {
 	allCollections bool
 	testNames      []string
 	client         *extendedClient
+	jsonOutput     bool
+	logger         *log.Logger
 }
 
-func NewValidator(configPath, collection string, allCollections bool, tests []string, headers []Header) *Validator {
+func NewValidator(configPath, collection string, allCollections bool, tests []string, headers []Header, jsonOutput bool) *Validator {
+	var output io.Writer = os.Stdout
+	if jsonOutput {
+		output = io.Discard
+	}
+	logger := log.New(output, "", 0)
 	return &Validator{
 		configPath:     configPath,
 		collection:     collection,
 		allCollections: allCollections,
 		testNames:      tests,
-		client:         &extendedClient{inner: &http.Client{}, headers: headers},
+		client:         &extendedClient{inner: &http.Client{}, headers: headers, logger: logger},
+		jsonOutput:     jsonOutput,
+		logger:         logger,
 	}
+}
+
+func (v *Validator) Logger() *log.Logger {
+	return v.logger
 }
 
 func (v *Validator) Run() int {
@@ -86,12 +100,16 @@ func (v *Validator) Run() int {
 		allResults = append(allResults, results...)
 	}
 
-	printSummary(allResults, time.Since(start))
+	if v.jsonOutput {
+		printJSON(allResults)
+	} else {
+		printSummary(allResults, time.Since(start))
+	}
 	return worstExitCode(allResults)
 }
 
 func (v *Validator) validateResource(r *api.Resource) []TestResult {
-	fmt.Printf("Starting validation for resource: %s\n", r.Singular)
+	v.logger.Printf("Starting validation for resource: %s\n", r.Singular)
 	ctx := &tests.ValidationContext{
 		Resource:      r,
 		CollectionURL: fmt.Sprintf("%s/%s", r.API.ServerURL, r.Plural),
@@ -118,9 +136,9 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 	}
 
 	// Global Setup: clean up collection
-	fmt.Println("Running Global Setup...")
+	v.logger.Println("Running Global Setup...")
 	if err := v.cleanupCollection(r); err != nil {
-		fmt.Printf("   Global Setup failed: %v\n", err)
+		v.logger.Printf("   Global Setup failed: %v\n", err)
 		results := make([]TestResult, len(testsToRun))
 		for i, t := range testsToRun {
 			results[i] = TestResult{Name: t.Name, URL: t.URL, Status: StatusError, Detail: fmt.Sprintf("global setup failed: %v", err)}
@@ -130,57 +148,57 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 
 	var results []TestResult
 	for i, test := range testsToRun {
-		fmt.Printf("%d. %s...\n", i+1, test.Name)
+		v.logger.Printf("%d. %s...\n", i+1, test.Name)
 		testStart := time.Now()
 
 		v.client.clearLogs()
 
 		if test.Precondition != nil {
 			if err := test.Precondition(ctx); err != nil {
-				fmt.Printf("   Skipped: %v\n", err)
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusSkip, Detail: err.Error(), Duration: time.Since(testStart)})
+				v.logger.Printf("   Skipped: %v\n", err)
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusSkip, Detail: err.Error(), DurationMS: time.Since(testStart)})
 				continue
 			}
 		}
 
 		if test.Setup != nil {
 			if err := test.Setup(v, ctx); err != nil {
-				fmt.Printf("   Setup failed: %v\n", err)
+				v.logger.Printf("   Setup failed: %v\n", err)
 				v.client.printLogs()
 				if test.Teardown != nil {
 					_ = test.Teardown(v, ctx)
 				}
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), Duration: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
 				continue
 			}
 		}
 
 		if err := test.Run(v, ctx); err != nil {
-			fmt.Printf("   Failed: %v\n", err)
+			v.logger.Printf("   Failed: %v\n", err)
 			v.client.printLogs()
 			if test.Teardown != nil {
 				_ = test.Teardown(v, ctx)
 			}
-			results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusFail, Detail: err.Error(), Duration: time.Since(testStart)})
+			results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusFail, Detail: err.Error(), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
 			continue
 		}
 
 		if test.Teardown != nil {
 			if err := test.Teardown(v, ctx); err != nil {
-				fmt.Printf("   Teardown failed: %v\n", err)
+				v.logger.Printf("   Teardown failed: %v\n", err)
 				v.client.printLogs()
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), Duration: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
 				continue
 			}
 		}
 
-		results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusPass, Duration: time.Since(testStart)})
+		results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusPass, DurationMS: time.Since(testStart)})
 	}
 
 	// Global Teardown: clean up collection
-	fmt.Println("Running Global Teardown...")
+	v.logger.Println("Running Global Teardown...")
 	if err := v.cleanupCollection(r); err != nil {
-		fmt.Printf("   Global Teardown failed: %v\n", err)
+		v.logger.Printf("   Global Teardown failed: %v\n", err)
 	}
 
 	return results
@@ -216,7 +234,7 @@ func (v *Validator) cleanupCollection(r *api.Resource) error {
 				if strings.Contains(err.Error(), "status 404") {
 					continue
 				}
-				fmt.Printf("   Warning: failed to delete during cleanup %s: %v\n", rName, err)
+				v.logger.Printf("   Warning: failed to delete during cleanup %s: %v\n", rName, err)
 			}
 		}
 

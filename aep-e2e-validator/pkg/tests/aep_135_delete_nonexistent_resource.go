@@ -24,6 +24,6 @@ func testDeleteNonExistentResource(v ValidationActions, ctx *ValidationContext) 
 	if respDelete.StatusCode != http.StatusNotFound {
 		return fmt.Errorf("expected 404, got %d", respDelete.StatusCode)
 	}
-	fmt.Println("   Got 404 as expected.")
+	v.Logger().Println("   Got 404 as expected.")
 	return nil
 }

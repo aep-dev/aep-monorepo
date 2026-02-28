@@ -2,12 +2,14 @@ package utils
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/aep-dev/aep-lib-go/pkg/api"
 )
 
 type Creator interface {
 	CreateResource(r *api.Resource, collectionURL string, payload map[string]interface{}) (map[string]interface{}, error)
+	Logger() *log.Logger
 }
 
 func CreateResource(c Creator, r *api.Resource, collectionURL string) (map[string]interface{}, error) {
@@ -27,10 +29,9 @@ func CreateResource(c Creator, r *api.Resource, collectionURL string) (map[strin
 	}
 
 	if rName != "" {
-		fmt.Printf("   Created %s\n", rName)
+		c.Logger().Printf("   Created %s\n", rName)
 	} else {
-		// Fallback logging if really needed, or just normal print
-		fmt.Printf("   Created resource (name/path missing)\n")
+		c.Logger().Printf("   Created resource (name/path missing)\n")
 	}
 	return resource, nil
 }
