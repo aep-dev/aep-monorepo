@@ -17,21 +17,38 @@ import (
 	"github.com/aep-dev/aep-lib-go/pkg/openapi"
 )
 
+type Header struct {
+	Key   string
+	Value string
+}
+
+type extendedClient struct {
+	inner   *http.Client
+	headers []Header
+}
+
+func (c *extendedClient) Do(req *http.Request) (*http.Response, error) {
+	for _, h := range c.headers {
+		req.Header.Add(h.Key, h.Value)
+	}
+	return c.inner.Do(req)
+}
+
 type Validator struct {
 	configPath     string
 	collection     string
 	allCollections bool
 	testNames      []string
-	client         *http.Client
+	client         *extendedClient
 }
 
-func NewValidator(configPath, collection string, allCollections bool, tests []string) *Validator {
+func NewValidator(configPath, collection string, allCollections bool, tests []string, headers []Header) *Validator {
 	return &Validator{
 		configPath:     configPath,
 		collection:     collection,
 		allCollections: allCollections,
 		testNames:      tests,
-		client:         &http.Client{},
+		client:         &extendedClient{inner: &http.Client{}, headers: headers},
 	}
 }
 

@@ -14,6 +14,28 @@ End-to-end validation requires the creation, deletion, list, and so on of the AP
 
 ## User Guide
 
+Validate a single collection:
+
 ```
 go run main.go validate --config "http://localhost:8000/openapi.json" --collection shelves
+```
+
+Validate all collections:
+
+```
+go run main.go validate --config "http://localhost:8000/openapi.json" --all-collections
+```
+
+Run specific tests:
+
+```
+go run main.go validate --config "http://localhost:8000/openapi.json" --collection shelves --tests aep-133-create,aep-135-delete
+```
+
+Pass custom headers (e.g. for authentication):
+
+```
+go run main.go validate --config "http://localhost:8000/openapi.json" --all-collections \
+  -H "Authorization=Bearer <token>" \
+  -H "X-Api-Key=my-api-key"
 ```

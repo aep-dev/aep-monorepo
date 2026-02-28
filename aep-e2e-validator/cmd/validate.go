@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aep-dev/aep-e2e-validator/pkg/validator"
 	"github.com/spf13/cobra"
@@ -13,7 +14,20 @@ var (
 	collection     string
 	allCollections bool
 	testNames      []string
+	headerFlags    []string
 )
+
+func parseHeaders(raw []string) ([]validator.Header, error) {
+	headers := make([]validator.Header, 0, len(raw))
+	for _, h := range raw {
+		key, value, ok := strings.Cut(h, "=")
+		if !ok {
+			return nil, fmt.Errorf("invalid header %q: must be in key=value format", h)
+		}
+		headers = append(headers, validator.Header{Key: strings.TrimSpace(key), Value: strings.TrimSpace(value)})
+	}
+	return headers, nil
+}
 
 var validateCmd = &cobra.Command{
 	Use:   "validate",
@@ -30,6 +44,11 @@ var validateCmd = &cobra.Command{
 			return fmt.Errorf("cannot specify both collection and all-collections")
 		}
 
+		headers, err := parseHeaders(headerFlags)
+		if err != nil {
+			return err
+		}
+
 		fmt.Printf("Validating with config: %s\n", configPath)
 		if allCollections {
 			fmt.Println("Validating all collections")
@@ -37,7 +56,7 @@ var validateCmd = &cobra.Command{
 			fmt.Printf("Validating collection: %s\n", collection)
 		}
 
-		v := validator.NewValidator(configPath, collection, allCollections, testNames)
+		v := validator.NewValidator(configPath, collection, allCollections, testNames, headers)
 		exitCode := v.Run()
 		if exitCode != validator.ExitCodeSuccess {
 			os.Exit(exitCode)
@@ -53,6 +72,7 @@ func init() {
 	validateCmd.Flags().StringVar(&collection, "collection", "", "Name of the collection to validate")
 	validateCmd.Flags().BoolVar(&allCollections, "all-collections", false, "Validate all collections in the spec")
 	validateCmd.Flags().StringSliceVar(&testNames, "tests", []string{}, "Comma-separated list of tests to run (e.g. aep-133-create)")
+	validateCmd.Flags().StringArrayVarP(&headerFlags, "header", "H", []string{}, "Headers to include in every request (format: key=value, repeatable)")
 
 	validateCmd.MarkFlagRequired("config")
 }
