@@ -17,23 +17,6 @@ import (
 	"github.com/aep-dev/aep-lib-go/pkg/openapi"
 )
 
-type Header struct {
-	Key   string
-	Value string
-}
-
-type extendedClient struct {
-	inner   *http.Client
-	headers []Header
-}
-
-func (c *extendedClient) Do(req *http.Request) (*http.Response, error) {
-	for _, h := range c.headers {
-		req.Header.Add(h.Key, h.Value)
-	}
-	return c.inner.Do(req)
-}
-
 type Validator struct {
 	configPath     string
 	collection     string
@@ -150,6 +133,8 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		fmt.Printf("%d. %s...\n", i+1, test.Name)
 		testStart := time.Now()
 
+		v.client.clearLogs()
+
 		if test.Precondition != nil {
 			if err := test.Precondition(ctx); err != nil {
 				fmt.Printf("   Skipped: %v\n", err)
@@ -161,6 +146,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		if test.Setup != nil {
 			if err := test.Setup(v, ctx); err != nil {
 				fmt.Printf("   Setup failed: %v\n", err)
+				v.client.printLogs()
 				if test.Teardown != nil {
 					_ = test.Teardown(v, ctx)
 				}
@@ -171,6 +157,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 
 		if err := test.Run(v, ctx); err != nil {
 			fmt.Printf("   Failed: %v\n", err)
+			v.client.printLogs()
 			if test.Teardown != nil {
 				_ = test.Teardown(v, ctx)
 			}
@@ -181,6 +168,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		if test.Teardown != nil {
 			if err := test.Teardown(v, ctx); err != nil {
 				fmt.Printf("   Teardown failed: %v\n", err)
+				v.client.printLogs()
 				results = append(results, TestResult{Name: test.Name, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), Duration: time.Since(testStart)})
 				continue
 			}
