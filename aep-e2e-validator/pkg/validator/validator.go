@@ -22,13 +22,14 @@ type Validator struct {
 	configPath     string
 	collection     string
 	allCollections bool
+	parent         string
 	testNames      []string
 	client         *extendedClient
 	jsonOutput     bool
 	logger         *log.Logger
 }
 
-func NewValidator(configPath, collection string, allCollections bool, tests []string, headers []Header, jsonOutput bool) *Validator {
+func NewValidator(configPath, collection string, allCollections bool, parent string, tests []string, headers []Header, jsonOutput bool) *Validator {
 	var output io.Writer = os.Stdout
 	if jsonOutput {
 		output = io.Discard
@@ -38,6 +39,7 @@ func NewValidator(configPath, collection string, allCollections bool, tests []st
 		configPath:     configPath,
 		collection:     collection,
 		allCollections: allCollections,
+		parent:         parent,
 		testNames:      tests,
 		client:         &extendedClient{inner: &http.Client{}, headers: headers, logger: logger},
 		jsonOutput:     jsonOutput,
@@ -108,11 +110,18 @@ func (v *Validator) Run() int {
 	return worstExitCode(allResults)
 }
 
+func (v *Validator) collectionURL(r *api.Resource) string {
+	if v.parent != "" {
+		return fmt.Sprintf("%s/%s/%s", r.API.ServerURL, v.parent, r.Plural)
+	}
+	return fmt.Sprintf("%s/%s", r.API.ServerURL, r.Plural)
+}
+
 func (v *Validator) validateResource(r *api.Resource) []TestResult {
 	v.logger.Printf("Starting validation for resource: %s\n", r.Singular)
 	ctx := &tests.ValidationContext{
 		Resource:      r,
-		CollectionURL: fmt.Sprintf("%s/%s", r.API.ServerURL, r.Plural),
+		CollectionURL: v.collectionURL(r),
 		Resources:     make([]map[string]interface{}, 0),
 	}
 
@@ -156,7 +165,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 		if test.Precondition != nil {
 			if err := test.Precondition(ctx); err != nil {
 				v.logger.Printf("   Skipped: %v\n", err)
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusSkip, Detail: err.Error(), DurationMS: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusSkip, Detail: err.Error(), Duration: time.Since(testStart)})
 				continue
 			}
 		}
@@ -168,7 +177,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 				if test.Teardown != nil {
 					_ = test.Teardown(v, ctx)
 				}
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("setup: %v", err), RequestLogs: v.client.logs, Duration: time.Since(testStart)})
 				continue
 			}
 		}
@@ -179,7 +188,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 			if test.Teardown != nil {
 				_ = test.Teardown(v, ctx)
 			}
-			results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusFail, Detail: err.Error(), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
+			results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusFail, Detail: err.Error(), RequestLogs: v.client.logs, Duration: time.Since(testStart)})
 			continue
 		}
 
@@ -187,12 +196,12 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 			if err := test.Teardown(v, ctx); err != nil {
 				v.logger.Printf("   Teardown failed: %v\n", err)
 				v.client.printLogs()
-				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), RequestLogs: v.client.logs, DurationMS: time.Since(testStart)})
+				results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusError, Detail: fmt.Sprintf("teardown: %v", err), RequestLogs: v.client.logs, Duration: time.Since(testStart)})
 				continue
 			}
 		}
 
-		results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusPass, DurationMS: time.Since(testStart)})
+		results = append(results, TestResult{Name: test.Name, URL: test.URL, Status: StatusPass, Duration: time.Since(testStart)})
 	}
 
 	// Global Teardown: clean up collection
@@ -205,7 +214,7 @@ func (v *Validator) validateResource(r *api.Resource) []TestResult {
 }
 
 func (v *Validator) cleanupCollection(r *api.Resource) error {
-	collectionURL := fmt.Sprintf("%s/%s", r.API.ServerURL, r.Plural)
+	collectionURL := v.collectionURL(r)
 	pageToken := ""
 
 	for {

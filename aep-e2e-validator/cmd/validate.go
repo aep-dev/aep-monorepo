@@ -13,6 +13,7 @@ var (
 	configPath     string
 	collection     string
 	allCollections bool
+	parent         string
 	testNames      []string
 	headerFlags    []string
 	jsonOutput     bool
@@ -44,6 +45,9 @@ var validateCmd = &cobra.Command{
 		if collection != "" && allCollections {
 			return fmt.Errorf("cannot specify both collection and all-collections")
 		}
+		if parent != "" && allCollections {
+			return fmt.Errorf("cannot specify both parent and all-collections")
+		}
 
 		headers, err := parseHeaders(headerFlags)
 		if err != nil {
@@ -59,7 +63,7 @@ var validateCmd = &cobra.Command{
 			}
 		}
 
-		v := validator.NewValidator(configPath, collection, allCollections, testNames, headers, jsonOutput)
+		v := validator.NewValidator(configPath, collection, allCollections, parent, testNames, headers, jsonOutput)
 		exitCode := v.Run()
 		if exitCode != validator.ExitCodeSuccess {
 			os.Exit(exitCode)
@@ -74,6 +78,7 @@ func init() {
 	validateCmd.Flags().StringVar(&configPath, "config", "", "Path to the OpenAPI spec file")
 	validateCmd.Flags().StringVar(&collection, "collection", "", "Name of the collection to validate")
 	validateCmd.Flags().BoolVar(&allCollections, "all-collections", false, "Validate all collections in the spec")
+	validateCmd.Flags().StringVar(&parent, "parent", "", "Parent resource path for child collections (e.g. shelves/horror)")
 	validateCmd.Flags().StringSliceVar(&testNames, "tests", []string{}, "Comma-separated list of tests to run (e.g. aep-133-create)")
 	validateCmd.Flags().StringArrayVarP(&headerFlags, "header", "H", []string{}, "Headers to include in every request (format: key=value, repeatable)")
 	validateCmd.Flags().BoolVar(&jsonOutput, "json", false, "Output results as JSON")

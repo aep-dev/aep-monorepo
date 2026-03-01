@@ -40,6 +40,12 @@ Run specific tests:
 go run main.go validate --config "http://localhost:8000/openapi.json" --collection shelves --tests aep-133-create,aep-135-delete
 ```
 
+Validate a child collection by specifying a parent resource:
+
+```
+go run main.go validate --config "http://localhost:8000/openapi.json" --collection books --parent "shelves/horror"
+```
+
 Pass custom headers (e.g. for authentication):
 
 ```

@@ -65,3 +65,19 @@ func TestParseHeaders(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateCmd_ParentWithAllCollectionsRejected(t *testing.T) {
+	rootCmd.SetArgs([]string{"validate", "--config", "http://example.com/openapi.json", "--all-collections", "--parent", "shelves/horror"})
+	err := rootCmd.Execute()
+	// Reset globals modified by flag parsing
+	allCollections = false
+	parent = ""
+	configPath = ""
+	if err == nil {
+		t.Fatal("expected error when both --parent and --all-collections are set")
+	}
+	want := "cannot specify both parent and all-collections"
+	if err.Error() != want {
+		t.Errorf("error = %q, want %q", err.Error(), want)
+	}
+}

@@ -4,7 +4,39 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/aep-dev/aep-lib-go/pkg/api"
 )
+
+func TestCollectionURL(t *testing.T) {
+	a := &api.API{ServerURL: "http://localhost:8000"}
+	r := &api.Resource{Plural: "books", API: a}
+
+	tests := []struct {
+		name   string
+		parent string
+		want   string
+	}{
+		{
+			name: "without parent",
+			want: "http://localhost:8000/books",
+		},
+		{
+			name:   "with parent",
+			parent: "shelves/horror",
+			want:   "http://localhost:8000/shelves/horror/books",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &Validator{parent: tt.parent}
+			if got := v.collectionURL(r); got != tt.want {
+				t.Errorf("collectionURL() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestExtendedClientDo_InjectsHeaders(t *testing.T) {
 	var receivedHeaders http.Header
