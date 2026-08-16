@@ -1,0 +1,183 @@
+package validator
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
+)
+
+type TestStatus string
+
+const (
+	StatusPass  TestStatus = "PASSED"
+	StatusFail  TestStatus = "FAILED"
+	StatusSkip  TestStatus = "SKIPPED"
+	StatusError TestStatus = "ERROR"
+)
+
+type TestResult struct {
+	Name        string        `json:"name"`
+	URL         string        `json:"url,omitempty"`
+	Status      TestStatus    `json:"status"`
+	Detail      string        `json:"detail,omitempty"`
+	RequestLogs []RequestLog  `json:"request_logs,omitempty"`
+	Duration    time.Duration `json:"duration"`
+}
+
+const summaryWidth = 60
+
+var renderer *lipgloss.Renderer
+
+func getRenderer() *lipgloss.Renderer {
+	if renderer == nil {
+		renderer = lipgloss.NewRenderer(os.Stdout, termenv.WithProfile(termenv.ColorProfile()))
+	}
+	return renderer
+}
+
+func greenStyle() lipgloss.Style {
+	return getRenderer().NewStyle().Foreground(lipgloss.Color("2")).Bold(true)
+}
+
+func redStyle() lipgloss.Style {
+	return getRenderer().NewStyle().Foreground(lipgloss.Color("1")).Bold(true)
+}
+
+func yellowStyle() lipgloss.Style {
+	return getRenderer().NewStyle().Foreground(lipgloss.Color("3")).Bold(true)
+}
+
+func printJSON(results []TestResult) {
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(results); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to marshal json: %v\n", err)
+	}
+}
+
+func printSummary(results []TestResult, totalDuration time.Duration) {
+	fmt.Println()
+
+	var passedTests []TestResult
+	var failedTests []TestResult
+	maxNameLen := 0
+	for _, r := range results {
+		if len(r.Name) > maxNameLen {
+			maxNameLen = len(r.Name)
+		}
+		if r.Status == StatusPass || r.Status == StatusSkip {
+			passedTests = append(passedTests, r)
+		} else {
+			failedTests = append(failedTests, r)
+		}
+	}
+
+	if len(passedTests) > 0 {
+		fmt.Println(centerLine("passed tests", '='))
+		for _, r := range passedTests {
+			icon := statusIcon(r.Status)
+			fmt.Printf(" %s  %-*s  %s\n", icon, maxNameLen, r.Name, r.Duration.Round(time.Millisecond))
+		}
+		fmt.Println()
+	}
+
+	if len(failedTests) > 0 {
+		fmt.Println(centerLine("failed tests", '='))
+		for _, r := range failedTests {
+			icon := statusIcon(r.Status)
+			fmt.Printf(" %s  %-*s  %s\n", icon, maxNameLen, r.Name, r.Duration.Round(time.Millisecond))
+			if r.Detail != "" {
+				for _, line := range strings.Split(r.Detail, "\n") {
+					fmt.Printf("    %s\n", line)
+				}
+			}
+			if r.URL != "" {
+				fmt.Printf("    see %s\n", r.URL)
+			}
+		}
+		fmt.Println()
+	}
+
+	passedCount, failedCount, skippedCount, erroredCount := countByStatus(results)
+	var parts []string
+	if passedCount > 0 {
+		parts = append(parts, greenStyle().Render(fmt.Sprintf("%d passed", passedCount)))
+	}
+	if failedCount > 0 {
+		parts = append(parts, redStyle().Render(fmt.Sprintf("%d failed", failedCount)))
+	}
+	if skippedCount > 0 {
+		parts = append(parts, yellowStyle().Render(fmt.Sprintf("%d skipped", skippedCount)))
+	}
+	if erroredCount > 0 {
+		parts = append(parts, redStyle().Render(fmt.Sprintf("%d error", erroredCount)))
+	}
+	summary := strings.Join(parts, ", ")
+	summary = fmt.Sprintf("%s in %s", summary, totalDuration.Round(time.Millisecond))
+	fmt.Println(centerLine(summary, '='))
+}
+
+func statusIcon(s TestStatus) string {
+	switch s {
+	case StatusPass:
+		return greenStyle().Render("PASSED ")
+	case StatusFail:
+		return redStyle().Render("FAILED ")
+	case StatusSkip:
+		return yellowStyle().Render("SKIPPED")
+	case StatusError:
+		return redStyle().Render("ERROR  ")
+	default:
+		return string(s)
+	}
+}
+
+func countByStatus(results []TestResult) (passed, failed, skipped, errored int) {
+	for _, r := range results {
+		switch r.Status {
+		case StatusPass:
+			passed++
+		case StatusFail:
+			failed++
+		case StatusSkip:
+			skipped++
+		case StatusError:
+			errored++
+		}
+	}
+	return
+}
+
+func centerLine(text string, pad byte) string {
+	plainLen := lipgloss.Width(text)
+	if plainLen+4 >= summaryWidth {
+		return fmt.Sprintf("%c %s %c", pad, text, pad)
+	}
+	left := (summaryWidth - plainLen - 2) / 2
+	right := summaryWidth - plainLen - 2 - left
+	return fmt.Sprintf("%s %s %s", strings.Repeat(string(pad), left), text, strings.Repeat(string(pad), right))
+}
+
+func worstExitCode(results []TestResult) int {
+	worst := ExitCodeSuccess
+	for _, r := range results {
+		var code int
+		switch r.Status {
+		case StatusPass, StatusSkip:
+			continue
+		case StatusFail:
+			code = ExitCodeTestFailed
+		case StatusError:
+			code = ExitCodeSetupFailed
+		}
+		if code > worst {
+			worst = code
+		}
+	}
+	return worst
+}
