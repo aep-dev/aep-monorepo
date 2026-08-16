@@ -1,0 +1,63 @@
+package api
+
+import (
+	"encoding/json"
+	"fmt"
+	"regexp"
+
+	"github.com/aep-dev/aep-lib-go/pkg/constants"
+	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+)
+
+var singularPluralRegex = regexp.MustCompile("^[a-z][a-z0-9_-]*[a-z0-9]$")
+
+func LoadAPIFromJson(data []byte) (*API, error) {
+	api := &API{}
+	err := json.Unmarshal(data, api)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling API: %v", err)
+	}
+	err = AddImplicitFieldsAndValidate(api)
+	if err != nil {
+		return nil, fmt.Errorf("error adding defaults to API: %v", err)
+	}
+	return api, nil
+}
+
+// addImplicitFieldsAndValidate adds implicit fields to the API object,
+// such as the "path" variable in the resource.
+func AddImplicitFieldsAndValidate(api *API) error {
+	// add the path variable to the resource
+	for name, r := range api.Resources {
+		if !singularPluralRegex.MatchString(name) {
+			return fmt.Errorf("resource name %s does not match the regex %s", name, singularPluralRegex.String())
+		}
+		if !singularPluralRegex.MatchString(r.Singular) {
+			return fmt.Errorf("singular resource name %s does not match the regex %s", r.Singular, singularPluralRegex.String())
+		}
+		if !singularPluralRegex.MatchString(r.Plural) {
+			return fmt.Errorf("plural resource name %s does not match the regex %s", r.Plural, singularPluralRegex.String())
+		}
+		r.API = api
+		if r.Schema.Properties == nil {
+			r.Schema.Properties = make(map[string]openapi.Schema)
+		}
+		r.Schema.Properties[constants.FIELD_PATH_NAME] = openapi.Schema{
+			Type:        "string",
+			Description: "The server-assigned path of the resource, which is unique within the service.",
+			XAEPField: &openapi.XAEPField{
+				FieldNumber: constants.FIELD_PATH_NUMBER,
+			},
+			ReadOnly: true,
+		}
+		for _, p := range r.Parents {
+			if parent, ok := api.Resources[p]; ok {
+				r.parentResources = append(r.parentResources, parent)
+				parent.Children = append(parent.Children, r)
+			} else {
+				return fmt.Errorf("parent resource %s not found for resource %s", p, r.Singular)
+			}
+		}
+	}
+	return nil
+}

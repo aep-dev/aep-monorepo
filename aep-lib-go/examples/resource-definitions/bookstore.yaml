@@ -1,0 +1,105 @@
+# normally this would be suffixed with the domain (.com)
+name: "bookstore.example.com"
+server_url: "http://localhost:8081"
+contact:
+  name: "API support"
+  email: "aepsupport@aep.dev"
+resources:
+  publisher: &publisher
+    singular: "publisher"
+    plural: "publishers"
+    schema:
+      type: object
+      properties:
+        description:
+          type: string
+          x-aep-field-number: 1
+    methods:
+      create: {}
+      read: {}
+      update: {}
+      delete: {}
+      list:
+        supports_filter: true
+        supports_skip: true
+      apply: {}
+  book: &book
+    singular: "book"
+    plural: "books"
+    parents: ["publisher"]
+    schema:
+      type: object
+      required: ["author", "edition", "isbn", "price", "published"]
+      properties:
+        isbn:
+          type: array
+          items:
+            type: string
+          x-aep-field-number: 1
+        price:
+          type: number
+          x-aep-field-number: 2
+        published:
+          type: boolean
+          x-aep-field-number: 3
+        edition:
+          type: integer
+          x-aep-field-number: 4
+        author:
+          x-aep-field-number: 5
+          type: array
+          items:
+            type: object
+            properties:
+              firstName:
+                type: string
+                x-aep-field-number: 1
+              lastName:
+                type: string
+                x-aep-field-number: 2
+    methods:
+      create:
+        supports_user_settable_create: true
+      read: {}
+      update: {}
+      delete: {}
+      list:
+        has_unreachable_resources: true
+      apply: {}
+    custom_methods:
+      - name: "archive"
+        method: "POST"
+        request:
+          type: object
+          properties: {}
+        response:
+          type: object
+          properties:
+            success:
+              type: boolean
+  book-edition:
+    singular: "book-edition"
+    plural: "book-editions"
+    parents: ["book"]
+    schema:
+      type: object
+      required: ["displayname"]
+      properties:
+        displayname:
+          type: string
+          x-aep-field-number: 1
+    methods:
+      create: {}
+      read: {}
+      list: {}
+      delete: {}
+  isbn:
+    singular: "isbn"
+    plural: "isbns"
+    schema:
+      type: object
+    properties: {}
+    methods:
+      read: {}
+      list: {}
+      create: {}
