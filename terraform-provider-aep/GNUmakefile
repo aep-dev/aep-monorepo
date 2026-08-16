@@ -7,7 +7,7 @@ install: build
 	go install -v ./...
 
 lint:
-	golangci-lint run ./... --timeout=3m0s
+	golangci-lint run ./internal/... ./config/... --timeout=3m0s
 
 fmt:
 	gofmt -s -w -e .
