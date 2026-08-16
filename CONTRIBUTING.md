@@ -3,8 +3,10 @@
 - [Contributing to AEP Monorepo](#contributing-to-aep-monorepo)
   - [Repository Layout](#repository-layout)
   - [Local Development \& Go Workspace](#local-development--go-workspace)
+  - [Dependency Management \& Synchronization](#dependency-management--synchronization)
   - [CI/CD \& GitHub Actions Pipelines](#cicd--github-actions-pipelines)
   - [Tagging and Releases](#tagging-and-releases)
+  - [Conventional Commits](#conventional-commits)
   - [Pull Request Guidelines](#pull-request-guidelines)
   - [References](#references)
 
@@ -20,6 +22,7 @@ aep-monorepo/
 ├── aepc/                         # Compiler/generator for AEP-compliant resource models
 ├── aepcli/                       # Command-line interface for interacting with AEP APIs
 ├── api-linter/                   # Protocol buffer linter for AEP rules
+├── scripts/                      # Shared developer scripts and automation tools
 ├── terraform-provider-aep/       # Dynamic Terraform provider for AEP APIs
 ├── go.work                       # Go Workspace configuration linking local modules
 └── go.work.sum
@@ -41,7 +44,7 @@ The monorepo uses Go workspaces configured via [go.work](go.work):
 Common development workflows:
 - Run all unit tests across all modules from the repository root:
   ```bash
-  go test ./...
+  just test
   ```
 - Run tests for a specific module:
   ```bash
@@ -54,6 +57,18 @@ Common development workflows:
 - Run linting for a specific module:
   ```bash
   cd api-linter && make lint
+  ```
+
+## Dependency Management & Synchronization
+
+- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized in the `go.mod` files of all dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`, `terraform-provider-aep`).
+- Synchronize all dependent module `go.mod` files automatically:
+  ```bash
+  just fix
+  ```
+- Verify whether dependent `go.mod` files are synchronized against the target branch:
+  ```bash
+  just check
   ```
 
 ## CI/CD & GitHub Actions Pipelines
@@ -72,11 +87,28 @@ Releases and Go module version tags use module-prefixed tags:
   - Example: `terraform-provider-aep/v0.5.0`
 - Pushing a prefixed tag triggers the corresponding release workflow to build artifacts and create a GitHub release.
 
+## Conventional Commits
+
+Commit messages and pull request titles should follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+- Structure commit messages as `<type>(<scope>): <description>`.
+- Common types:
+  - `feat`: A new feature or capability.
+  - `fix`: A bug fix.
+  - `docs`: Documentation changes.
+  - `refactor`: Code changes that neither fix a bug nor add a feature.
+  - `test`: Adding or correcting tests.
+  - `chore`: Maintenance tasks, dependency updates, and tooling improvements.
+- Common scopes include module names or subsystem areas (e.g. `feat(aepcli): add support for custom headers`, `fix(api-linter): correct resource name check`).
+
 ## Pull Request Guidelines
 
 - Verify that tests pass locally before opening a pull request:
   ```bash
-  go test ./...
+  just test
+  ```
+- If modifying [aep-lib-go](aep-lib-go), run the dependency synchronization check before opening a PR:
+  ```bash
+  just check
   ```
 - When merging, a squash and rebase strategy is used. Context and iteration are preserved in the pull request.
 
@@ -84,7 +116,11 @@ Releases and Go module version tags use module-prefixed tags:
 
 - Design document detailing monorepo initialization and git history grafting: [DESIGN/2026-08-16-repository-initialization-and-grafting.md](DESIGN/2026-08-16-repository-initialization-and-grafting.md)
 - Root Go workspace configuration linking all submodules: [go.work](go.work)
+- Command runner recipe definitions: [justfile](justfile)
 - GitHub Actions workflow configurations directory: [.github/workflows](.github/workflows)
+- Internal dependency synchronization helper script: [scripts/sync-deps.py](scripts/sync-deps.py)
+- Conventional Commits specification: https://www.conventionalcommits.org/
 - AEP development guidelines and standards: https://aep.dev
+
 
 
