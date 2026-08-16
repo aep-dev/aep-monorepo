@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aep-dev/aep-lib-go/pkg/api"
 	"github.com/aep-dev/aep-lib-go/pkg/client"
@@ -50,7 +51,7 @@ type ExampleResource struct {
 }
 
 func (r *ExampleResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.name
+	resp.TypeName = req.ProviderTypeName + "_" + strings.ReplaceAll(r.name, "-", "_")
 }
 
 func (r *ExampleResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
