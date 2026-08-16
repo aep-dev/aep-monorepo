@@ -1,0 +1,21 @@
+name: Monorepo Dependency Sync Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aep-lib-go/**'
+
+jobs:
+  check-deps:
+    name: Verify Dependent Module Updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify dependency synchronization
+        run: |
+          ./scripts/sync-deps.py --check --base="origin/${{ github.base_ref }}"
