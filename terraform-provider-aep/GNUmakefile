@@ -7,7 +7,8 @@ install: build
 	go install -v ./...
 
 lint:
-	golangci-lint run ./internal/... ./config/... --timeout=3m0s
+	go vet ./...
+	test -z "$$(gofmt -s -l .)"
 
 fmt:
 	gofmt -s -w -e .
