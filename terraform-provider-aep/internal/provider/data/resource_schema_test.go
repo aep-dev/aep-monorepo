@@ -38,7 +38,6 @@ func TestSchemaAttributes(t *testing.T) {
 						SupportsUserSettableCreate: true,
 					},
 				},
-				Pattern: "",
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -89,7 +88,6 @@ func TestSchemaAttributes(t *testing.T) {
 						SupportsUserSettableCreate: false,
 					},
 				},
-				Pattern: "",
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -144,7 +142,6 @@ func TestSchemaAttributes(t *testing.T) {
 						SupportsUserSettableCreate: false,
 					},
 				},
-				Pattern: "",
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -222,7 +219,6 @@ func TestSchemaAttributes(t *testing.T) {
 						SupportsUserSettableCreate: false,
 					},
 				},
-				Pattern: "",
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
