@@ -1,0 +1,19 @@
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  forbidigo:
+    forbid:
+      - '^fmt\.Print'
+      - '^log\.'
+      - '^print$'
+      - '^println$'
+      - '^panic$'
+linters:
+  disable:
+    - typecheck
+issues:
+  exclude-dirs-use-default: false
+  exclude-rules:
+    - linters:
+        - staticcheck
+      text: 'SA1019: "github.com/jhump/protoreflect/desc'

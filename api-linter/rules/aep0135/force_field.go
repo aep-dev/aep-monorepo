@@ -1,0 +1,54 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package aep0135
+
+import (
+	"github.com/aep-dev/api-linter/lint"
+	"github.com/aep-dev/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
+)
+
+// Delete methods for resources that are parents should have a bool force field.
+var forceField = &lint.MessageRule{
+	Name:     lint.NewRuleName(135, "force-field"),
+	RuleType: lint.NewRuleType(lint.MustRule),
+	OnlyIf: func(m *desc.MessageDescriptor) bool {
+		name := m.FindFieldByName("path")
+		ref := utils.GetResourceReference(name)
+		types := ref.GetType()
+		validRef := ref != nil && len(types) > 0 && utils.FindResource(types[0], m.GetFile()) != nil
+
+		return utils.IsDeleteRequestMessage(m) && validRef
+	},
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		force := m.FindFieldByName("force")
+		name := m.FindFieldByName("path")
+		ref := utils.GetResourceReference(name)
+		types := ref.GetType()
+		res := utils.FindResource(types[0], m.GetFile())
+
+		children := utils.FindResourceChildren(res, m.GetFile())
+		if len(children) > 0 && force == nil {
+			return []lint.Problem{
+				{
+					Message:    "Delete requests for resources with children should have a `bool force` field",
+					Descriptor: m,
+				},
+			}
+		}
+
+		return nil
+	},
+}

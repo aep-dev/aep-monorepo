@@ -1,0 +1,66 @@
+---
+rule:
+  aep: 135
+  name: [core, '0135', http-body]
+  summary: Delete methods must not have an HTTP body.
+permalink: /135/http-body
+redirect_from:
+  - /0135/http-body
+---
+
+# Delete methods: No HTTP body
+
+This rule enforces that all `Delete` RPCs omit the HTTP `body`, as mandated in
+[AEP-135][].
+
+## Details
+
+This rule looks at any message matching beginning with `Delete`, and complains
+if the HTTP `body` field is set.
+
+## Examples
+
+**Incorrect** code for this rule:
+
+```proto
+// Incorrect.
+rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
+  option (google.api.http) = {
+    delete: "/v1/{path=publishers/*/books/*}"
+    body: "*"  // This should be absent.
+  };
+}
+```
+
+**Correct** code for this rule:
+
+```proto
+// Correct.
+rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
+  option (google.api.http) = {
+    delete: "/v1/{path=publishers/*/books/*}"
+  };
+}
+```
+
+## Disabling
+
+If you need to violate this rule, use a leading comment above the method.
+Remember to also include an [aep.dev/not-precedent][] comment explaining why.
+
+```proto
+// (-- api-linter: core::0135::http-body=disabled
+//     aep.dev/not-precedent: We need to do this because reasons. --)
+rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
+  option (google.api.http) = {
+    delete: "/v1/{path=publishers/*/books/*}"
+    body: "*"
+  };
+}
+```
+
+If you need to violate this rule for an entire file, place the comment at the
+top of the file.
+
+[aep-135]: https://aep.dev/135
+[aep.dev/not-precedent]: https://aep.dev/not-precedent

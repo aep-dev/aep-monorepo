@@ -1,0 +1,10 @@
+{
+  extends: [
+    "config:base",
+    "group:all",
+    "schedule:weekly",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  labels: ["automerge"],
+  postUpdateOptions: ["gomodTidy"],
+}
