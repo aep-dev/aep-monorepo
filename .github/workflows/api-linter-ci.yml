@@ -1,0 +1,33 @@
+name: api-linter CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api-linter/**'
+      - '.github/workflows/api-linter-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'api-linter/**'
+      - '.github/workflows/api-linter-*.yml'
+
+jobs:
+  ci:
+    name: Build & Lint & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api-linter
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'api-linter/go.mod'
+          cache-dependency-path: 'api-linter/go.sum'
+      - name: Run make all
+        run: make all
