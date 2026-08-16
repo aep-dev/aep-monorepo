@@ -33,10 +33,11 @@ func TestSchemaAttributes(t *testing.T) {
 				},
 			},
 			resource: &api.Resource{
-				CreateMethod: &api.CreateMethod{
-					SupportsUserSettableCreate: true,
+				Methods: api.Methods{
+					Create: &api.CreateMethod{
+						SupportsUserSettableCreate: true,
+					},
 				},
-				PatternElems: []string{},
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -82,10 +83,11 @@ func TestSchemaAttributes(t *testing.T) {
 				Required: []string{"foo"},
 			},
 			resource: &api.Resource{
-				CreateMethod: &api.CreateMethod{
-					SupportsUserSettableCreate: false,
+				Methods: api.Methods{
+					Create: &api.CreateMethod{
+						SupportsUserSettableCreate: false,
+					},
 				},
-				PatternElems: []string{},
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -135,10 +137,11 @@ func TestSchemaAttributes(t *testing.T) {
 				},
 			},
 			resource: &api.Resource{
-				CreateMethod: &api.CreateMethod{
-					SupportsUserSettableCreate: false,
+				Methods: api.Methods{
+					Create: &api.CreateMethod{
+						SupportsUserSettableCreate: false,
+					},
 				},
-				PatternElems: []string{},
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{
@@ -211,10 +214,11 @@ func TestSchemaAttributes(t *testing.T) {
 				},
 			},
 			resource: &api.Resource{
-				CreateMethod: &api.CreateMethod{
-					SupportsUserSettableCreate: false,
+				Methods: api.Methods{
+					Create: &api.CreateMethod{
+						SupportsUserSettableCreate: false,
+					},
 				},
-				PatternElems: []string{},
 			},
 			want: &ResourceSchema{
 				Attributes: map[string]*ResourceAttribute{

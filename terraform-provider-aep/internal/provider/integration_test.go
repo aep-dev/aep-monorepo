@@ -39,7 +39,7 @@ func skipIfNoAepbase(t *testing.T) {
 
 func resourceDefinitionConfig() string {
 	return `
-resource "scaffolding_aep-resource-definition" "publisher" {
+resource "scaffolding_aep_resource_definition" "publisher" {
   singular = "publisher"
   plural   = "publishers"
   schema = jsonencode({
@@ -49,11 +49,11 @@ resource "scaffolding_aep-resource-definition" "publisher" {
   })
 }
 
-resource "scaffolding_aep-resource-definition" "book" {
+resource "scaffolding_aep_resource_definition" "book" {
   singular   = "book"
   plural     = "books"
   parents    = ["publisher"]
-  depends_on = [scaffolding_aep-resource-definition.publisher]
+  depends_on = [scaffolding_aep_resource_definition.publisher]
   schema = jsonencode({
     properties = {
       price     = { type = "string" }

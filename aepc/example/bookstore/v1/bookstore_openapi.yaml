@@ -194,7 +194,7 @@ paths:
               $ref: '#/components/schemas/isbn'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -267,7 +267,7 @@ paths:
               $ref: '#/components/schemas/publisher'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -353,6 +353,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/publisher'
           description: Successful response
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publisher'
+          description: Successful response
   /publishers/{publisher_id}/books:
     get:
       description: List method for book
@@ -409,7 +415,7 @@ paths:
               $ref: '#/components/schemas/book'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -515,6 +521,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful response
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+          description: Successful response
   /publishers/{publisher_id}/books/{book_id}/editions:
     get:
       description: List method for book-edition
@@ -577,7 +589,7 @@ paths:
               $ref: '#/components/schemas/book-edition'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -720,7 +732,7 @@ paths:
               $ref: '#/components/schemas/store'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -844,7 +856,7 @@ paths:
               $ref: '#/components/schemas/item'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:

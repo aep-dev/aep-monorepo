@@ -1,0 +1,36 @@
+name: aepcli CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aepcli/**'
+      - '.github/workflows/aepcli-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aepcli/**'
+      - '.github/workflows/aepcli-*.yml'
+
+jobs:
+  test:
+    name: Run aepcli Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aepcli
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'aepcli/go.mod'
+          cache-dependency-path: 'aepcli/go.sum'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...

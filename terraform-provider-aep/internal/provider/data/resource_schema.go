@@ -132,8 +132,9 @@ func NewResourceSchema(ctx context.Context, r *api.Resource, o *openapi.OpenAPI)
 	}
 
 	// Add all parameters.
-	if len(r.PatternElems) > 0 {
-		for _, elem := range r.PatternElems[:len(r.PatternElems)-1] {
+	patternElems := r.PatternElems()
+	if len(patternElems) > 0 {
+		for _, elem := range patternElems[:len(patternElems)-1] {
 			if strings.HasPrefix(elem, "{") && strings.HasSuffix(elem, "}") {
 				paramName := strings.Replace(elem[1:len(elem)-1], "-", "_", -1)
 				schema.Attributes[paramName] = &ResourceAttribute{
@@ -158,7 +159,7 @@ func NewResourceSchema(ctx context.Context, r *api.Resource, o *openapi.OpenAPI)
 	}
 
 	if _, ok := schema.Attributes["id"]; !ok {
-		if r.CreateMethod != nil && r.CreateMethod.SupportsUserSettableCreate {
+		if r.Methods.Create != nil && r.Methods.Create.SupportsUserSettableCreate {
 			schema.Attributes["id"] = &ResourceAttribute{
 				TerraformName: "id",
 				JSONName:      "id",

@@ -7,15 +7,23 @@ GRPC_GATEWAY_PORT=8081
 PUBLISHER_ID="orderly-cottage"
 DESCRIPTION="very orderly"
 
-# start a process and get it's PID
-go build example/main.go
-go run example/main.go &
+# build and start the example server
+go build -o example_server example/main.go
+./example_server &
 PID=$!
 echo "started server with PID: ${PID}"
-sleep 1;
 
 # set a trap, kill the process when the script exits
-trap "kill ${PID}" EXIT
+trap "kill ${PID} 2>/dev/null || true; rm -f example_server" EXIT
+
+# wait for server to start
+for i in $(seq 1 30); do
+    if curl -sf "http://localhost:${GRPC_GATEWAY_PORT}/openapi.json" > /dev/null 2>&1; then
+        echo "server is ready"
+        break
+    fi
+    sleep 0.5
+done
 
 # check if "bookstore.example.com" is in OPENAPI_OUTPUT
 OPENAPI_OUTPUT=$(curl "http://localhost:${GRPC_GATEWAY_PORT}/openapi.json")

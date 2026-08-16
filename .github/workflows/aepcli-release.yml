@@ -1,13 +1,17 @@
-name: release
+name: aepcli Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'aepcli/v*'
 
 jobs:
   build:
-    name: Build Release Binaries
+    name: Build & Upload Release Binaries
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aepcli
     strategy:
       matrix:
         include:
@@ -31,7 +35,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version-file: 'aepcli/go.mod'
+          cache-dependency-path: 'aepcli/go.sum'
 
       - name: Build binary
         env:
@@ -41,8 +46,9 @@ jobs:
           go build -o ${{ matrix.artifact_name }} ./cmd/aepcli
 
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.artifact_name }}
+          tag_name: ${{ github.ref_name }}
+          files: aepcli/${{ matrix.artifact_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

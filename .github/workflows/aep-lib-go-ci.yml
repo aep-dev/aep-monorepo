@@ -1,0 +1,36 @@
+name: aep-lib-go CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aep-lib-go/**'
+      - '.github/workflows/aep-lib-go-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aep-lib-go/**'
+      - '.github/workflows/aep-lib-go-*.yml'
+
+jobs:
+  test:
+    name: Run aep-lib-go Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aep-lib-go
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'aep-lib-go/go.mod'
+          cache-dependency-path: 'aep-lib-go/go.sum'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...

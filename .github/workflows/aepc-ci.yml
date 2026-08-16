@@ -1,0 +1,35 @@
+name: aepc CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aepc/**'
+      - '.github/workflows/aepc-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aepc/**'
+      - '.github/workflows/aepc-*.yml'
+
+jobs:
+  tests:
+    name: Run aepc Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aepc
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'aepc/go.mod'
+          cache-dependency-path: 'aepc/go.sum'
+
+      - name: Install buf and run tests
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.42.0
+          ./scripts/test-all.sh

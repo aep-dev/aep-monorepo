@@ -72,7 +72,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -194,7 +194,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -295,6 +295,16 @@
         ],
         "responses": {
           "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/publisher"
+                }
+              }
+            }
+          },
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -427,7 +437,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -552,6 +562,16 @@
         ],
         "responses": {
           "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/book"
+                }
+              }
+            }
+          },
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -702,7 +722,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -938,7 +958,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
@@ -1143,7 +1163,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
