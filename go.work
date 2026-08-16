@@ -1,0 +1,10 @@
+go 1.26.3
+
+use (
+	./aep-e2e-validator
+	./aep-lib-go
+	./aepc
+	./aepcli
+	./api-linter
+	./terraform-provider-aep
+)
