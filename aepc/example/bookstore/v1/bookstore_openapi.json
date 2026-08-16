@@ -261,7 +261,7 @@
           "200": {
             "description": "Successful response",
             "content": {
-              "application/json": {
+              "application/merge-patch+json": {
                 "schema": {
                   "$ref": "#/components/schemas/publisher"
                 }
@@ -520,7 +520,7 @@
           "200": {
             "description": "Successful response",
             "content": {
-              "application/json": {
+              "application/merge-patch+json": {
                 "schema": {
                   "$ref": "#/components/schemas/book"
                 }
@@ -1025,7 +1025,7 @@
           "200": {
             "description": "Successful response",
             "content": {
-              "application/json": {
+              "application/merge-patch+json": {
                 "schema": {
                   "$ref": "#/components/schemas/store"
                 }
@@ -1246,7 +1246,7 @@
           "200": {
             "description": "Successful response",
             "content": {
-              "application/json": {
+              "application/merge-patch+json": {
                 "schema": {
                   "$ref": "#/components/schemas/item"
                 }

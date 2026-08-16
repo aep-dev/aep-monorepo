@@ -327,7 +327,7 @@ paths:
       responses:
         "200":
           content:
-            application/json:
+            application/merge-patch+json:
               schema:
                 $ref: '#/components/schemas/publisher'
           description: Successful response
@@ -490,7 +490,7 @@ paths:
       responses:
         "200":
           content:
-            application/json:
+            application/merge-patch+json:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful response
@@ -792,7 +792,7 @@ paths:
       responses:
         "200":
           content:
-            application/json:
+            application/merge-patch+json:
               schema:
                 $ref: '#/components/schemas/store'
           description: Successful response
@@ -927,7 +927,7 @@ paths:
       responses:
         "200":
           content:
-            application/json:
+            application/merge-patch+json:
               schema:
                 $ref: '#/components/schemas/item'
           description: Successful response

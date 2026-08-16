@@ -132,7 +132,7 @@ func TestToOpenAPI(t *testing.T) {
 							"200": {
 								Description: "Successful response",
 								Content: map[string]openapi.MediaType{
-									"application/json": {
+									"application/merge-patch+json": {
 										Schema: &openapi.Schema{
 											Ref: "#/components/schemas/book",
 										},
