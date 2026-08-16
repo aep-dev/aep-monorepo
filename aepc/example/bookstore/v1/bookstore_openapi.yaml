@@ -194,7 +194,7 @@ paths:
               $ref: '#/components/schemas/isbn'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -267,7 +267,7 @@ paths:
               $ref: '#/components/schemas/publisher'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -327,7 +327,7 @@ paths:
       responses:
         "200":
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/publisher'
           description: Successful response
@@ -348,6 +348,12 @@ paths:
         required: true
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publisher'
+          description: Successful response
+        "201":
           content:
             application/json:
               schema:
@@ -409,7 +415,7 @@ paths:
               $ref: '#/components/schemas/book'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -484,7 +490,7 @@ paths:
       responses:
         "200":
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful response
@@ -510,6 +516,12 @@ paths:
         required: true
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+          description: Successful response
+        "201":
           content:
             application/json:
               schema:
@@ -577,7 +589,7 @@ paths:
               $ref: '#/components/schemas/book-edition'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -720,7 +732,7 @@ paths:
               $ref: '#/components/schemas/store'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -780,7 +792,7 @@ paths:
       responses:
         "200":
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/store'
           description: Successful response
@@ -844,7 +856,7 @@ paths:
               $ref: '#/components/schemas/item'
         required: true
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -915,7 +927,7 @@ paths:
       responses:
         "200":
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/item'
           description: Successful response
