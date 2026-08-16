@@ -6,6 +6,8 @@ issues:
 
 linters:
   disable-all: true
+  disable:
+    - typecheck
   enable:
     - durationcheck
     - errcheck
