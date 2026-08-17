@@ -3,7 +3,7 @@ module github.com/aep-dev/aep-monorepo/terraform-provider-aep
 go 1.22.7
 
 require (
-	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20250320211115-2ab5fafea044
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.1.0
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/terraform-plugin-framework v1.13.0
 	github.com/hashicorp/terraform-plugin-go v0.25.0
