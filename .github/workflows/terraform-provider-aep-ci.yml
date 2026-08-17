@@ -61,7 +61,7 @@ jobs:
           go-version-file: 'terraform-provider-aep/go.mod'
           cache-dependency-path: 'terraform-provider-aep/go.sum'
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
