@@ -1,4 +1,4 @@
-module github.com/aep-dev/api-linter
+module github.com/aep-dev/aep-monorepo/api-linter
 
 go 1.24.0
 

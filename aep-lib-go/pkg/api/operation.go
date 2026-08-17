@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 var additionalPropertiesTrue = json.RawMessage([]byte("true"))

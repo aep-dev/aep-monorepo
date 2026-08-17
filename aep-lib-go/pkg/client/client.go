@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/cases"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/cases"
 )
 
 type RequestLoggingFunction func(ctx context.Context, req *http.Request, args ...any)

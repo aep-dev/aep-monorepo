@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

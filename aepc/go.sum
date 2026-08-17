@@ -18,10 +18,10 @@ github.com/PuerkitoBio/purell v1.1.0 h1:rmGxhojJlM0tuKtfdvliR84CFHljx9ag64t2xmVk
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV/sSk/8dngufqelfh6jnri85riMAaF/M=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
-github.com/aep-dev/aep-lib-go v0.0.0-20260208052831-f2a02f53a637 h1:7tZhVn+a3e1ITD5KC+jITawtd+kuNNC+ePFDhDw5bYQ=
-github.com/aep-dev/aep-lib-go v0.0.0-20260208052831-f2a02f53a637/go.mod h1:oPOz/8HDQAI0sR+pHSteMkiP/WHM3RNHKY4DctnwVpo=
-github.com/aep-dev/terraform-provider-aep v0.0.0-20241112052633-f48d45460768 h1:b5fRfpIIsOsdsT2N1MsBxr0K/fZacCUlWp0uY9/BJzM=
-github.com/aep-dev/terraform-provider-aep v0.0.0-20241112052633-f48d45460768/go.mod h1:sUuUJSkWTc4GBxp8GEZXCeEI38VMyuM5msPQ9BG0kMA=
+github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260208052831-f2a02f53a637 h1:7tZhVn+a3e1ITD5KC+jITawtd+kuNNC+ePFDhDw5bYQ=
+github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260208052831-f2a02f53a637/go.mod h1:oPOz/8HDQAI0sR+pHSteMkiP/WHM3RNHKY4DctnwVpo=
+github.com/aep-dev/aep-monorepo/terraform-provider-aep v0.0.0-20241112052633-f48d45460768 h1:b5fRfpIIsOsdsT2N1MsBxr0K/fZacCUlWp0uY9/BJzM=
+github.com/aep-dev/aep-monorepo/terraform-provider-aep v0.0.0-20241112052633-f48d45460768/go.mod h1:sUuUJSkWTc4GBxp8GEZXCeEI38VMyuM5msPQ9BG0kMA=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=
 github.com/agext/levenshtein v1.2.2/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=

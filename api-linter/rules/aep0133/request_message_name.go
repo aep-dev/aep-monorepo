@@ -15,8 +15,8 @@
 package aep0133
 
 import (
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/rules/internal/utils"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/utils"
 )
 
 // Create method should have a properly named input message.

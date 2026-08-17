@@ -17,7 +17,7 @@ End-to-end validation requires the creation, deletion, list, and so on of the AP
 In the future, proper packages and releases will be available. For now, you can install it using `go install`:
 
 ```
-go install github.com/aep-dev/aep-e2e-validator@latest
+go install github.com/aep-dev/aep-monorepo/aep-e2e-validator@latest
 ```
 
 ## User Guide

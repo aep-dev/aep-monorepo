@@ -17,8 +17,8 @@ package aep0141
 import (
 	"strings"
 
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/locations"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/locations"
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/jhump/protoreflect/desc"
 )

@@ -16,7 +16,7 @@
 package aep0135
 
 import (
-	"github.com/aep-dev/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
 )
 
 // AddRules accepts a register function and registers each of

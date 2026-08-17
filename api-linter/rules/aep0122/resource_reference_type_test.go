@@ -17,7 +17,7 @@ package aep0122
 import (
 	"testing"
 
-	"github.com/aep-dev/api-linter/rules/internal/testutils"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils"
 )
 
 func TestResourceReferenceType(t *testing.T) {

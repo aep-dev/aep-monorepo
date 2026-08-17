@@ -19,7 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	aepapi "buf.build/gen/go/aep/api/protocolbuffers/go/aep/api"
-	"github.com/aep-dev/api-linter/rules/internal/testutils"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils"
 	"github.com/google/go-cmp/cmp"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"

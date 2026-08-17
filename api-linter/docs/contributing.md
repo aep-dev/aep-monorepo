@@ -167,7 +167,7 @@ When making a conversion PR, the following steps should be taken:
 [aep]: https://aep.dev/
 [go]: https://golang.org/
 [`go.mod`]: https://github.com/aep-dev/api-linter/blob/main/go.mod
-[`problem`]: https://godoc.org/github.com/aep-dev/api-linter/lint#Problem
+[`problem`]: https://godoc.org/github.com/aep-dev/aep-monorepo/api-linter/lint#Problem
 [protoreflect]: https://godoc.org/github.com/jhump/protoreflect
 [`rules.go`]: https://github.com/aep-dev/api-linter/blob/main/rules/rules.go
 [visitor pattern]: https://en.wikipedia.org/wiki/Visitor_pattern

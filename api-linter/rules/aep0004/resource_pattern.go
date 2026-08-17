@@ -19,9 +19,9 @@ import (
 	"strings"
 
 	aepapi "buf.build/gen/go/aep/api/protocolbuffers/go/aep/api"
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/locations"
-	"github.com/aep-dev/api-linter/rules/internal/utils"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/locations"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )

@@ -3,8 +3,8 @@
 package main
 
 import (
-	"github.com/aep-dev/aepc/example/gateway"
-	"github.com/aep-dev/aepc/example/service"
+	"github.com/aep-dev/aep-monorepo/aepc/example/gateway"
+	"github.com/aep-dev/aep-monorepo/aepc/example/service"
 )
 
 func main() {

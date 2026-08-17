@@ -38,7 +38,7 @@ Each linter rule has its own [rule documentation][], and rules can be
 To install `api-linter`, use `go install`:
 
 ```sh
-go install github.com/aep-dev/api-linter/cmd/api-linter@latest
+go install github.com/aep-dev/aep-monorepo/api-linter/cmd/api-linter@latest
 ```
 
 It will install `api-linter` into your local Go binary directory
@@ -89,7 +89,7 @@ The API linter can be used as a plugin for `buf lint`.
 To install the plugin, run:
 
 ```sh
-go install github.com/aep-dev/api-linter/cmd/buf-plugin-aep@latest
+go install github.com/aep-dev/aep-monorepo/api-linter/cmd/buf-plugin-aep@latest
 ```
 
 It will install `buf-plugin-aep` into your local Go binary directory

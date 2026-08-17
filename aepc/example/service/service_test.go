@@ -8,7 +8,7 @@ import (
 	"time"
 
 	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
-	bpb "github.com/aep-dev/aepc/example/bookstore/v1"
+	bpb "github.com/aep-dev/aep-monorepo/aepc/example/bookstore/v1"
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

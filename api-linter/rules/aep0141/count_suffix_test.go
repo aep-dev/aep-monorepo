@@ -17,8 +17,8 @@ package aep0141
 import (
 	"testing"
 
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/rules/internal/testutils"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils"
 )
 
 func TestCount(t *testing.T) {

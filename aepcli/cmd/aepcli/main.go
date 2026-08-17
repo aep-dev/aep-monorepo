@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
-	"github.com/aep-dev/aepcli/internal/config"
-	"github.com/aep-dev/aepcli/internal/service"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aepcli/internal/config"
+	"github.com/aep-dev/aep-monorepo/aepcli/internal/service"
 
 	"github.com/spf13/cobra"
 )

@@ -1,10 +1,10 @@
-module github.com/aep-dev/aepcli
+module github.com/aep-dev/aep-monorepo/aepcli
 
 go 1.23
 
 require (
 	github.com/BurntSushi/toml v1.4.0
-	github.com/aep-dev/aep-lib-go v0.0.0-20260218063107-bb4d0cbad616
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260218063107-bb4d0cbad616
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 )
@@ -19,4 +19,4 @@ require (
 )
 
 // uncomment for local development.
-// replace github.com/aep-dev/aep-lib-go => ../aep-lib-go
+// replace github.com/aep-dev/aep-monorepo/aep-lib-go => ../aep-lib-go

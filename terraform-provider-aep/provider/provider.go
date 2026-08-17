@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 
-	"github.com/aep-dev/aep-lib-go/pkg/client"
-	"github.com/aep-dev/terraform-provider-aep/config"
-	internalprovider "github.com/aep-dev/terraform-provider-aep/internal/provider"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/client"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/config"
+	internalprovider "github.com/aep-dev/aep-monorepo/terraform-provider-aep/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	tfprovider "github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"

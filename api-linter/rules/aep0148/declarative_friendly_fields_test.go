@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/aep-dev/api-linter/rules/internal/testutils"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils"
 )
 
 func TestDeclarativeFriendlyFields(t *testing.T) {

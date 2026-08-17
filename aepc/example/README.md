@@ -21,7 +21,7 @@ This example provides an example of generating a terraform provider using
 To build the provider, run the following:
 
 ```sh
-go build -o terraform-provider-bookstore github.com/aep-dev/aepc/example/terraform/
+go build -o terraform-provider-bookstore github.com/aep-dev/aep-monorepo/aepc/example/terraform/
 ```
 
 ### Installing

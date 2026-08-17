@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/terraform-provider-aep/internal/provider/data"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/internal/provider/data"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 

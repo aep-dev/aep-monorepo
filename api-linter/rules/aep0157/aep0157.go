@@ -18,7 +18,7 @@ package aep0157
 import (
 	"strings"
 
-	"github.com/aep-dev/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 

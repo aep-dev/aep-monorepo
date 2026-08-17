@@ -18,9 +18,9 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/locations"
-	"github.com/aep-dev/api-linter/rules/internal/utils"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/locations"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )

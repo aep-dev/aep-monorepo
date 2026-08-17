@@ -1,9 +1,9 @@
-module github.com/aep-dev/aep-e2e-validator
+module github.com/aep-dev/aep-monorepo/aep-e2e-validator
 
 go 1.24.4
 
 require (
-	github.com/aep-dev/aep-lib-go v0.0.0-20260208052831-f2a02f53a637
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260208052831-f2a02f53a637
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/muesli/termenv v0.16.0
 	github.com/spf13/cobra v1.10.2

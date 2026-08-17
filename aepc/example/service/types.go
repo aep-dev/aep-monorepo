@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	bpb "github.com/aep-dev/aepc/example/bookstore/v1"
+	bpb "github.com/aep-dev/aep-monorepo/aepc/example/bookstore/v1"
 	"google.golang.org/protobuf/proto"
 )
 

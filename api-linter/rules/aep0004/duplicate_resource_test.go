@@ -17,8 +17,8 @@ package aep0004
 import (
 	"testing"
 
-	"github.com/aep-dev/api-linter/lint"
-	"github.com/aep-dev/api-linter/rules/internal/testutils"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils"
 )
 
 func TestDuplicateResource(t *testing.T) {

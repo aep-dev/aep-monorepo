@@ -81,8 +81,8 @@ See `examples/main.go` for a complete example. The key steps are:
 package main
 
 import (
-    "github.com/aep-dev/terraform-provider-aep/config"
-    "github.com/aep-dev/terraform-provider-aep/provider"
+    "github.com/aep-dev/aep-monorepo/terraform-provider-aep/config"
+    "github.com/aep-dev/aep-monorepo/terraform-provider-aep/provider"
 )
 
 func main() {

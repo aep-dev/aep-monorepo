@@ -19,7 +19,7 @@ go install github.com/bufbuild/buf/cmd/buf@v1.27.1
 Install the aepc fork of the api-linter:
 
 ```bash
-go install github.com/aep-dev/api-linter/cmd/api-linter@latest
+go install github.com/aep-dev/aep-monorepo/api-linter/cmd/api-linter@latest
 ```
 
 ## Building aepc

@@ -20,9 +20,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/cases"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/cases"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/jhump/protoreflect/desc/protoprint"

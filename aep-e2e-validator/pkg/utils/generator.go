@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 func init() {

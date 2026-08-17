@@ -18,7 +18,7 @@ import (
 
 	api "buf.build/gen/go/aep/api/protocolbuffers/go/aep/api"
 	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
-	bpb "github.com/aep-dev/aepc/example/bookstore/v1"
+	bpb "github.com/aep-dev/aep-monorepo/aepc/example/bookstore/v1"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"

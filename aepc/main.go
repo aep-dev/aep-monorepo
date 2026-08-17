@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aep-dev/aepc/cmd"
+	"github.com/aep-dev/aep-monorepo/aepc/cmd"
 )
 
 func main() {

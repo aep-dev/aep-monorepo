@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
 )
 
 func TestCollectionURL(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aep-dev/aep-lib-go/pkg/client"
-	"github.com/aep-dev/terraform-provider-aep/config"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/client"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/config"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"

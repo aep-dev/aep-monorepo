@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
+	"github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/utils"
 )
 
 var TestAEP134UpdateResource = Test{

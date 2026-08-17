@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
 )
 
 type ServiceCommand struct {

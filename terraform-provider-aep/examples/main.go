@@ -10,9 +10,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aep-dev/aep-lib-go/pkg/client"
-	"github.com/aep-dev/terraform-provider-aep/config"
-	"github.com/aep-dev/terraform-provider-aep/provider"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/client"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/config"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )

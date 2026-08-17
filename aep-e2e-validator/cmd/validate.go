@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aep-dev/aep-e2e-validator/pkg/validator"
+	"github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/validator"
 	"github.com/spf13/cobra"
 )
 

@@ -1,12 +1,12 @@
-module github.com/aep-dev/aepc
+module github.com/aep-dev/aep-monorepo/aepc
 
 go 1.24.0
 
 require (
 	buf.build/gen/go/aep/api/protocolbuffers/go v1.36.10-20251109183837-26a011a354ee.1
 	cloud.google.com/go/longrunning v0.6.6
-	github.com/aep-dev/aep-lib-go v0.0.0-20260208052831-f2a02f53a637
-	github.com/aep-dev/terraform-provider-aep v0.0.0-20241112052633-f48d45460768
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260208052831-f2a02f53a637
+	github.com/aep-dev/aep-monorepo/terraform-provider-aep v0.0.0-20241112052633-f48d45460768
 	github.com/google/cel-go v0.22.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.35.0
@@ -105,4 +105,4 @@ require (
 )
 
 // uncomment for local development
-// replace github.com/aep-dev/aep-lib-go => ../aep-lib-go
+// replace github.com/aep-dev/aep-monorepo/aep-lib-go => ../aep-lib-go

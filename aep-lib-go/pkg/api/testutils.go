@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 func ExampleAPI() *API {

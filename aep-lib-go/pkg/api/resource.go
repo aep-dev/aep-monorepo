@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/cases"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/cases"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 type Resource struct {

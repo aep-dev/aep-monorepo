@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	bpb "github.com/aep-dev/aepc/example/bookstore/v1"
+	bpb "github.com/aep-dev/aep-monorepo/aepc/example/bookstore/v1"
 )
 
 // gRPC server endpoint

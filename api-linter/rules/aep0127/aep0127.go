@@ -16,7 +16,7 @@
 package aep0127
 
 import (
-	"github.com/aep-dev/api-linter/lint"
+	"github.com/aep-dev/aep-monorepo/api-linter/lint"
 )
 
 // AddRules adds all of the AEP-127 rules to the provided registry.

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 func getTestAPI() *api.API {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
-	"github.com/aep-dev/terraform-provider-aep/internal/provider/data"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/terraform-provider-aep/internal/provider/data"
 )
 
 type GeneratedProviderData struct {

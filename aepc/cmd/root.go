@@ -22,9 +22,9 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/proto"
-	"github.com/aep-dev/aepc/validator"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/proto"
+	"github.com/aep-dev/aep-monorepo/aepc/validator"
 	"github.com/spf13/cobra"
 )
 

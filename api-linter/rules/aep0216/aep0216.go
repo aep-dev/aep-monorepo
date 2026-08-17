@@ -15,7 +15,7 @@
 // Package aep0216 contains rules defined in https://aep.dev/216.
 package aep0216
 
-import "github.com/aep-dev/api-linter/lint"
+import "github.com/aep-dev/aep-monorepo/api-linter/lint"
 
 // AddRules accepts a register function and registers each of
 // this AEP's rules to it.

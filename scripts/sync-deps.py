@@ -78,7 +78,7 @@ def sync_deps() -> int:
 
     print(f"Target aep-lib-go version: {pseudo_version}")
 
-    pattern = re.compile(r"(github\.com/aep-dev/aep-lib-go\s+)v[0-9A-Za-z.\-]+")
+    pattern = re.compile(r"(github\.com/aep-dev/aep-monorepo/aep-lib-go\s+)v[0-9A-Za-z.\-]+")
 
     for dep in DEPENDENT_MODULES:
         go_mod_path = ROOT_DIR / dep / "go.mod"
@@ -86,7 +86,7 @@ def sync_deps() -> int:
             continue
 
         content = go_mod_path.read_text()
-        if "github.com/aep-dev/aep-lib-go" in content:
+        if "github.com/aep-dev/aep-monorepo/aep-lib-go" in content:
             new_content = pattern.sub(rf"\g<1>{pseudo_version}", content)
             go_mod_path.write_text(new_content)
             print(f"  Updated {dep}/go.mod to {pseudo_version}")

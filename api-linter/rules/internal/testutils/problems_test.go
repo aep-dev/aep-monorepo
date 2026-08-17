@@ -17,7 +17,7 @@ package testutils
 import (
 	"testing"
 
-	. "github.com/aep-dev/api-linter/lint"
+	. "github.com/aep-dev/aep-monorepo/api-linter/lint"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 

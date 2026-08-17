@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/aep-dev/aep-e2e-validator/pkg/utils"
+	"github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/utils"
 )
 
 var TestAEP133Create = Test{

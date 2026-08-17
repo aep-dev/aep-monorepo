@@ -1,4 +1,4 @@
-module github.com/aep-dev/aep-lib-go
+module github.com/aep-dev/aep-monorepo/aep-lib-go
 
 go 1.23
 

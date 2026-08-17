@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/aep-dev/aep-lib-go/pkg/constants"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/constants"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 var singularPluralRegex = regexp.MustCompile("^[a-z][a-z0-9_-]*[a-z0-9]$")

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/aep-dev/aepc/pkg/cel2ansisql"
+	"github.com/aep-dev/aep-monorepo/aepc/pkg/cel2ansisql"
 	"github.com/google/cel-go/cel"
 )
 

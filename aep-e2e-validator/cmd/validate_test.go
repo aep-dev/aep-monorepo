@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/aep-dev/aep-e2e-validator/pkg/validator"
+	"github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/validator"
 )
 
 func TestParseHeaders(t *testing.T) {
