@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 # gazelle:exclude **/testdata
 # gazelle:exclude api-linter/example
 # gazelle:exclude aepc/example/terraform
+# gazelle:exclude aep-lib-ts
 gazelle(name = "gazelle")
 
 gazelle(

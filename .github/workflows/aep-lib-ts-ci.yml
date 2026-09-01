@@ -1,0 +1,27 @@
+name: aep-lib-ts CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aep-lib-ts/**'
+      - '.github/workflows/aep-lib-ts-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aep-lib-ts/**'
+      - '.github/workflows/aep-lib-ts-*.yml'
+
+jobs:
+  test:
+    name: Run aep-lib-ts Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Run tests
+        run: bazel test //aep-lib-ts/...
