@@ -23,7 +23,6 @@ aep-monorepo/
 ├── aepcli/                       # Command-line interface for interacting with AEP APIs
 ├── api-linter/                   # Protocol buffer linter for AEP rules
 ├── scripts/                      # Shared developer scripts and automation tools
-├── terraform-provider-aep/       # Dynamic Terraform provider for AEP APIs
 ├── go.work                       # Go Workspace configuration linking local modules
 └── go.work.sum
 ```
@@ -33,7 +32,6 @@ aep-monorepo/
 - [aepc](aepc): This project contains the compiler and code generator for AEP services.
 - [aepcli](aepcli): This project contains the command line interface tool for interacting with AEP-compliant APIs.
 - [api-linter](api-linter): This project contains the protobuf linter enforcing AEP style guidelines.
-- [terraform-provider-aep](terraform-provider-aep): This project contains the dynamic Terraform provider generated from AEP OpenAPI schemas.
 
 ## Local Development & Go Workspace
 
@@ -61,7 +59,7 @@ Common development workflows:
 
 ## Dependency Management & Synchronization
 
-- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized in the `go.mod` files of all dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`, `terraform-provider-aep`).
+- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized in the `go.mod` files of all dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`).
 - Synchronize all dependent module `go.mod` files automatically:
   ```bash
   just fix
@@ -84,7 +82,6 @@ Releases and Go module version tags use module-prefixed tags:
   - Example: `api-linter/v1.2.0`
   - Example: `aepcli/v0.4.1`
   - Example: `aep-lib-go/v0.3.0`
-  - Example: `terraform-provider-aep/v0.5.0`
 - Pushing a prefixed tag triggers the corresponding release workflow to build artifacts and create a GitHub release.
 
 ## Conventional Commits

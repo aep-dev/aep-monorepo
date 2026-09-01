@@ -1,6 +1,6 @@
 # aep-lib-go
 
-This repository contains utility libraries that are common across the other aep go-based tools (e.g. aepcli, aepc, terraform-provider-aep).
+This repository contains utility libraries that are common across the other aep go-based tools (e.g. aepcli, aepc, aep-e2e-validator).
 
 It contains, among other things:
 
