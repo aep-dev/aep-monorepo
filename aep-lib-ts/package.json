@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/aep-dev/aep-lib-ts.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "AEP Team",
   "type": "module",
   "exports": {
