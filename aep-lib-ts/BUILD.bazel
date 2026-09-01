@@ -1,0 +1,32 @@
+sh_test(
+    name = "test",
+    srcs = ["test.sh"],
+    data = glob([
+        "src/**/*",
+        "*.json",
+        "*.js",
+    ]),
+    tags = ["local", "no-sandbox"],
+    visibility = ["//visibility:public"],
+)
+
+sh_binary(
+    name = "build",
+    srcs = ["build.sh"],
+    data = glob([
+        "src/**/*",
+        "*.json",
+        "*.js",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "srcs",
+    srcs = glob([
+        "src/**/*",
+        "*.json",
+        "*.js",
+    ]),
+    visibility = ["//visibility:public"],
+)

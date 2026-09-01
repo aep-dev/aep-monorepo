@@ -1,12 +1,13 @@
 # AEP Monorepo
 
 - This repository contains the consolidated source code and tooling ecosystem for [API Enhancement Proposals (AEP)](https://aep.dev).
-- It is built and tested using [Bazel](https://bazel.build/) with Bzlmod and Gazelle, and supports Go workspaces for native development.
+- It is built and tested using [Bazel](https://bazel.build/) with Bzlmod and Gazelle, and supports Go workspaces and TypeScript for native development.
 
 ## Projects
 
 - [aep-e2e-validator](aep-e2e-validator): Runtime end-to-end conformance testing tool for AEP HTTP APIs.
 - [aep-lib-go](aep-lib-go): Shared Go core libraries, common types, OpenAPI parsers, and resource schema representations.
+- [aep-lib-ts](aep-lib-ts): Shared TypeScript core libraries, case conversion utilities, OpenAPI schemas, and API client helpers.
 - [aepc](aepc): Resource-oriented compiler and code generator for AEP services, protocol buffers, and OpenAPI specifications.
 - [aepcli](aepcli): Dynamic command-line interface tool generated from OpenAPI definitions for AEP APIs.
 - [api-linter](api-linter): Protocol buffer linter enforcing AEP design rules and naming standards.
@@ -32,6 +33,7 @@
   ```bash
   bazel test //aepcli/...
   bazel test //aep-lib-go/...
+  bazel test //aep-lib-ts/...
   ```
 - Synchronize internal module dependencies and update BUILD files:
   ```bash
@@ -42,6 +44,7 @@
 
 - Guidelines for contributing, local development, module tagging, and pull requests: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Bazel architecture and migration design document: [DESIGN/2026-09-01-bazel-migration.md](DESIGN/2026-09-01-bazel-migration.md)
+- TypeScript library graft design document: [DESIGN/2026-09-01-aep-lib-ts-grafting.md](DESIGN/2026-09-01-aep-lib-ts-grafting.md)
 
 ## References
 

@@ -1,6 +1,10 @@
 # Bazel build artifacts and symlinks at root
 /bazel-*
 
+# Node.js build artifacts
+node_modules/
+dist/
+
 # OS files
 .DS_Store
 Thumbs.db
