@@ -46,6 +46,11 @@
 - Bazel architecture and migration design document: [DESIGN/2026-09-01-bazel-migration.md](DESIGN/2026-09-01-bazel-migration.md)
 - TypeScript library graft design document: [DESIGN/2026-09-01-aep-lib-ts-grafting.md](DESIGN/2026-09-01-aep-lib-ts-grafting.md)
 
+## License
+
+- The root monorepo, `aep-lib-go`, `aep-lib-ts`, `aepcli`, `aepc`, and `api-linter` are licensed under the [Apache-2.0 License](LICENSE).
+- `aep-e2e-validator` is licensed under the [MIT License](aep-e2e-validator/LICENSE).
+
 ## References
 
 - API Enhancement Proposals standard documentation and specifications: https://aep.dev
