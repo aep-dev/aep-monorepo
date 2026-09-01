@@ -1,0 +1,43 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "rules",
+    srcs = ["rules.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/aep0004",
+        "//api-linter/rules/aep0121",
+        "//api-linter/rules/aep0122",
+        "//api-linter/rules/aep0126",
+        "//api-linter/rules/aep0127",
+        "//api-linter/rules/aep0131",
+        "//api-linter/rules/aep0132",
+        "//api-linter/rules/aep0133",
+        "//api-linter/rules/aep0134",
+        "//api-linter/rules/aep0135",
+        "//api-linter/rules/aep0136",
+        "//api-linter/rules/aep0141",
+        "//api-linter/rules/aep0142",
+        "//api-linter/rules/aep0144",
+        "//api-linter/rules/aep0148",
+        "//api-linter/rules/aep0151",
+        "//api-linter/rules/aep0155",
+        "//api-linter/rules/aep0156",
+        "//api-linter/rules/aep0157",
+        "//api-linter/rules/aep0158",
+        "//api-linter/rules/aep0159",
+        "//api-linter/rules/aep0164",
+        "//api-linter/rules/aep0191",
+        "//api-linter/rules/aep0192",
+        "//api-linter/rules/aep0216",
+    ],
+)
+
+go_test(
+    name = "rules_test",
+    srcs = ["rules_test.go"],
+    embed = [":rules"],
+    deps = ["//api-linter/lint"],
+)

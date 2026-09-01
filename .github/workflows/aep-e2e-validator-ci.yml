@@ -16,21 +16,12 @@ jobs:
   test:
     name: Run aep-e2e-validator Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aep-e2e-validator
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'aep-e2e-validator/go.mod'
-          cache-dependency-path: 'aep-e2e-validator/go.sum'
-
-      - name: Install dependencies
-        run: go mod download
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
 
       - name: Run tests
-        run: go test -v ./...
+        run: bazel test //aep-e2e-validator/...

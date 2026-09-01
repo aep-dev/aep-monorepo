@@ -1,0 +1,29 @@
+name: Bazel CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Bazel Tests & Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Check dependency synchronization
+        run: bazel run //:check
+
+      - name: Run all tests
+        run: bazel test //...
+
+      - name: Build all targets
+        run: bazel build //...

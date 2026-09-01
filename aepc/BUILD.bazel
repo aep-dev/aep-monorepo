@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "aepc_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepc",
+    visibility = ["//visibility:private"],
+    deps = ["//aepc/cmd"],
+)
+
+go_binary(
+    name = "aepc",
+    embed = [":aepc_lib"],
+    visibility = ["//visibility:public"],
+)

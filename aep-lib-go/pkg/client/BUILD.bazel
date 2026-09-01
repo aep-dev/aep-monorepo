@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "client",
+    srcs = ["client.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/client",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/cases",
+    ],
+)
+
+go_test(
+    name = "client_test",
+    srcs = ["client_test.go"],
+    embed = [":client"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "@com_github_jarcoal_httpmock//:httpmock",
+    ],
+)

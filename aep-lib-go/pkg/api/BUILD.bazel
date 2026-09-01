@@ -1,0 +1,39 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "api",
+    srcs = [
+        "api.go",
+        "loader.go",
+        "openapi.go",
+        "operation.go",
+        "resource.go",
+        "testutils.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/cases",
+        "//aep-lib-go/pkg/constants",
+        "//aep-lib-go/pkg/openapi",
+    ],
+)
+
+go_test(
+    name = "api_test",
+    srcs = [
+        "api_test.go",
+        "loader_test.go",
+        "openapi_test.go",
+    ],
+    data = ["//aep-lib-go:examples"],
+    embed = [":api"],
+    deps = [
+        "//aep-lib-go/pkg/constants",
+        "//aep-lib-go/pkg/openapi",
+        "@com_github_ghodss_yaml//:yaml",
+        "@com_github_jarcoal_httpmock//:httpmock",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+    ],
+)

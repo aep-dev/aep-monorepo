@@ -1,0 +1,70 @@
+module github.com/aep-dev/aep-monorepo
+
+go 1.24.0
+
+require (
+	bitbucket.org/creachadair/stringset v0.0.14
+	buf.build/gen/go/aep/api/protocolbuffers/go v1.36.10-20251109183837-26a011a354ee.1
+	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.10-20250718181942-e35f9b667443.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1
+	buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.10-20241007202033-cf42259fcbfc.1
+	buf.build/go/bufplugin v0.9.0
+	buf.build/go/protovalidate v1.0.0
+	buf.build/go/spdx v0.2.0
+	cel.dev/expr v0.25.1
+	cloud.google.com/go/longrunning v0.7.0
+	github.com/BurntSushi/toml v1.4.0
+	github.com/antlr4-go/antlr/v4 v4.13.1
+	github.com/aymanbagabas/go-osc52/v2 v2.0.1
+	github.com/bmatcuk/doublestar/v4 v4.9.1
+	github.com/bufbuild/protocompile v0.14.1
+	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc
+	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/charmbracelet/x/ansi v0.8.0
+	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd
+	github.com/charmbracelet/x/term v0.2.1
+	github.com/clipperhouse/uax29/v2 v2.2.0
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+	github.com/gertd/go-pluralize v0.2.1
+	github.com/ghodss/yaml v1.0.0
+	github.com/golang/protobuf v1.5.4
+	github.com/google/cel-go v0.27.0
+	github.com/google/go-cmp v0.7.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
+	github.com/inconshreveable/mousetrap v1.1.0
+	github.com/jarcoal/httpmock v1.4.0
+	github.com/jhump/protoreflect v1.17.0
+	github.com/kr/pretty v0.3.1
+	github.com/kr/text v0.2.0
+	github.com/lithammer/dedent v1.1.0
+	github.com/lucasb-eyer/go-colorful v1.2.0
+	github.com/mattn/go-isatty v0.0.20
+	github.com/mattn/go-runewidth v0.0.19
+	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/muesli/termenv v0.16.0
+	github.com/olekukonko/tablewriter v0.0.5
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
+	github.com/rivo/uniseg v0.4.7
+	github.com/rogpeppe/go-internal v1.14.1
+	github.com/rs/cors v1.11.1
+	github.com/spf13/cobra v1.10.2
+	github.com/spf13/pflag v1.0.10
+	github.com/stoewer/go-strcase v1.3.1
+	github.com/stretchr/testify v1.11.1
+	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e
+	golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b
+	golang.org/x/net v0.48.0
+	golang.org/x/sync v0.19.0
+	golang.org/x/sys v0.39.0
+	golang.org/x/text v0.32.0
+	google.golang.org/genproto v0.0.0-20251014184007-4626949a642f
+	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
+	google.golang.org/grpc v1.79.3
+	google.golang.org/protobuf v1.36.12
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
+	pluginrpc.com/pluginrpc v0.5.0
+)
+

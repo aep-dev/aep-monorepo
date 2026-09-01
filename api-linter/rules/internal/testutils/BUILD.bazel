@@ -1,0 +1,38 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "testutils",
+    srcs = [
+        "parse.go",
+        "problems.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/internal/testutils",
+    visibility = ["//api-linter/rules:__subpackages__"],
+    deps = [
+        "//api-linter/lint",
+        "@build_buf_gen_go_aep_api_protocolbuffers_go//aep/api",
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/protoparse",
+        "@com_github_lithammer_dedent//:dedent",
+        "@com_google_cloud_go_longrunning//autogen/longrunningpb",
+        "@org_golang_google_genproto//googleapis/type/date",
+        "@org_golang_google_genproto//googleapis/type/datetime",
+        "@org_golang_google_genproto//googleapis/type/timeofday",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+    ],
+)
+
+go_test(
+    name = "testutils_test",
+    srcs = [
+        "parse_test.go",
+        "problems_test.go",
+    ],
+    embed = [":testutils"],
+    deps = [
+        "//api-linter/lint",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+    ],
+)

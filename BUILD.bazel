@@ -1,0 +1,30 @@
+load("@gazelle//:def.bzl", "gazelle")
+
+package(default_visibility = ["//visibility:public"])
+
+# gazelle:prefix github.com/aep-dev/aep-monorepo
+# gazelle:proto disable_global
+# gazelle:exclude **/testdata
+# gazelle:exclude api-linter/example
+# gazelle:exclude aepc/example/terraform
+gazelle(name = "gazelle")
+
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=aep-lib-go/go.mod",
+        "-to_macro=deps.bzl%go_dependencies",
+        "-prune",
+    ],
+    command = "update-repos",
+)
+
+alias(
+    name = "fix",
+    actual = "//scripts:fix",
+)
+
+alias(
+    name = "check",
+    actual = "//scripts:check",
+)

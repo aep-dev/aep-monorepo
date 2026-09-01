@@ -1,17 +1,28 @@
 # Justfile for AEP monorepo tasks
 
+export USE_BAZEL_VERSION := "7.4.1"
+
 # Default recipe: list available recipes
 default:
     @just --list
 
-# Run tests across all workspace modules
+# Run tests across all workspace targets using Bazel
 test:
-    go test ./aep-lib-go/... ./aepcli/... ./api-linter/... ./aep-e2e-validator/... ./aepc/example/service/... ./aepc/pkg/...
+    bazel test //...
 
-# Synchronize internal monorepo dependencies
+# Build all workspace targets using Bazel
+build:
+    bazel build //...
+
+# Run Gazelle to generate/update Bazel BUILD files
+gazelle:
+    bazel run //:gazelle
+
+# Synchronize internal monorepo dependencies and update BUILD files
 fix:
-    ./scripts/sync-deps.py
+    bazel run //:fix
+    bazel run //:gazelle
 
 # Verify internal monorepo dependencies are synchronized
 check:
-    ./scripts/sync-deps.py --check
+    bazel run //:check

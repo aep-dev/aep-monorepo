@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "quality-checker_lib",
+    srcs = [
+        "main.go",
+        "rule_documented.go",
+        "rule_name.go",
+        "rule_registered.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/internal/cmd/quality-checker",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_stoewer_go_strcase//:go-strcase",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+    ],
+)
+
+go_binary(
+    name = "quality-checker",
+    embed = [":quality-checker_lib"],
+    visibility = ["//api-linter:__subpackages__"],
+)

@@ -1,0 +1,52 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0164",
+    srcs = [
+        "aep0164.go",
+        "http_body.go",
+        "http_method.go",
+        "http_uri_suffix.go",
+        "request_message_name.go",
+        "request_name_behavior.go",
+        "request_name_field.go",
+        "request_name_reference.go",
+        "request_unknown_fields.go",
+        "resource_expire_time_field.go",
+        "response_lro.go",
+        "response_message_name.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0164",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0164_test",
+    srcs = [
+        "aep0164_test.go",
+        "http_body_test.go",
+        "http_method_test.go",
+        "http_uri_suffix_test.go",
+        "request_message_name_test.go",
+        "request_name_behavior_test.go",
+        "request_name_field_test.go",
+        "request_name_reference_test.go",
+        "request_unknown_fields_test.go",
+        "resource_expire_time_field_test.go",
+        "response_lro_test.go",
+        "response_message_name_test.go",
+    ],
+    embed = [":aep0164"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+    ],
+)

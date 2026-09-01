@@ -1,0 +1,29 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0156",
+    srcs = [
+        "aep0156.go",
+        "forbidden_methods.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0156",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0156_test",
+    srcs = [
+        "aep0156_test.go",
+        "forbidden_methods_test.go",
+    ],
+    embed = [":aep0156"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

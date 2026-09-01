@@ -1,0 +1,61 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0135",
+    srcs = [
+        "aep0135.go",
+        "force_field.go",
+        "http_body.go",
+        "http_method.go",
+        "http_uri_path.go",
+        "method_signature.go",
+        "request_force_field.go",
+        "request_message_name.go",
+        "request_path_behavior.go",
+        "request_path_field.go",
+        "request_path_reference.go",
+        "request_path_required.go",
+        "request_required_fields.go",
+        "request_unknown_fields.go",
+        "response_lro.go",
+        "response_message_name.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0135",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+    ],
+)
+
+go_test(
+    name = "aep0135_test",
+    srcs = [
+        "aep0135_test.go",
+        "force_field_test.go",
+        "http_body_test.go",
+        "http_method_test.go",
+        "http_uri_path_test.go",
+        "method_signature_test.go",
+        "request_force_field_test.go",
+        "request_message_name_test.go",
+        "request_path_behavior_test.go",
+        "request_path_field_test.go",
+        "request_path_reference_test.go",
+        "request_path_required_test.go",
+        "request_required_fields_test.go",
+        "request_unknown_fields_test.go",
+        "response_lro_test.go",
+        "response_message_name_test.go",
+    ],
+    embed = [":aep0135"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+    ],
+)

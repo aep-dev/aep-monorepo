@@ -1,0 +1,6 @@
+# Bazel build artifacts and symlinks at root
+/bazel-*
+
+# OS files
+.DS_Store
+Thumbs.db

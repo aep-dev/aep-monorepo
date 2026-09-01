@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "validator",
+    srcs = ["validator.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepc/validator",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+    ],
+)

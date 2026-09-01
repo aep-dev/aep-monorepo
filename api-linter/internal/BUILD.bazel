@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "internal",
+    srcs = ["version.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/internal",
+    visibility = ["//api-linter:__subpackages__"],
+)

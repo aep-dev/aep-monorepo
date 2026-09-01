@@ -1,0 +1,48 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "lint",
+    srcs = [
+        "config.go",
+        "lint.go",
+        "problem.go",
+        "response.go",
+        "rule.go",
+        "rule_aliases.go",
+        "rule_enabled.go",
+        "rule_groups.go",
+        "rule_name.go",
+        "rule_registry.go",
+        "rule_urls.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/lint",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_bmatcuk_doublestar_v4//:doublestar",
+        "@com_github_jhump_protoreflect//desc",
+        "@in_gopkg_yaml_v2//:yaml_v2",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "lint_test",
+    srcs = [
+        "config_test.go",
+        "lint_test.go",
+        "problem_test.go",
+        "rule_enabled_test.go",
+        "rule_groups_test.go",
+        "rule_name_test.go",
+        "rule_registry_test.go",
+        "rule_test.go",
+        "rule_urls_test.go",
+    ],
+    embed = [":lint"],
+    deps = [
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+        "@in_gopkg_yaml_v2//:yaml_v2",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)

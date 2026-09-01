@@ -2,6 +2,7 @@
 
 - [Contributing to AEP Monorepo](#contributing-to-aep-monorepo)
   - [Repository Layout](#repository-layout)
+  - [Build System \& Bazel](#build-system--bazel)
   - [Local Development \& Go Workspace](#local-development--go-workspace)
   - [Dependency Management \& Synchronization](#dependency-management--synchronization)
   - [CI/CD \& GitHub Actions Pipelines](#cicd--github-actions-pipelines)
@@ -23,57 +24,76 @@ aep-monorepo/
 ├── aepcli/                       # Command-line interface for interacting with AEP APIs
 ├── api-linter/                   # Protocol buffer linter for AEP rules
 ├── scripts/                      # Shared developer scripts and automation tools
+├── MODULE.bazel                  # Bazel Bzlmod configuration
+├── BUILD.bazel                   # Root Bazel build definitions and Gazelle config
 ├── go.work                       # Go Workspace configuration linking local modules
 └── go.work.sum
 ```
 
-- [aep-e2e-validator](aep-e2e-validator): This project contains the end-to-end conformance testing suite for AEP APIs.
-- [aep-lib-go](aep-lib-go): This project contains the common Go library with core types, OpenAPI parsing, and resource schema representations.
-- [aepc](aepc): This project contains the compiler and code generator for AEP services.
-- [aepcli](aepcli): This project contains the command line interface tool for interacting with AEP-compliant APIs.
-- [api-linter](api-linter): This project contains the protobuf linter enforcing AEP style guidelines.
+- [aep-e2e-validator](aep-e2e-validator): Runtime end-to-end conformance testing suite for AEP APIs.
+- [aep-lib-go](aep-lib-go): Common Go library with core types, OpenAPI parsing, and resource schema representations.
+- [aepc](aepc): Compiler and code generator for AEP services.
+- [aepcli](aepcli): Command-line interface tool for interacting with AEP-compliant APIs.
+- [api-linter](api-linter): Protobuf linter enforcing AEP design rules and naming standards.
+
+## Build System & Bazel
+
+The repository uses [Bazel](https://bazel.build/) (v7.4.1) as the unified polyglot build and test system, configured with Bzlmod ([MODULE.bazel](MODULE.bazel)) and Gazelle.
+
+Common Bazel workflows (managed via [justfile](justfile)):
+- Run all tests across all packages:
+  ```bash
+  just test
+  # or: bazel test //...
+  ```
+- Build all binaries and packages:
+  ```bash
+  just build
+  # or: bazel build //...
+  ```
+- Run tests for a specific module or package:
+  ```bash
+  bazel test //aepcli/...
+  bazel test //aep-lib-go/...
+  bazel test //api-linter/...
+  ```
+- Build a specific binary target:
+  ```bash
+  bazel build //aepcli/cmd/aepcli:aepcli
+  bazel build //api-linter/cmd/api-linter:api-linter
+  bazel build //aepc:aepc
+  ```
+- Regenerate or update Bazel `BUILD.bazel` files with Gazelle:
+  ```bash
+  just gazelle
+  # or: bazel run //:gazelle
+  ```
 
 ## Local Development & Go Workspace
 
-The monorepo uses Go workspaces configured via [go.work](go.work):
+For IDE integration (`gopls`, VSCode, GoLand), the repository maintains Go workspaces configured via [go.work](go.work):
 - Cross-module local development functions without requiring local replace directives in go.mod files.
 - Edits in shared libraries like [aep-lib-go](aep-lib-go) are immediately visible to downstream tools such as [api-linter](api-linter), [aepcli](aepcli), and [aepc](aepc).
 
-Common development workflows:
-- Run all unit tests across all modules from the repository root:
-  ```bash
-  just test
-  ```
-- Run tests for a specific module:
-  ```bash
-  go test ./aepcli/...
-  ```
-  Alternatively, run tests from within the module directory:
-  ```bash
-  cd aepcli && go test ./...
-  ```
-- Run linting for a specific module:
-  ```bash
-  cd api-linter && make lint
-  ```
-
 ## Dependency Management & Synchronization
 
-- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized in the `go.mod` files of all dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`).
-- Synchronize all dependent module `go.mod` files automatically:
+- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized across dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`).
+- Synchronize all dependent module `go.mod` files and Bazel definitions automatically:
   ```bash
   just fix
+  # or: bazel run //:fix && bazel run //:gazelle
   ```
 - Verify whether dependent `go.mod` files are synchronized against the target branch:
   ```bash
   just check
+  # or: bazel run //:check
   ```
 
 ## CI/CD & GitHub Actions Pipelines
 
 Workflows live in the root [.github/workflows](.github/workflows) directory:
-- Pipelines are isolated per module using path-based triggers.
-- Pull requests only execute workflows corresponding to modified modules.
+- [bazel-ci.yml](.github/workflows/bazel-ci.yml) validates all test and build targets on pull requests and pushes to `main`.
+- Module-specific pipelines provide path-based triggers and binary release packaging.
 
 ## Tagging and Releases
 
@@ -99,25 +119,21 @@ Commit messages and pull request titles should follow the [Conventional Commits]
 
 ## Pull Request Guidelines
 
-- Verify that tests pass locally before opening a pull request:
-  ```bash
-  just test
-  ```
-- If modifying [aep-lib-go](aep-lib-go), run the dependency synchronization check before opening a PR:
+- Verify that tests and dependency checks pass locally before opening a pull request:
   ```bash
   just check
+  just test
   ```
 - When merging, a squash and rebase strategy is used. Context and iteration are preserved in the pull request.
 
 ## References
 
 - Design document detailing monorepo initialization and git history grafting: [DESIGN/2026-08-16-repository-initialization-and-grafting.md](DESIGN/2026-08-16-repository-initialization-and-grafting.md)
+- Design document detailing Bazel build system adoption: [DESIGN/2026-09-01-bazel-migration.md](DESIGN/2026-09-01-bazel-migration.md)
+- Root Bazel module configuration: [MODULE.bazel](MODULE.bazel)
 - Root Go workspace configuration linking all submodules: [go.work](go.work)
 - Command runner recipe definitions: [justfile](justfile)
 - GitHub Actions workflow configurations directory: [.github/workflows](.github/workflows)
 - Internal dependency synchronization helper script: [scripts/sync-deps.py](scripts/sync-deps.py)
 - Conventional Commits specification: https://www.conventionalcommits.org/
 - AEP development guidelines and standards: https://aep.dev
-
-
-

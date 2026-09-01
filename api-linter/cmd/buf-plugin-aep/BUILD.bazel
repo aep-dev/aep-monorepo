@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "buf-plugin-aep_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/cmd/buf-plugin-aep",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules",
+        "@build_buf_go_bufplugin//check",
+        "@build_buf_go_bufplugin//descriptor",
+        "@com_github_jhump_protoreflect//desc",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+    ],
+)
+
+go_binary(
+    name = "buf-plugin-aep",
+    embed = [":buf-plugin-aep_lib"],
+    visibility = ["//visibility:public"],
+)
