@@ -16,21 +16,12 @@ jobs:
   test:
     name: Run aep-lib-go Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aep-lib-go
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'aep-lib-go/go.mod'
-          cache-dependency-path: 'aep-lib-go/go.sum'
-
-      - name: Install dependencies
-        run: go mod download
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
 
       - name: Run tests
-        run: go test -v ./...
+        run: bazel test //aep-lib-go/...

@@ -16,21 +16,12 @@ jobs:
   test:
     name: Run aepcli Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aepcli
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'aepcli/go.mod'
-          cache-dependency-path: 'aepcli/go.sum'
-
-      - name: Install dependencies
-        run: go mod download
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
 
       - name: Run tests
-        run: go test -v ./...
+        run: bazel test //aepcli/...

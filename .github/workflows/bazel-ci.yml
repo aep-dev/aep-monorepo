@@ -16,12 +16,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Bazel
-        uses: bazel-contrib/setup-bazel@v0.8.5
-        with:
-          bazelisk-cache: true
-          disk-cache: true
-          repository-cache: true
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
 
       - name: Check dependency synchronization
         run: bazel run //:check
@@ -31,4 +27,3 @@ jobs:
 
       - name: Build all targets
         run: bazel build //...
-
