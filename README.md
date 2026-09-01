@@ -10,7 +10,6 @@
 - [aepc](aepc): Resource-oriented compiler and code generator for AEP services, protocol buffers, and OpenAPI specifications.
 - [aepcli](aepcli): Dynamic command-line interface tool generated from OpenAPI definitions for AEP APIs.
 - [api-linter](api-linter): Protocol buffer linter enforcing AEP design rules and naming standards.
-- [terraform-provider-aep](terraform-provider-aep): Dynamic Terraform provider generated at runtime from AEP OpenAPI schemas.
 
 ## Getting Started
 

@@ -2,13 +2,14 @@
 """Manage and verify internal monorepo dependencies for aep-lib-go consumers."""
 
 import argparse
+import datetime
 import os
 import re
 import subprocess
 import sys
 from pathlib import Path
 
-DEPENDENT_MODULES = ["aepcli", "aepc", "aep-e2e-validator", "terraform-provider-aep"]
+DEPENDENT_MODULES = ["aepcli", "aepc", "aep-e2e-validator"]
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -73,7 +74,8 @@ def sync_deps() -> int:
     print("Synchronizing internal monorepo dependencies...")
 
     commit_sha = run_cmd(["git", "rev-parse", "--short=12", "HEAD"])
-    commit_time = run_cmd(["git", "log", "-1", "--format=%cd", "--date=format:%Y%m%d%H%M%S", "HEAD"])
+    commit_epoch = int(run_cmd(["git", "log", "-1", "--format=%ct", "HEAD"]))
+    commit_time = datetime.datetime.fromtimestamp(commit_epoch, tz=datetime.timezone.utc).strftime("%Y%m%d%H%M%S")
     pseudo_version = f"v0.0.0-{commit_time}-{commit_sha}"
 
     print(f"Target aep-lib-go version: {pseudo_version}")
