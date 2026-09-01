@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "constants",
+    srcs = ["constants.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/constants",
+    visibility = ["//visibility:public"],
+)

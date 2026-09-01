@@ -1,0 +1,49 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "api-linter_lib",
+    srcs = [
+        "cli.go",
+        "github_actions.go",
+        "main.go",
+        "rules.go",
+        "summary.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/cmd/api-linter",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//api-linter/internal",
+        "//api-linter/lint",
+        "//api-linter/rules",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/protoparse",
+        "@com_github_olekukonko_tablewriter//:tablewriter",
+        "@com_github_spf13_pflag//:pflag",
+        "@in_gopkg_yaml_v2//:yaml_v2",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_binary(
+    name = "api-linter",
+    embed = [":api-linter_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "api-linter_test",
+    srcs = [
+        "cli_test.go",
+        "github_actions_test.go",
+        "integration_test.go",
+        "summary_test.go",
+    ],
+    data = glob(["internal/testdata/**"]),
+    embed = [":api-linter_lib"],
+    deps = [
+        "//api-linter/lint",
+        "@com_github_google_go_cmp//cmp",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)

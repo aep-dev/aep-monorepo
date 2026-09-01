@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "aep-e2e-validator_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-e2e-validator",
+    visibility = ["//visibility:private"],
+    deps = ["//aep-e2e-validator/cmd"],
+)
+
+go_binary(
+    name = "aep-e2e-validator",
+    embed = [":aep-e2e-validator_lib"],
+    visibility = ["//visibility:public"],
+)

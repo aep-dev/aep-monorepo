@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "cmd",
+    srcs = [
+        "root.go",
+        "validate.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-e2e-validator/cmd",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-e2e-validator/pkg/validator",
+        "@com_github_spf13_cobra//:cobra",
+    ],
+)
+
+go_test(
+    name = "cmd_test",
+    srcs = ["validate_test.go"],
+    embed = [":cmd"],
+    deps = ["//aep-e2e-validator/pkg/validator"],
+)

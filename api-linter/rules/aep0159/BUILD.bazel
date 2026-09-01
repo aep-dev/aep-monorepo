@@ -1,0 +1,30 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0159",
+    srcs = [
+        "aep0159.go",
+        "hardcoded_hyphen.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0159",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0159_test",
+    srcs = [
+        "aep0159_test.go",
+        "hardcoded_hyphen_test.go",
+    ],
+    embed = [":aep0159"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

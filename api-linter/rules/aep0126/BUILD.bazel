@@ -1,0 +1,31 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0126",
+    srcs = [
+        "aep0126.go",
+        "unspecified.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0126",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_stoewer_go_strcase//:go-strcase",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+    ],
+)
+
+go_test(
+    name = "aep0126_test",
+    srcs = [
+        "aep0126_test.go",
+        "unspecified_test.go",
+    ],
+    embed = [":aep0126"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

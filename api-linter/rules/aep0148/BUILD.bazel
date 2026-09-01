@@ -1,0 +1,42 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0148",
+    srcs = [
+        "aep0148.go",
+        "declarative_friendly_fields.go",
+        "field_behavior.go",
+        "human_names.go",
+        "ip_address_format.go",
+        "uid_format.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0148",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "aep0148_test",
+    srcs = [
+        "aep0148_test.go",
+        "declarative_friendly_fields_test.go",
+        "field_behavior_test.go",
+        "human_names_test.go",
+        "ip_address_format_test.go",
+        "uid_format_test.go",
+    ],
+    embed = [":aep0148"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+    ],
+)

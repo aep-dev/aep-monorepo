@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+sh_binary(
+    name = "fix",
+    srcs = ["fix.sh"],
+    data = ["sync-deps.py"],
+)
+
+sh_binary(
+    name = "check",
+    srcs = ["check.sh"],
+    data = ["sync-deps.py"],
+)
+
+sh_test(
+    name = "check_test",
+    srcs = ["check.sh"],
+    data = ["sync-deps.py"],
+)

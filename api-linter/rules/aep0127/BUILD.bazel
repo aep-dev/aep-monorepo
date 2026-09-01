@@ -1,0 +1,38 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0127",
+    srcs = [
+        "aep0127.go",
+        "http_annotation.go",
+        "http_template_pattern.go",
+        "http_template_syntax.go",
+        "resource_path_extraction.go",
+        "uri_leading_slash.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0127",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0127_test",
+    srcs = [
+        "aep0127_test.go",
+        "http_annotation_test.go",
+        "http_template_pattern_test.go",
+        "http_template_syntax_test.go",
+        "resource_path_extraction_test.go",
+        "uri_leading_slash_test.go",
+    ],
+    embed = [":aep0127"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

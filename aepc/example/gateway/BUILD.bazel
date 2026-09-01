@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gateway",
+    srcs = ["gateway.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepc/example/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aepc/example/bookstore/v1:bookstore",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
+        "@com_github_rs_cors//:cors",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_golang_google_protobuf//encoding/protojson",
+    ],
+)

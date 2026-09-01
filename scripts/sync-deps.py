@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 DEPENDENT_MODULES = ["aepcli", "aepc", "aep-e2e-validator"]
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(os.environ.get("BUILD_WORKSPACE_DIRECTORY", Path(__file__).resolve().parent.parent))
 
 
 def run_cmd(cmd: list[str], check: bool = True) -> str:

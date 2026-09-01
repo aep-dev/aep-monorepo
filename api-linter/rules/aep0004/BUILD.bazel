@@ -1,0 +1,55 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0004",
+    srcs = [
+        "aep0004.go",
+        "duplicate_resource.go",
+        "path_never_optional.go",
+        "resource_annotation.go",
+        "resource_name_components_alternate.go",
+        "resource_path_field.go",
+        "resource_pattern.go",
+        "resource_plural.go",
+        "resource_reference_type.go",
+        "resource_singular.go",
+        "resource_type_name.go",
+        "resource_variables.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0004",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@build_buf_gen_go_aep_api_protocolbuffers_go//aep/api",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_stoewer_go_strcase//:go-strcase",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "aep0004_test",
+    srcs = [
+        "aep0004_test.go",
+        "duplicate_resource_test.go",
+        "path_never_optional_test.go",
+        "resource_annotation_test.go",
+        "resource_name_components_alternate_test.go",
+        "resource_path_field_test.go",
+        "resource_pattern_test.go",
+        "resource_plural_test.go",
+        "resource_reference_type_test.go",
+        "resource_singular_test.go",
+        "resource_type_name_test.go",
+        "resource_variables_test.go",
+    ],
+    embed = [":aep0004"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)

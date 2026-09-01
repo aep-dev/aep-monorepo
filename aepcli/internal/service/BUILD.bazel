@@ -1,0 +1,35 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "service",
+    srcs = [
+        "ca.go",
+        "flagtypes.go",
+        "resource_definition.go",
+        "service.go",
+        "types.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepcli/internal/service",
+    visibility = ["//aepcli:__subpackages__"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "@com_github_spf13_cobra//:cobra",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = [
+        "ca_test.go",
+        "field_description_test.go",
+        "flagtypes_test.go",
+        "resource_definition_test.go",
+        "service_test.go",
+    ],
+    embed = [":service"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+    ],
+)

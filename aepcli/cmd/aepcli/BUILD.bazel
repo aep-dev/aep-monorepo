@@ -1,0 +1,33 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "aepcli_lib",
+    srcs = [
+        "core.go",
+        "main.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepcli/cmd/aepcli",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "//aepcli/internal/config",
+        "//aepcli/internal/service",
+        "@com_github_spf13_cobra//:cobra",
+    ],
+)
+
+go_binary(
+    name = "aepcli",
+    embed = [":aepcli_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "aepcli_test",
+    srcs = ["main_test.go"],
+    embed = [":aepcli_lib"],
+    env = {
+        "HOME": "/tmp",
+    },
+)

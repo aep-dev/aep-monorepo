@@ -1,0 +1,42 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0192",
+    srcs = [
+        "absolute_links.go",
+        "aep0192.go",
+        "deprecated_comment.go",
+        "has_comments.go",
+        "no_html.go",
+        "no_markdown_headings.go",
+        "no_markdown_tables.go",
+        "only_leading_comments.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0192",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0192_test",
+    srcs = [
+        "absolute_links_test.go",
+        "aep0192_test.go",
+        "deprecated_test.go",
+        "has_comments_test.go",
+        "no_html_test.go",
+        "no_markdown_headings_test.go",
+        "no_markdown_tables_test.go",
+        "only_leading_comments_test.go",
+    ],
+    embed = [":aep0192"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

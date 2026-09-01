@@ -1,0 +1,41 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0136",
+    srcs = [
+        "aep0136.go",
+        "declarative_standard_methods_only.go",
+        "http_body.go",
+        "http_method.go",
+        "prepositions.go",
+        "verb_noun.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0136",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/data",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_stoewer_go_strcase//:go-strcase",
+        "@org_bitbucket_creachadair_stringset//:stringset",
+    ],
+)
+
+go_test(
+    name = "aep0136_test",
+    srcs = [
+        "aep0136_test.go",
+        "declarative_standard_methods_only_test.go",
+        "http_body_test.go",
+        "http_method_test.go",
+        "prepositions_test.go",
+        "verb_noun_test.go",
+    ],
+    embed = [":aep0136"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)

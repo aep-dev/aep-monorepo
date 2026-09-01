@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "utils",
+    srcs = [
+        "create.go",
+        "generator.go",
+        "list.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/utils",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+    ],
+)

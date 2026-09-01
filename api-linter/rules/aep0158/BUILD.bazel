@@ -1,0 +1,43 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0158",
+    srcs = [
+        "aep0158.go",
+        "request_max_page_size_field.go",
+        "request_page_token_field.go",
+        "request_skip_field.go",
+        "response_next_page_token_field.go",
+        "response_repeated_field.go",
+        "response_unary.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0158",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+    ],
+)
+
+go_test(
+    name = "aep0158_test",
+    srcs = [
+        "aep0158_test.go",
+        "request_max_page_size_field_test.go",
+        "request_page_token_field_test.go",
+        "request_skip_field_test.go",
+        "response_next_page_token_field_test.go",
+        "response_repeated_field_test.go",
+        "response_unary_test.go",
+    ],
+    embed = [":aep0158"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+    ],
+)

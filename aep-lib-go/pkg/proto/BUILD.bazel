@@ -1,0 +1,42 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "proto",
+    srcs = [
+        "constants.go",
+        "message.go",
+        "proto.go",
+        "resource.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/cases",
+        "//aep-lib-go/pkg/constants",
+        "//aep-lib-go/pkg/openapi",
+        "@build_buf_gen_go_aep_api_protocolbuffers_go//aep/api",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+        "@com_github_jhump_protoreflect//desc/protoprint",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/descriptorpb",
+        "@org_golang_google_protobuf//types/known/fieldmaskpb",
+    ],
+)
+
+go_test(
+    name = "proto_test",
+    srcs = [
+        "proto_output_only_test.go",
+        "proto_test.go",
+    ],
+    embed = [":proto"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "@com_github_jhump_protoreflect//desc/builder",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

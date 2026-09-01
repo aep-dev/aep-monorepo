@@ -1,0 +1,28 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "validator",
+    srcs = [
+        "client.go",
+        "exit_codes.go",
+        "result.go",
+        "validator.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/validator",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-e2e-validator/pkg/tests",
+        "//aep-e2e-validator/pkg/utils",
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "@com_github_charmbracelet_lipgloss//:lipgloss",
+        "@com_github_muesli_termenv//:termenv",
+    ],
+)
+
+go_test(
+    name = "validator_test",
+    srcs = ["validator_test.go"],
+    embed = [":validator"],
+    deps = ["//aep-lib-go/pkg/api"],
+)

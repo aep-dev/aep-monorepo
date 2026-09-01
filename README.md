@@ -1,7 +1,7 @@
 # AEP Monorepo
 
 - This repository contains the consolidated source code and tooling ecosystem for [API Enhancement Proposals (AEP)](https://aep.dev).
-- It is managed as a multi-module Go workspace linking shared libraries, command-line tools, linters, code generators, and infrastructure providers.
+- It is built and tested using [Bazel](https://bazel.build/) with Bzlmod and Gazelle, and supports Go workspaces for native development.
 
 ## Projects
 
@@ -18,23 +18,35 @@
   git clone https://github.com/aep-dev/aep-monorepo.git
   cd aep-monorepo
   ```
-- The repository uses Go workspaces defined in [go.work](go.work).
-- Run tests across all workspace modules:
+- Run all tests across the monorepo using Bazel or Just:
   ```bash
-  go test ./...
+  just test
+  # or: bazel test //...
   ```
-- Run tests for an individual module:
+- Build all targets across the workspace:
   ```bash
-  go test ./aepcli/...
+  just build
+  # or: bazel build //...
+  ```
+- Run tests for an individual module or target:
+  ```bash
+  bazel test //aepcli/...
+  bazel test //aep-lib-go/...
+  ```
+- Synchronize internal module dependencies and update BUILD files:
+  ```bash
+  just fix
   ```
 
 ## Documentation
 
 - Guidelines for contributing, local development, module tagging, and pull requests: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Bazel architecture and migration design document: [DESIGN/2026-09-01-bazel-migration.md](DESIGN/2026-09-01-bazel-migration.md)
 
 ## References
 
 - API Enhancement Proposals standard documentation and specifications: https://aep.dev
+- Root Bazel module configuration: [MODULE.bazel](MODULE.bazel)
 - Root Go workspace configuration linking all submodules: [go.work](go.work)
 - Project contribution and development guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 - GitHub Actions CI/CD workflows directory: [.github/workflows](.github/workflows)

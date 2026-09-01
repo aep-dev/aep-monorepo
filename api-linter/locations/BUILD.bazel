@@ -1,0 +1,47 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "locations",
+    srcs = [
+        "descriptor_locations.go",
+        "field_locations.go",
+        "file_locations.go",
+        "locations.go",
+        "message_locations.go",
+        "method_locations.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/locations",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_buf_gen_go_aep_api_protocolbuffers_go//aep/api",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_google_cloud_go_longrunning//autogen/longrunningpb",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "locations_test",
+    srcs = [
+        "descriptor_locations_test.go",
+        "field_locations_test.go",
+        "file_locations_test.go",
+        "locations_test.go",
+        "message_locations_test.go",
+        "method_locations_test.go",
+    ],
+    embed = [":locations"],
+    deps = [
+        "@build_buf_gen_go_aep_api_protocolbuffers_go//aep/api",
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_jhump_protoreflect//desc/builder",
+        "@com_github_jhump_protoreflect//desc/protoparse",
+        "@com_github_lithammer_dedent//:dedent",
+        "@com_google_cloud_go_longrunning//autogen/longrunningpb",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)

@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	buf.build/gen/go/aep/api/protocolbuffers/go v1.36.10-20251109183837-26a011a354ee.1
 	cloud.google.com/go/longrunning v0.7.0
-	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260817010658-63d4a885d750
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20260901132022-b69ac1bc6386
 	github.com/google/cel-go v0.27.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/mattn/go-sqlite3 v1.14.24

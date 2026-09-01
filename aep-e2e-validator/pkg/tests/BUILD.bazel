@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "tests",
+    srcs = [
+        "aep_132_list_resources_limit_1.go",
+        "aep_132_list_resources_page_token.go",
+        "aep_133_create.go",
+        "aep_133_duplicate_creation_check.go",
+        "aep_134_update_resource.go",
+        "aep_135_delete_nonexistent_resource.go",
+        "aep_135_delete_resource.go",
+        "interface.go",
+        "list_common.go",
+        "tests.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aep-e2e-validator/pkg/tests",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-e2e-validator/pkg/utils",
+        "//aep-lib-go/pkg/api",
+    ],
+)

@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0157",
+    srcs = [
+        "aep0157.go",
+        "request_read_mask_field.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0157",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+    ],
+)
+
+go_test(
+    name = "aep0157_test",
+    srcs = ["request_read_mask_field_test.go"],
+    embed = [":aep0157"],
+    deps = ["//api-linter/rules/internal/testutils"],
+)

@@ -1,0 +1,43 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aep0122",
+    srcs = [
+        "aep0122.go",
+        "kebab_case_uris.go",
+        "no_self_links.go",
+        "path_suffix.go",
+        "resource_collection_identifiers.go",
+        "resource_id_output_only.go",
+        "resource_reference_type.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/api-linter/rules/aep0122",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/locations",
+        "//api-linter/rules/internal/utils",
+        "@com_github_jhump_protoreflect//desc",
+        "@com_github_stoewer_go_strcase//:go-strcase",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_protobuf//types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "aep0122_test",
+    srcs = [
+        "api0122_test.go",
+        "kebab_case_uris_test.go",
+        "no_self_links_test.go",
+        "path_suffix_test.go",
+        "resource_collection_identifiers_test.go",
+        "resource_id_output_only_test.go",
+        "resource_reference_type_test.go",
+    ],
+    embed = [":aep0122"],
+    deps = [
+        "//api-linter/lint",
+        "//api-linter/rules/internal/testutils",
+    ],
+)
