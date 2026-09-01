@@ -1,11 +1,11 @@
 module github.com/aep-dev/aep-monorepo/api-linter
 
-go 1.24.0
+go 1.25.0
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.14
 	buf.build/gen/go/aep/api/protocolbuffers/go v1.36.10-20251109183837-26a011a354ee.1
-	buf.build/go/bufplugin v0.9.0
+	buf.build/go/bufplugin v0.10.0
 	cloud.google.com/go/longrunning v0.7.0
 	github.com/bmatcuk/doublestar/v4 v4.9.1
 	github.com/gertd/go-pluralize v0.2.1
@@ -22,10 +22,10 @@ require (
 )
 
 require (
-	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.10-20250718181942-e35f9b667443.1 // indirect
+	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.11-20250718181942-e35f9b667443.1 // indirect
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1 // indirect
-	buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.10-20241007202033-cf42259fcbfc.1 // indirect
-	buf.build/go/protovalidate v1.0.0 // indirect
+	buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.11-20241007202033-cf42259fcbfc.1 // indirect
+	buf.build/go/protovalidate v1.1.3 // indirect
 	buf.build/go/spdx v0.2.0 // indirect
 	cel.dev/expr v0.25.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
