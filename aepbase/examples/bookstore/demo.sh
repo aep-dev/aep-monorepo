@@ -2,8 +2,8 @@
 # Bookstore demo: uses aepcli for ALL operations.
 #
 # Prerequisites:
-#   1. Install aepcli (e.g. go install github.com/aep-dev/aepcli/cmd/aepcli@latest)
-#   2. Start server:  go run ./examples/bookstore
+#   1. Install aepcli (e.g. go install github.com/aep-dev/aep-monorepo/aepcli/cmd/aepcli@latest)
+#   2. Start server:  bazel run //aepbase/examples/bookstore
 
 set -euo pipefail
 
@@ -11,7 +11,7 @@ API="http://localhost:8080/openapi.json"
 
 if ! command -v aepcli &>/dev/null; then
   echo "aepcli not found in PATH"
-  echo "Install it first: go install github.com/aep-dev/aepcli/cmd/aepcli@latest"
+  echo "Install it first: go install github.com/aep-dev/aep-monorepo/aepcli/cmd/aepcli@latest"
   exit 1
 fi
 

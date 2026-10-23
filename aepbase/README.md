@@ -16,9 +16,17 @@ A dynamic API backend that follows the [AEP (API Enhancement Proposals)](https:/
 
 ### Build and run
 
+From the monorepo root:
+
 ```bash
-go build -o aepbase ./
-./aepbase
+bazel run //aepbase -- -data-dir "$PWD/aepbase_data"
+```
+
+Or install it with Go:
+
+```bash
+go install github.com/aep-dev/aep-monorepo/aepbase@latest
+aepbase
 ```
 
 Server starts at `http://localhost:8080`.
@@ -61,10 +69,10 @@ curl -X POST http://localhost:8080/aep-resource-definitions \
 
 ### Using aepcli
 
-Since aepbase generates an OpenAPI spec, you can use [aepcli](https://github.com/aep-dev/aepcli) to interact with it instead of writing curl commands by hand. `aepcli` reads the spec and gives you typed commands for every resource automatically.
+Since aepbase generates an OpenAPI spec, you can use [aepcli](https://github.com/aep-dev/aep-monorepo/tree/main/aepcli) to interact with it instead of writing curl commands by hand. `aepcli` reads the spec and gives you typed commands for every resource automatically.
 
 ```bash
-go install github.com/aep-dev/aepcli/cmd/aepcli@latest
+go install github.com/aep-dev/aep-monorepo/aepcli/cmd/aepcli@latest
 ```
 
 Point it at the OpenAPI endpoint:
@@ -182,8 +190,10 @@ docs/
 
 ## Running Tests
 
+From the monorepo root:
+
 ```bash
-go test ./...
+bazel test //aepbase/...
 ```
 
 ## License
