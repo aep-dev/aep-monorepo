@@ -144,8 +144,8 @@ package main
 
 import (
     "net/http"
-    "github.com/rambleraptor/aepbase/pkg/aepbase"
-    "github.com/rambleraptor/aepbase/pkg/db"
+    "github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbase"
+    "github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
 )
 
 func main() {

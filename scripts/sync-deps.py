@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-DEPENDENT_MODULES = ["aepcli", "aepc", "aep-e2e-validator"]
+DEPENDENT_MODULES = ["aepcli", "aepc", "aep-e2e-validator", "aepbase"]
 ROOT_DIR = Path(os.environ.get("BUILD_WORKSPACE_DIRECTORY", Path(__file__).resolve().parent.parent))
 
 

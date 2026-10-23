@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
 
-	"github.com/rambleraptor/aepbase/pkg/filestore"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/filestore"
 )
 
 // FileFieldConfig carries per-resource file-field configuration through

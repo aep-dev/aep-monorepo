@@ -12,15 +12,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 
-	"github.com/rambleraptor/aepbase/pkg/db"
-	"github.com/rambleraptor/aepbase/pkg/meta"
-	"github.com/rambleraptor/aepbase/pkg/oauth"
-	"github.com/rambleraptor/aepbase/pkg/operation"
-	"github.com/rambleraptor/aepbase/pkg/resource"
-	"github.com/rambleraptor/aepbase/pkg/user"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/meta"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/oauth"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/operation"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/resource"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/user"
 )
 
 // Middleware is a function that wraps an http.Handler with additional behavior.
@@ -115,7 +115,7 @@ func NewState(d *sql.DB, serverURL string) *State {
 			Resources: make(map[string]*api.Resource),
 			Contact: &api.Contact{
 				Name: "aepbase",
-				URL:  "https://github.com/rambleraptor/aepbase",
+				URL:  "https://github.com/aep-dev/aep-monorepo/tree/main/aepbase",
 			},
 		},
 		singletonResources: make(map[string]bool),

@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
-	"github.com/rambleraptor/aepbase/pkg/db"
-	"github.com/rambleraptor/aepbase/pkg/meta"
-	"github.com/rambleraptor/aepbase/pkg/user"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/meta"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/user"
 )
 
 // ServerOptions configures an aepbase server.

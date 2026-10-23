@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/rambleraptor/aepbase/pkg/aepbase"
-	"github.com/rambleraptor/aepbase/pkg/user"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbase"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/user"
 )
 
 func main() {

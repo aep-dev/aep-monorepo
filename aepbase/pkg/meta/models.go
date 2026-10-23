@@ -3,7 +3,7 @@ package meta
 import (
 	"encoding/json"
 
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 )
 
 type ResourceDefinition struct {

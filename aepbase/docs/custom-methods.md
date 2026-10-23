@@ -24,10 +24,10 @@ import (
     "log"
     "net/http"
 
-    "github.com/aep-dev/aep-lib-go/pkg/openapi"
-    "github.com/rambleraptor/aepbase/pkg/aepbase"
-    "github.com/rambleraptor/aepbase/pkg/db"
-    "github.com/rambleraptor/aepbase/pkg/meta"
+    "github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+    "github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbase"
+    "github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
+    "github.com/aep-dev/aep-monorepo/aepbase/pkg/meta"
 )
 
 func main() {

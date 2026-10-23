@@ -12,12 +12,12 @@ import (
 
 	"database/sql"
 
-	"github.com/aep-dev/aep-lib-go/pkg/api"
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/api"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
 
-	"github.com/rambleraptor/aepbase/pkg/db"
-	"github.com/rambleraptor/aepbase/pkg/filestore"
-	"github.com/rambleraptor/aepbase/pkg/user"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/filestore"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/user"
 )
 
 // CustomMethodHandler holds the handler and HTTP method for a custom method.

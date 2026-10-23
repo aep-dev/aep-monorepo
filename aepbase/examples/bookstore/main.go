@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aep-dev/aep-lib-go/pkg/openapi"
-	"github.com/rambleraptor/aepbase/pkg/aepbase"
-	"github.com/rambleraptor/aepbase/pkg/resource"
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbase"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/resource"
 )
 
 func main() {
