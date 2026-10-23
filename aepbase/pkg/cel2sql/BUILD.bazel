@@ -1,0 +1,19 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "cel2sql",
+    srcs = ["cel2sql.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/cel2sql",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_google_cel_go//cel:go_default_library",
+        "@org_golang_google_genproto_googleapis_api//expr/v1alpha1",
+    ],
+)
+
+go_test(
+    name = "cel2sql_test",
+    srcs = ["cel2sql_test.go"],
+    embed = [":cel2sql"],
+    deps = ["@com_github_google_cel_go//cel:go_default_library"],
+)

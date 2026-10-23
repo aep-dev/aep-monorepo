@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "resource",
+    srcs = [
+        "file_handler.go",
+        "handler.go",
+        "store.go",
+        "validate.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/resource",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "//aepbase/pkg/cel2sql",
+        "//aepbase/pkg/db",
+        "//aepbase/pkg/filestore",
+        "//aepbase/pkg/user",
+        "@com_github_google_cel_go//cel:go_default_library",
+    ],
+)

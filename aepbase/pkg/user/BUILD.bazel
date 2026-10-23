@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "user",
+    srcs = [
+        "auth.go",
+        "handler.go",
+        "models.go",
+        "store.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/user",
+    visibility = ["//visibility:public"],
+    deps = ["@org_golang_x_crypto//bcrypt"],
+)
