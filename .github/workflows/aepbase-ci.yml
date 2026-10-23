@@ -1,0 +1,207 @@
+name: aepbase CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aepbase/**'
+      - '.github/workflows/aepbase-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aepbase/**'
+      - '.github/workflows/aepbase-*.yml'
+
+jobs:
+  test:
+    name: Run aepbase Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Run tests
+        run: bazel test //aepbase/...
+
+  bookstore-demo:
+    name: Run Bookstore Demo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Build bookstore server and aepcli
+        run: |
+          bazel build //aepbase/examples/bookstore //aepcli/cmd/aepcli
+          mkdir -p "$RUNNER_TEMP/bin"
+          cp "$(bazel cquery --output=files //aepbase/examples/bookstore 2>/dev/null)" "$RUNNER_TEMP/bin/bookstore"
+          cp "$(bazel cquery --output=files //aepcli/cmd/aepcli 2>/dev/null)" "$RUNNER_TEMP/bin/aepcli"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Run bookstore demo
+        run: |
+          bookstore --db ":memory:" &
+          SERVER_PID=$!
+          sleep 2
+          bash ./aepbase/examples/bookstore/demo.sh
+          kill $SERVER_PID
+
+  e2e-validator:
+    name: Run aep-e2e-validator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Build aepbase and aep-e2e-validator
+        run: |
+          bazel build //aepbase //aep-e2e-validator
+          mkdir -p "$RUNNER_TEMP/bin"
+          cp "$(bazel cquery --output=files //aepbase 2>/dev/null)" "$RUNNER_TEMP/bin/aepbase"
+          cp "$(bazel cquery --output=files //aep-e2e-validator 2>/dev/null)" "$RUNNER_TEMP/bin/aep-e2e-validator"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Start server and create resources
+        run: |
+          aepbase -db ":memory:" &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+
+          # Wait for server to be ready
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/openapi.json > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+
+          # Create a top-level resource
+          curl -sf -X POST 'http://localhost:8080/aep-resource-definitions?id=publisher' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "singular": "publisher",
+              "plural": "publishers",
+              "schema": {
+                "properties": {
+                  "name": {"type": "string"},
+                  "location": {"type": "string"}
+                }
+              }
+            }'
+
+          # Create a child resource
+          curl -sf -X POST 'http://localhost:8080/aep-resource-definitions?id=book' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "singular": "book",
+              "plural": "books",
+              "parents": ["publisher"],
+              "schema": {
+                "properties": {
+                  "title": {"type": "string"},
+                  "author": {"type": "string"}
+                }
+              }
+            }'
+
+      - name: Validate top-level resource (publishers)
+        run: aep-e2e-validator validate --config http://localhost:8080/openapi.json --collection publishers
+
+      - name: Create parent for child resource validation
+        run: |
+          curl -sf -X POST 'http://localhost:8080/publishers?id=test-publisher' \
+            -H 'Content-Type: application/json' \
+            -d '{"name": "Test Publisher", "location": "New York"}'
+
+      - name: Validate child resource (books)
+        run: aep-e2e-validator validate --config http://localhost:8080/openapi.json --collection books --parent publishers/test-publisher
+
+      - name: Stop server
+        if: always()
+        run: kill $SERVER_PID || true
+
+  openapi-lint:
+    name: Lint Generated OpenAPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Spectral and AEP linter
+        working-directory: ${{ runner.temp }}
+        run: |
+          npm install -g @stoplight/spectral-cli
+          npm install @aep_dev/aep-openapi-linter
+
+      - name: Build aepbase
+        run: |
+          bazel build //aepbase
+          mkdir -p "$RUNNER_TEMP/bin"
+          cp "$(bazel cquery --output=files //aepbase 2>/dev/null)" "$RUNNER_TEMP/bin/aepbase"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Start server and create resources
+        run: |
+          aepbase -db ":memory:" &
+          SERVER_PID=$!
+
+          # Wait for server to be ready
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/openapi.json > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+
+          # Create a sample resource so the OpenAPI spec has content
+          curl -sf -X POST 'http://localhost:8080/aep-resource-definitions?id=publisher' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "singular": "publisher",
+              "plural": "publishers",
+              "schema": {
+                "properties": {
+                  "name": {"type": "string"},
+                  "location": {"type": "string"}
+                }
+              }
+            }'
+
+          curl -sf -X POST 'http://localhost:8080/aep-resource-definitions?id=book' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "singular": "book",
+              "plural": "books",
+              "parents": ["publisher"],
+              "schema": {
+                "properties": {
+                  "title": {"type": "string"},
+                  "author": {"type": "string"}
+                }
+              }
+            }'
+
+          # Fetch the OpenAPI spec
+          curl -sf http://localhost:8080/openapi.json -o "$RUNNER_TEMP/openapi.json"
+
+          kill $SERVER_PID
+
+      - name: Lint OpenAPI spec
+        run: spectral lint "$RUNNER_TEMP/openapi.json" --ruleset "$RUNNER_TEMP/node_modules/@aep_dev/aep-openapi-linter/spectral.yaml"
