@@ -132,7 +132,7 @@ func TestToOpenAPI(t *testing.T) {
 							"200": {
 								Description: "Successful response",
 								Content: map[string]openapi.MediaType{
-									"application/merge-patch+json": {
+									"application/json": {
 										Schema: &openapi.Schema{
 											Ref: "#/components/schemas/book",
 										},
@@ -629,6 +629,20 @@ func TestLongRunningMethods(t *testing.T) {
 		"Expected response schema to reference aep.api.Operation for DeleteMethod")
 	assert.NotNil(t, deleteOperation.XAEPLongRunningOperation,
 		"Expected XAEPLongRunningOperation to be set for DeleteMethod")
+}
+
+func TestToOpenAPIRoundTripUpdate(t *testing.T) {
+	openAPI, err := ConvertToOpenAPI(ExampleAPI())
+	assert.NoError(t, err)
+
+	a, err := GetAPI(openAPI, "", "")
+	assert.NoError(t, err)
+
+	book, ok := a.Resources["book"]
+	assert.True(t, ok, "Expected book resource after round trip")
+	assert.NotNil(t, book.Methods.Get, "Expected GET method after round trip")
+	assert.NotNil(t, book.Methods.Update, "Expected UPDATE method after round trip")
+	assert.NotNil(t, book.Methods.Delete, "Expected DELETE method after round trip")
 }
 
 func TestDereferenceSchemaWithExternalReference(t *testing.T) {
