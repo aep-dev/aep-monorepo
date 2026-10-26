@@ -1,0 +1,3337 @@
+package aepbase_test
+
+import (
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/aep-dev/aep-lib-go/pkg/openapi"
+	"github.com/rambleraptor/aepbase/pkg/aepbase"
+	"github.com/rambleraptor/aepbase/pkg/db"
+	"github.com/rambleraptor/aepbase/pkg/meta"
+	"github.com/rambleraptor/aepbase/pkg/user"
+)
+
+// helper to create a fresh State with an in-memory SQLite DB.
+func newTestState(t *testing.T) *aepbase.State {
+	t.Helper()
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	return aepbase.NewState(d, "http://localhost:8080")
+}
+
+func doRequest(t *testing.T, handler http.Handler, method, path, body string) *http.Response {
+	t.Helper()
+	var bodyReader io.Reader
+	if body != "" {
+		bodyReader = strings.NewReader(body)
+	}
+	req := httptest.NewRequest(method, path, bodyReader)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	return w.Result()
+}
+
+func readJSON(t *testing.T, resp *http.Response) map[string]any {
+	t.Helper()
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("reading body: %v", err)
+	}
+	var m map[string]any
+	if err := json.Unmarshal(b, &m); err != nil {
+		t.Fatalf("parsing JSON %q: %v", string(b), err)
+	}
+	return m
+}
+
+func createResource(t *testing.T, h http.Handler, id, singular, plural string, parents []string, props map[string]any) map[string]any {
+	t.Helper()
+	schema := map[string]any{"properties": props}
+	body := map[string]any{
+		"singular": singular,
+		"plural":   plural,
+		"schema":   schema,
+	}
+	if len(parents) > 0 {
+		body["parents"] = parents
+	}
+	b, _ := json.Marshal(body)
+	path := "/aep-resource-definitions"
+	if id != "" {
+		path += "?id=" + id
+	}
+	resp := doRequest(t, h, "POST", path, string(b))
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("createResource %s: status %d: %v", singular, resp.StatusCode, m)
+	}
+	return readJSON(t, resp)
+}
+
+// --- Meta-API Tests ---
+
+func TestCreateResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	m := createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	if m["id"] != "publisher" {
+		t.Errorf("expected id=publisher, got %v", m["id"])
+	}
+	if m["path"] != "aep-resource-definitions/publisher" {
+		t.Errorf("expected path=aep-resource-definitions/publisher, got %v", m["path"])
+	}
+	if m["create_time"] == nil || m["update_time"] == nil {
+		t.Error("expected timestamps")
+	}
+}
+
+func TestCreateResourceWithUserID(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	m := createResource(t, h, "my-custom-id", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	if m["id"] != "my-custom-id" {
+		t.Errorf("expected id=my-custom-id, got %v", m["id"])
+	}
+}
+
+func TestCreateResourceAutoID(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	m := createResource(t, h, "", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	// Auto ID defaults to singular name.
+	if m["id"] != "publisher" {
+		t.Errorf("expected id=publisher (auto), got %v", m["id"])
+	}
+}
+
+func TestCreateResourceDuplicate(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	body := `{"singular":"publisher","plural":"publishers2","schema":{"properties":{"name":{"type":"string"}}}}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", body)
+	if resp.StatusCode != 409 {
+		t.Errorf("expected 409, got %d", resp.StatusCode)
+	}
+}
+
+func TestCreateResourceMissingFields(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions", `{"singular":"","plural":""}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400, got %d", resp.StatusCode)
+	}
+}
+
+func TestCreateResourceInvalidParent(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	body := `{"singular":"book","plural":"books","parents":["nonexistent"],"schema":{"properties":{"title":{"type":"string"}}}}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=book", body)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400, got %d", resp.StatusCode)
+	}
+}
+
+func TestGetResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/aep-resource-definitions/publisher", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["singular"] != "publisher" {
+		t.Errorf("expected singular=publisher, got %v", m["singular"])
+	}
+}
+
+func TestGetResourceNotFound(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	resp := doRequest(t, h, "GET", "/aep-resource-definitions/nonexistent", "")
+	if resp.StatusCode != 404 {
+		t.Errorf("expected 404, got %d", resp.StatusCode)
+	}
+}
+
+func TestListResources(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "author", "author", "authors", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/aep-resource-definitions", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results, got %d", len(results))
+	}
+}
+
+func TestDeleteResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "DELETE", "/aep-resource-definitions/publisher", "")
+	if resp.StatusCode != 204 {
+		t.Errorf("expected 204, got %d", resp.StatusCode)
+	}
+	resp = doRequest(t, h, "GET", "/aep-resource-definitions/publisher", "")
+	if resp.StatusCode != 404 {
+		t.Errorf("expected 404 after delete, got %d", resp.StatusCode)
+	}
+}
+
+func TestDeleteResourceWithChildren(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "DELETE", "/aep-resource-definitions/publisher", "")
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 (has children), got %d", resp.StatusCode)
+	}
+}
+
+func TestUpdateResourceAddColumn(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	// Create an instance first.
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	// Add a column.
+	patch := `{"schema":{"properties":{"name":{"type":"string"},"location":{"type":"string"}}}}`
+	resp := doRequest(t, h, "PATCH", "/aep-resource-definitions/publisher", patch)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+
+	// Use the new column.
+	resp = doRequest(t, h, "PATCH", "/publishers/acme", `{"location":"NYC"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 on update, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["location"] != "NYC" {
+		t.Errorf("expected location=NYC, got %v", m["location"])
+	}
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme preserved, got %v", m["name"])
+	}
+}
+
+func TestUpdateResourceRemoveColumn(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"location": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","location":"NYC"}`)
+
+	// Remove location column.
+	patch := `{"schema":{"properties":{"name":{"type":"string"}}}}`
+	resp := doRequest(t, h, "PATCH", "/aep-resource-definitions/publisher", patch)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+
+	// Verify existing data still has name.
+	resp = doRequest(t, h, "GET", "/publishers/acme", "")
+	m := readJSON(t, resp)
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme after column removal, got %v", m["name"])
+	}
+	// location should no longer appear.
+	if _, ok := m["location"]; ok {
+		t.Errorf("expected location to be gone, but it's still present: %v", m["location"])
+	}
+}
+
+func TestUpdateResourceChangeType(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	patch := `{"schema":{"properties":{"name":{"type":"integer"}}}}`
+	resp := doRequest(t, h, "PATCH", "/aep-resource-definitions/publisher", patch)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 on type change, got %d", resp.StatusCode)
+	}
+}
+
+func TestUpdateResourceChangeParents(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "author", "author", "authors", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	patch := `{"parents":["author"]}`
+	resp := doRequest(t, h, "PATCH", "/aep-resource-definitions/book", patch)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 on parent change, got %d", resp.StatusCode)
+	}
+}
+
+// --- Dynamic Resource CRUD Tests ---
+
+func TestCreateInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"location": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","location":"NYC"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["id"] != "acme" {
+		t.Errorf("expected id=acme, got %v", m["id"])
+	}
+	if m["path"] != "publishers/acme" {
+		t.Errorf("expected path=publishers/acme, got %v", m["path"])
+	}
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme, got %v", m["name"])
+	}
+	if m["create_time"] == nil || m["update_time"] == nil {
+		t.Error("expected timestamps")
+	}
+}
+
+func TestCreateInstanceAutoID(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "POST", "/publishers", `{"name":"Acme"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["id"] == nil || m["id"] == "" {
+		t.Error("expected auto-generated id")
+	}
+}
+
+func TestGetInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	resp := doRequest(t, h, "GET", "/publishers/acme", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme, got %v", m["name"])
+	}
+}
+
+func TestGetInstanceNotFound(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/publishers/nonexistent", "")
+	if resp.StatusCode != 404 {
+		t.Errorf("expected 404, got %d", resp.StatusCode)
+	}
+}
+
+func TestUpdateInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	resp := doRequest(t, h, "PATCH", "/publishers/acme", `{"name":"Acme Corp"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme Corp" {
+		t.Errorf("expected name=Acme Corp, got %v", m["name"])
+	}
+}
+
+func TestUpdateInstancePartial(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"location": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","location":"NYC"}`)
+
+	// Only update name.
+	resp := doRequest(t, h, "PATCH", "/publishers/acme", `{"name":"Acme Corp"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme Corp" {
+		t.Errorf("expected name=Acme Corp, got %v", m["name"])
+	}
+	if m["location"] != "NYC" {
+		t.Errorf("expected location=NYC preserved, got %v", m["location"])
+	}
+}
+
+func TestEnumField(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Register a resource that constrains the "status" field to an enum.
+	body := `{
+		"singular":"task",
+		"plural":"tasks",
+		"schema":{"properties":{"title":{"type":"string"},"status":{"type":"string"}}},
+		"enums":{"status":["pending","done"]}
+	}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=task", body)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("register task: status %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	enums, ok := m["enums"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected enums in definition response, got %v", m["enums"])
+	}
+	if _, ok := enums["status"]; !ok {
+		t.Errorf("expected enums.status, got %v", enums)
+	}
+
+	// Valid enum value -> 200.
+	resp = doRequest(t, h, "POST", "/tasks?id=t1", `{"title":"write","status":"pending"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("valid enum create: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Invalid enum value -> 400.
+	resp = doRequest(t, h, "POST", "/tasks?id=t2", `{"title":"eat","status":"bogus"}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("invalid enum create: expected 400, got %d", resp.StatusCode)
+	}
+
+	// PATCH rejects invalid enum value.
+	resp = doRequest(t, h, "PATCH", "/tasks/t1", `{"status":"bogus"}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("invalid enum patch: expected 400, got %d", resp.StatusCode)
+	}
+
+	// PATCH accepts valid enum value.
+	resp = doRequest(t, h, "PATCH", "/tasks/t1", `{"status":"done"}`)
+	if resp.StatusCode != 200 {
+		t.Errorf("valid enum patch: expected 200, got %d", resp.StatusCode)
+	}
+}
+
+func TestDeleteInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	resp := doRequest(t, h, "DELETE", "/publishers/acme", "")
+	if resp.StatusCode != 204 {
+		t.Errorf("expected 204, got %d", resp.StatusCode)
+	}
+}
+
+func TestDeleteInstanceNotFound(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "DELETE", "/publishers/nonexistent", "")
+	if resp.StatusCode != 404 {
+		t.Errorf("expected 404, got %d", resp.StatusCode)
+	}
+}
+
+func TestListInstances(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+	doRequest(t, h, "POST", "/publishers?id=beta", `{"name":"Beta"}`)
+
+	resp := doRequest(t, h, "GET", "/publishers", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results, got %d", len(results))
+	}
+}
+
+// --- Parent/Child Tests ---
+
+func setupPublisherAndBook(t *testing.T, h http.Handler) {
+	t.Helper()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title":      map[string]any{"type": "string"},
+		"page_count": map[string]any{"type": "integer"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+	doRequest(t, h, "POST", "/publishers?id=beta", `{"name":"Beta"}`)
+}
+
+func TestCreateChildInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	setupPublisherAndBook(t, h)
+
+	resp := doRequest(t, h, "POST", "/publishers/acme/books?id=go-guide", `{"title":"The Go Guide","page_count":350}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["path"] != "publishers/acme/books/go-guide" {
+		t.Errorf("expected path=publishers/acme/books/go-guide, got %v", m["path"])
+	}
+	if m["title"] != "The Go Guide" {
+		t.Errorf("expected title=The Go Guide, got %v", m["title"])
+	}
+}
+
+func TestGetChildInstance(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	setupPublisherAndBook(t, h)
+	doRequest(t, h, "POST", "/publishers/acme/books?id=go-guide", `{"title":"The Go Guide","page_count":350}`)
+
+	resp := doRequest(t, h, "GET", "/publishers/acme/books/go-guide", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["title"] != "The Go Guide" {
+		t.Errorf("expected title=The Go Guide, got %v", m["title"])
+	}
+}
+
+func TestListChildrenScopedToParent(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	setupPublisherAndBook(t, h)
+	doRequest(t, h, "POST", "/publishers/acme/books?id=book1", `{"title":"Book One","page_count":100}`)
+	doRequest(t, h, "POST", "/publishers/acme/books?id=book2", `{"title":"Book Two","page_count":200}`)
+	doRequest(t, h, "POST", "/publishers/beta/books?id=book3", `{"title":"Book Three","page_count":300}`)
+
+	// List books under acme — should only return 2.
+	resp := doRequest(t, h, "GET", "/publishers/acme/books", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 books under acme, got %d", len(results))
+	}
+
+	// List books under beta — should only return 1.
+	resp = doRequest(t, h, "GET", "/publishers/beta/books", "")
+	m = readJSON(t, resp)
+	results = m["results"].([]any)
+	if len(results) != 1 {
+		t.Errorf("expected 1 book under beta, got %d", len(results))
+	}
+}
+
+// --- Pagination Tests ---
+
+func TestListPagination(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	for i := 0; i < 5; i++ {
+		id := fmt.Sprintf("pub%02d", i)
+		doRequest(t, h, "POST", fmt.Sprintf("/publishers?id=%s", id), fmt.Sprintf(`{"name":"Publisher %d"}`, i))
+	}
+
+	// First page: 2 items.
+	resp := doRequest(t, h, "GET", "/publishers?max_page_size=2", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results on first page, got %d", len(results))
+	}
+	nextToken, ok := m["next_page_token"].(string)
+	if !ok || nextToken == "" {
+		t.Fatal("expected next_page_token on first page")
+	}
+
+	// Second page.
+	resp = doRequest(t, h, "GET", fmt.Sprintf("/publishers?max_page_size=2&page_token=%s", nextToken), "")
+	m = readJSON(t, resp)
+	results = m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results on second page, got %d", len(results))
+	}
+	nextToken2, ok := m["next_page_token"].(string)
+	if !ok || nextToken2 == "" {
+		t.Fatal("expected next_page_token on second page")
+	}
+
+	// Third page: 1 item, no next token.
+	resp = doRequest(t, h, "GET", fmt.Sprintf("/publishers?max_page_size=2&page_token=%s", nextToken2), "")
+	m = readJSON(t, resp)
+	results = m["results"].([]any)
+	if len(results) != 1 {
+		t.Errorf("expected 1 result on third page, got %d", len(results))
+	}
+	if _, ok := m["next_page_token"]; ok {
+		t.Error("expected no next_page_token on last page")
+	}
+}
+
+// --- OpenAPI Tests ---
+
+func TestOpenAPIEmpty(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["openapi"] != "3.1.0" {
+		t.Errorf("expected openapi=3.1.0, got %v", m["openapi"])
+	}
+}
+
+func TestOpenAPIAfterCreate(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	if _, ok := paths["/publishers"]; !ok {
+		t.Error("expected /publishers path in OpenAPI spec")
+	}
+	if _, ok := paths["/publishers/{publisher_id}"]; !ok {
+		t.Error("expected /publishers/{publisher_id} path in OpenAPI spec")
+	}
+}
+
+func TestOpenAPIAfterDelete(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "DELETE", "/aep-resource-definitions/publisher", "")
+
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths, ok := m["paths"].(map[string]any)
+	if !ok {
+		paths = map[string]any{}
+	}
+	// After deleting the user resource, only the built-in meta paths should
+	// remain. The operations resource is only exposed when an async custom
+	// method has been registered.
+	builtinPaths := map[string]bool{
+		"/aep-resource-definitions":                              true,
+		"/aep-resource-definitions/{aep_resource_definition_id}": true,
+	}
+	for p := range paths {
+		if !builtinPaths[p] {
+			t.Errorf("unexpected path %q after deleting resource", p)
+		}
+	}
+}
+
+func TestOpenAPIParentChild(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	expected := []string{
+		"/publishers",
+		"/publishers/{publisher_id}",
+		"/publishers/{publisher_id}/books",
+		"/publishers/{publisher_id}/books/{book_id}",
+	}
+	for _, p := range expected {
+		if _, ok := paths[p]; !ok {
+			t.Errorf("expected path %s in OpenAPI spec", p)
+		}
+	}
+}
+
+// --- Restart Recovery Test ---
+
+func TestRestartRecovery(t *testing.T) {
+	dbPath := t.TempDir() + "/shared.db"
+
+	// Phase 1: Create resources and data.
+	d1, err := db.Init(dbPath)
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	state1 := aepbase.NewState(d1, "http://localhost:8080")
+	h1 := state1.Handler()
+	createResource(t, h1, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h1, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+	d1.Close()
+
+	// Phase 2: Reopen and recover (simulates restart).
+	d2, err := db.Init(dbPath)
+	if err != nil {
+		t.Fatalf("db.Init (reopen): %v", err)
+	}
+	defer d2.Close()
+
+	state2 := aepbase.NewState(d2, "http://localhost:8080")
+	defs, err := meta.LoadAll(d2)
+	if err != nil {
+		t.Fatalf("meta.LoadAll: %v", err)
+	}
+	if len(defs) != 1 {
+		t.Fatalf("expected 1 definition, got %d", len(defs))
+	}
+	for _, def := range defs {
+		if err := state2.AddResource(def); err != nil {
+			t.Fatalf("AddResource on recovery: %v", err)
+		}
+	}
+
+	h2 := state2.Handler()
+
+	// Verify data survived.
+	resp := doRequest(t, h2, "GET", "/publishers/acme", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 after recovery, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme after recovery, got %v", m["name"])
+	}
+
+	// OpenAPI should also be restored.
+	resp = doRequest(t, h2, "GET", "/openapi.json", "")
+	spec := readJSON(t, resp)
+	paths := spec["paths"].(map[string]any)
+	if _, ok := paths["/publishers"]; !ok {
+		t.Error("expected /publishers path after recovery")
+	}
+}
+
+// --- Custom Method Tests ---
+
+func TestCustomMethodPOST(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"archived": map[string]any{"type": "boolean"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","archived":false}`)
+
+	err := state.AddCustomMethod("publisher", "archive", aepbase.CustomMethodConfig{
+		Method:         "POST",
+		RequestSchema:  &openapi.Schema{Type: "object", Properties: openapi.Properties{}},
+		ResponseSchema: &openapi.Schema{Type: "object", Properties: openapi.Properties{"archived": {Type: "boolean"}}},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"archived": true})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	// Must re-get handler after mux rebuild.
+	h = state.Handler()
+
+	resp := doRequest(t, h, "POST", "/publishers/acme:archive", `{}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["archived"] != true {
+		t.Errorf("expected archived=true, got %v", m["archived"])
+	}
+}
+
+func TestCustomMethodGET(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	err := state.AddCustomMethod("publisher", "stats", aepbase.CustomMethodConfig{
+		Method:         "GET",
+		ResponseSchema: &openapi.Schema{Type: "object", Properties: openapi.Properties{"book_count": {Type: "integer"}}},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"book_count": 42})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	h = state.Handler()
+
+	resp := doRequest(t, h, "GET", "/publishers/acme:stats", "")
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["book_count"] != float64(42) {
+		t.Errorf("expected book_count=42, got %v", m["book_count"])
+	}
+}
+
+func TestCustomMethodGETDoesNotBreakRegularGet(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	err := state.AddCustomMethod("publisher", "stats", aepbase.CustomMethodConfig{
+		Method:         "GET",
+		ResponseSchema: &openapi.Schema{Type: "object", Properties: openapi.Properties{"count": {Type: "integer"}}},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"count": 1})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	h = state.Handler()
+
+	// Regular GET should still work.
+	resp := doRequest(t, h, "GET", "/publishers/acme", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 for regular GET, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme, got %v", m["name"])
+	}
+}
+
+func TestCustomMethodNotFound(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+
+	resp := doRequest(t, h, "POST", "/publishers/acme:nonexistent", `{}`)
+	if resp.StatusCode != 404 {
+		t.Errorf("expected 404, got %d", resp.StatusCode)
+	}
+}
+
+func TestCustomMethodAppearsInOpenAPI(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+
+	err := state.AddCustomMethod("publisher", "archive", aepbase.CustomMethodConfig{
+		Method:         "POST",
+		RequestSchema:  &openapi.Schema{Type: "object", Properties: openapi.Properties{}},
+		ResponseSchema: &openapi.Schema{Type: "object", Properties: openapi.Properties{"archived": {Type: "boolean"}}},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	h = state.Handler()
+
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	cmPath, ok := paths["/publishers/{publisher_id}:archive"]
+	if !ok {
+		t.Fatalf("expected /publishers/{publisher_id}:archive path in OpenAPI spec, got paths: %v", keys(paths))
+	}
+	pathItem := cmPath.(map[string]any)
+	if _, ok := pathItem["post"]; !ok {
+		t.Error("expected POST operation on custom method path")
+	}
+}
+
+func TestCustomMethodOnChildResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	setupPublisherAndBook(t, h)
+	doRequest(t, h, "POST", "/publishers/acme/books?id=go-guide", `{"title":"The Go Guide","page_count":350}`)
+
+	err := state.AddCustomMethod("book", "archive", aepbase.CustomMethodConfig{
+		Method:         "POST",
+		RequestSchema:  &openapi.Schema{Type: "object"},
+		ResponseSchema: &openapi.Schema{Type: "object", Properties: openapi.Properties{"status": {Type: "string"}}},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			bookID := r.PathValue("book_id")
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"status": "archived", "book": bookID})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	h = state.Handler()
+
+	resp := doRequest(t, h, "POST", "/publishers/acme/books/go-guide:archive", `{}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["status"] != "archived" {
+		t.Errorf("expected status=archived, got %v", m["status"])
+	}
+	if m["book"] != "go-guide" {
+		t.Errorf("expected book=go-guide, got %v", m["book"])
+	}
+}
+
+func TestCustomMethodInvalidConfig(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+
+	// Missing handler.
+	err := state.AddCustomMethod("publisher", "archive", aepbase.CustomMethodConfig{
+		Method:         "POST",
+		RequestSchema:  &openapi.Schema{Type: "object"},
+		ResponseSchema: &openapi.Schema{Type: "object"},
+	})
+	if err == nil {
+		t.Error("expected error for missing handler")
+	}
+
+	// Invalid HTTP method.
+	err = state.AddCustomMethod("publisher", "archive", aepbase.CustomMethodConfig{
+		Method:         "PUT",
+		RequestSchema:  &openapi.Schema{Type: "object"},
+		ResponseSchema: &openapi.Schema{Type: "object"},
+		Handler:        func(w http.ResponseWriter, r *http.Request) {},
+	})
+	if err == nil {
+		t.Error("expected error for invalid HTTP method")
+	}
+
+	// Missing response schema.
+	err = state.AddCustomMethod("publisher", "archive", aepbase.CustomMethodConfig{
+		Method:  "POST",
+		Handler: func(w http.ResponseWriter, r *http.Request) {},
+	})
+	if err == nil {
+		t.Error("expected error for missing response schema")
+	}
+
+	// Nonexistent resource — deferred, no error.
+	err = state.AddCustomMethod("nonexistent", "archive", aepbase.CustomMethodConfig{
+		Method:         "POST",
+		RequestSchema:  &openapi.Schema{Type: "object"},
+		ResponseSchema: &openapi.Schema{Type: "object"},
+		Handler:        func(w http.ResponseWriter, r *http.Request) {},
+	})
+	if err != nil {
+		t.Errorf("expected deferred registration for nonexistent resource, got error: %v", err)
+	}
+}
+
+func keys(m map[string]any) []string {
+	var ks []string
+	for k := range m {
+		ks = append(ks, k)
+	}
+	return ks
+}
+
+// --- Apply Method Tests ---
+
+func TestApplyCreatesNewResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+
+	// Apply (PUT) to a resource that doesn't exist yet — should create it.
+	resp := doRequest(t, h, "PUT", "/publishers/acme", `{"name":"Acme"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["id"] != "acme" {
+		t.Errorf("expected id=acme, got %v", m["id"])
+	}
+	if m["name"] != "Acme" {
+		t.Errorf("expected name=Acme, got %v", m["name"])
+	}
+
+	// Verify it can be retrieved.
+	resp = doRequest(t, h, "GET", "/publishers/acme", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 on GET, got %d", resp.StatusCode)
+	}
+}
+
+func TestApplyReplacesExistingResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"location": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","location":"NYC"}`)
+
+	// Apply (PUT) replaces the entire resource.
+	resp := doRequest(t, h, "PUT", "/publishers/acme", `{"name":"Acme Corp"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme Corp" {
+		t.Errorf("expected name=Acme Corp, got %v", m["name"])
+	}
+	// location should be nil/empty since Apply is a full replace, not a merge.
+	if m["location"] != nil {
+		t.Errorf("expected location=nil after full replace, got %v", m["location"])
+	}
+}
+
+func TestApplyOnChildResource(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	setupPublisherAndBook(t, h)
+
+	// Apply a book that doesn't exist yet.
+	resp := doRequest(t, h, "PUT", "/publishers/acme/books/go-guide", `{"title":"The Go Guide","page_count":350}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["path"] != "publishers/acme/books/go-guide" {
+		t.Errorf("expected path=publishers/acme/books/go-guide, got %v", m["path"])
+	}
+}
+
+func TestApplyAppearsInOpenAPI(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	resourcePath := paths["/publishers/{publisher_id}"].(map[string]any)
+	if _, ok := resourcePath["put"]; !ok {
+		t.Error("expected PUT (Apply) operation in OpenAPI spec for /publishers/{publisher_id}")
+	}
+}
+
+// --- Required Field Enforcement Tests ---
+
+func TestCreateRejectsWhenRequiredFieldMissing(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	// Create a resource with required fields.
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name":     map[string]any{"type": "string"},
+			"location": map[string]any{"type": "string"},
+		},
+		"required": []any{"name"},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("createResource: status %d: %v", resp.StatusCode, m)
+	}
+
+	// Try creating without the required "name" field.
+	resp = doRequest(t, h, "POST", "/publishers?id=acme", `{"location":"NYC"}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for missing required field, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	errMsg := m["error"].(map[string]any)["message"].(string)
+	if !strings.Contains(errMsg, "name") {
+		t.Errorf("expected error to mention 'name', got: %s", errMsg)
+	}
+}
+
+func TestCreateSucceedsWhenRequiredFieldPresent(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name": map[string]any{"type": "string"},
+		},
+		"required": []any{"name"},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+}
+
+func TestApplyRejectsWhenRequiredFieldMissing(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name": map[string]any{"type": "string"},
+		},
+		"required": []any{"name"},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+
+	resp := doRequest(t, h, "PUT", "/publishers/acme", `{}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for missing required field on Apply, got %d", resp.StatusCode)
+	}
+}
+
+func TestOpenAPIIncludesRequiredFields(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name":     map[string]any{"type": "string"},
+			"location": map[string]any{"type": "string"},
+		},
+		"required": []any{"name"},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+	if resp.StatusCode != 200 {
+		t.Fatalf("createResource: status %d", resp.StatusCode)
+	}
+
+	resp = doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	components := m["components"].(map[string]any)
+	schemas := components["schemas"].(map[string]any)
+	pub := schemas["publisher"].(map[string]any)
+	req, ok := pub["required"]
+	if !ok {
+		t.Fatal("expected 'required' array in OpenAPI component schema for publisher")
+	}
+	arr := req.([]any)
+	found := false
+	for _, v := range arr {
+		if v == "name" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected 'name' in required array, got %v", arr)
+	}
+
+	// Also verify the required array is returned in the resource definition GET.
+	resp = doRequest(t, h, "GET", "/aep-resource-definitions/publisher", "")
+	defn := readJSON(t, resp)
+	defSchema := defn["schema"].(map[string]any)
+	defReq, ok := defSchema["required"]
+	if !ok {
+		t.Fatal("expected 'required' in resource definition schema")
+	}
+	defArr := defReq.([]any)
+	found = false
+	for _, v := range defArr {
+		if v == "name" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected 'name' in resource definition required array, got %v", defArr)
+	}
+}
+
+func TestOpenAPIIncludesRequiredFieldsAfterRestart(t *testing.T) {
+	dbPath := t.TempDir() + "/required.db"
+
+	// Phase 1: Create resource with required field.
+	d1, err := db.Init(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s1 := aepbase.NewState(d1, "http://localhost:8080")
+	h1 := s1.Handler()
+
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name":     map[string]any{"type": "string"},
+			"location": map[string]any{"type": "string"},
+		},
+		"required": []any{"name"},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	resp := doRequest(t, h1, "POST", "/aep-resource-definitions?id=publisher", string(b))
+	if resp.StatusCode != 200 {
+		t.Fatalf("createResource: status %d", resp.StatusCode)
+	}
+	d1.Close()
+
+	// Phase 2: Reopen and recover.
+	d2, err := db.Init(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer d2.Close()
+	s2 := aepbase.NewState(d2, "http://localhost:8080")
+	defs, err := meta.LoadAll(d2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, def := range defs {
+		if err := s2.AddResource(def); err != nil {
+			t.Fatalf("AddResource on recovery: %v", err)
+		}
+	}
+	h2 := s2.Handler()
+
+	// Verify required survives restart in OpenAPI.
+	resp = doRequest(t, h2, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	components := m["components"].(map[string]any)
+	schemas := components["schemas"].(map[string]any)
+	pub := schemas["publisher"].(map[string]any)
+	req, ok := pub["required"]
+	if !ok {
+		t.Fatal("expected 'required' in OpenAPI schema after restart")
+	}
+	arr := req.([]any)
+	found := false
+	for _, v := range arr {
+		if v == "name" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected 'name' in required array after restart, got %v", arr)
+	}
+}
+
+// --- Data Type Validation Tests ---
+
+func TestCreateRejectsWrongType(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":       map[string]any{"type": "string"},
+		"book_count": map[string]any{"type": "integer"},
+		"active":     map[string]any{"type": "boolean"},
+	})
+
+	// String field with integer value.
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"name":123,"book_count":5,"active":true}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for wrong type (string got number), got %d", resp.StatusCode)
+	}
+
+	// Integer field with string value.
+	resp = doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","book_count":"five","active":true}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for wrong type (integer got string), got %d", resp.StatusCode)
+	}
+
+	// Boolean field with string value.
+	resp = doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","book_count":5,"active":"yes"}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for wrong type (boolean got string), got %d", resp.StatusCode)
+	}
+}
+
+func TestCreateAcceptsCorrectTypes(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":       map[string]any{"type": "string"},
+		"book_count": map[string]any{"type": "integer"},
+		"active":     map[string]any{"type": "boolean"},
+		"rating":     map[string]any{"type": "number"},
+	})
+
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","book_count":5,"active":true,"rating":4.5}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+}
+
+func TestUpdateRejectsWrongType(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	resp := doRequest(t, h, "PATCH", "/publishers/acme", `{"name":42}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for wrong type on update, got %d", resp.StatusCode)
+	}
+}
+
+func TestCreateRejectsFloatForInteger(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"book_count": map[string]any{"type": "integer"},
+	})
+
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"book_count":3.14}`)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for float in integer field, got %d", resp.StatusCode)
+	}
+}
+
+// --- ReadOnly Field Enforcement Tests ---
+
+func TestCreateStripsReadOnlyFields(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	// Create resource where "status" is read-only.
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name":   map[string]any{"type": "string"},
+			"status": map[string]any{"type": "string", "readOnly": true},
+		},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+
+	// Try creating with the read-only field — should be silently stripped.
+	resp := doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","status":"active"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	// status should not be set (or be nil).
+	if m["status"] != nil {
+		t.Errorf("expected status to be nil (read-only stripped), got %v", m["status"])
+	}
+}
+
+func TestUpdateStripsReadOnlyFields(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	schema := map[string]any{
+		"properties": map[string]any{
+			"name":   map[string]any{"type": "string"},
+			"status": map[string]any{"type": "string", "readOnly": true},
+		},
+	}
+	body := map[string]any{
+		"singular": "publisher",
+		"plural":   "publishers",
+		"schema":   schema,
+	}
+	b, _ := json.Marshal(body)
+	doRequest(t, h, "POST", "/aep-resource-definitions?id=publisher", string(b))
+
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+
+	// Try updating with a read-only field.
+	resp := doRequest(t, h, "PATCH", "/publishers/acme", `{"name":"Acme Corp","status":"archived"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["name"] != "Acme Corp" {
+		t.Errorf("expected name=Acme Corp, got %v", m["name"])
+	}
+	// status should not have been updated.
+	if m["status"] != nil {
+		t.Errorf("expected status to remain nil (read-only stripped), got %v", m["status"])
+	}
+}
+
+// --- List Method Options Tests ---
+
+func TestListWithFilter(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"location": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme","location":"NYC"}`)
+	doRequest(t, h, "POST", "/publishers?id=beta", `{"name":"Beta","location":"LA"}`)
+	doRequest(t, h, "POST", "/publishers?id=gamma", `{"name":"Gamma","location":"NYC"}`)
+
+	// Filter by location == "NYC" (CEL syntax).
+	resp := doRequest(t, h, "GET", "/publishers?filter=location+%3D%3D+'NYC'", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results for filter location=NYC, got %d", len(results))
+	}
+}
+
+func TestListWithSkip(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	for i := 0; i < 5; i++ {
+		id := fmt.Sprintf("pub%02d", i)
+		doRequest(t, h, "POST", fmt.Sprintf("/publishers?id=%s", id), fmt.Sprintf(`{"name":"Publisher %d"}`, i))
+	}
+
+	// Skip first 3 results.
+	resp := doRequest(t, h, "GET", "/publishers?skip=3", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 2 {
+		t.Errorf("expected 2 results after skipping 3 of 5, got %d", len(results))
+	}
+}
+
+func TestListFilterAppearsInOpenAPI(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	listPath := paths["/publishers"].(map[string]any)
+	getOp := listPath["get"].(map[string]any)
+	params := getOp["parameters"].([]any)
+	foundFilter := false
+	foundSkip := false
+	for _, p := range params {
+		param := p.(map[string]any)
+		if param["name"] == "filter" {
+			foundFilter = true
+		}
+		if param["name"] == "skip" {
+			foundSkip = true
+		}
+	}
+	if !foundFilter {
+		t.Error("expected 'filter' parameter in OpenAPI list operation")
+	}
+	if !foundSkip {
+		t.Error("expected 'skip' parameter in OpenAPI list operation")
+	}
+}
+
+// --- Parent-Child Relationship Depth Tests ---
+
+func TestGrandchildResources(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	// Create 3-level hierarchy: publisher -> book -> chapter.
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "chapter", "chapter", "chapters", []string{"book"}, map[string]any{
+		"heading": map[string]any{"type": "string"},
+	})
+
+	// Create instances at each level.
+	doRequest(t, h, "POST", "/publishers?id=acme", `{"name":"Acme"}`)
+	doRequest(t, h, "POST", "/publishers/acme/books?id=go-guide", `{"title":"The Go Guide"}`)
+	resp := doRequest(t, h, "POST", "/publishers/acme/books/go-guide/chapters?id=ch1", `{"heading":"Getting Started"}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["path"] != "publishers/acme/books/go-guide/chapters/ch1" {
+		t.Errorf("expected full path for grandchild, got %v", m["path"])
+	}
+
+	// Get the grandchild.
+	resp = doRequest(t, h, "GET", "/publishers/acme/books/go-guide/chapters/ch1", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 on GET grandchild, got %d", resp.StatusCode)
+	}
+	m = readJSON(t, resp)
+	if m["heading"] != "Getting Started" {
+		t.Errorf("expected heading=Getting Started, got %v", m["heading"])
+	}
+}
+
+func TestGrandchildOpenAPIPaths(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "chapter", "chapter", "chapters", []string{"book"}, map[string]any{
+		"heading": map[string]any{"type": "string"},
+	})
+
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, resp)
+	paths := m["paths"].(map[string]any)
+	expected := []string{
+		"/publishers/{publisher_id}/books/{book_id}/chapters",
+		"/publishers/{publisher_id}/books/{book_id}/chapters/{chapter_id}",
+	}
+	for _, p := range expected {
+		if _, ok := paths[p]; !ok {
+			t.Errorf("expected path %s in OpenAPI spec, got paths: %v", p, keys(paths))
+		}
+	}
+}
+
+func TestDeleteResourceWithGrandchildren(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+	createResource(t, h, "publisher", "publisher", "publishers", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "book", "book", "books", []string{"publisher"}, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "chapter", "chapter", "chapters", []string{"book"}, map[string]any{
+		"heading": map[string]any{"type": "string"},
+	})
+
+	// Cannot delete book because chapter depends on it.
+	resp := doRequest(t, h, "DELETE", "/aep-resource-definitions/book", "")
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 (has children), got %d", resp.StatusCode)
+	}
+
+	// Delete chapter first, then book, then publisher.
+	resp = doRequest(t, h, "DELETE", "/aep-resource-definitions/chapter", "")
+	if resp.StatusCode != 204 {
+		t.Errorf("expected 204 deleting chapter, got %d", resp.StatusCode)
+	}
+	resp = doRequest(t, h, "DELETE", "/aep-resource-definitions/book", "")
+	if resp.StatusCode != 204 {
+		t.Errorf("expected 204 deleting book, got %d", resp.StatusCode)
+	}
+	resp = doRequest(t, h, "DELETE", "/aep-resource-definitions/publisher", "")
+	if resp.StatusCode != 204 {
+		t.Errorf("expected 204 deleting publisher, got %d", resp.StatusCode)
+	}
+}
+
+// --- Operations Tests ---
+
+// registerNoopAsyncMethod registers a trivial async custom method on a
+// resource so the built-in operations resource gets exposed.
+func registerNoopAsyncMethod(t *testing.T, state *aepbase.State, resourceSingular string) {
+	t.Helper()
+	err := state.AddCustomMethod(resourceSingular, "noop", aepbase.CustomMethodConfig{
+		Method: "POST",
+		Async:  true,
+		RequestSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		ResponseSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+}
+
+func TestOperationsListEmpty(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// The operations resource is only exposed after an async custom method
+	// has been registered.
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	registerNoopAsyncMethod(t, state, "book")
+
+	resp := doRequest(t, h, "GET", "/operations", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results := m["results"].([]any)
+	if len(results) != 0 {
+		t.Errorf("expected empty results, got %d", len(results))
+	}
+}
+
+func TestOperationsGetNotFound(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	registerNoopAsyncMethod(t, state, "book")
+
+	resp := doRequest(t, h, "GET", "/operations/nonexistent", "")
+	if resp.StatusCode != 404 {
+		t.Fatalf("expected 404, got %d", resp.StatusCode)
+	}
+}
+
+func TestOperationsNotExposedWithoutAsyncMethod(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// With no async custom methods registered, /operations should not be
+	// exposed at all.
+	resp := doRequest(t, h, "GET", "/operations", "")
+	if resp.StatusCode != 404 {
+		t.Fatalf("expected 404, got %d", resp.StatusCode)
+	}
+
+	// The OpenAPI spec should not contain any operation paths or schema.
+	specResp := doRequest(t, h, "GET", "/openapi.json", "")
+	m := readJSON(t, specResp)
+	paths, _ := m["paths"].(map[string]any)
+	for p := range paths {
+		if strings.HasPrefix(p, "/operations") {
+			t.Errorf("did not expect operations path %q without async method", p)
+		}
+	}
+	if components, ok := m["components"].(map[string]any); ok {
+		if schemas, ok := components["schemas"].(map[string]any); ok {
+			if _, ok := schemas["operation"]; ok {
+				t.Error("did not expect operation schema without async method")
+			}
+		}
+	}
+}
+
+func TestAsyncCustomMethod(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Create a resource.
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+
+	// Register an async custom method.
+	err := state.AddCustomMethod("book", "write", aepbase.CustomMethodConfig{
+		Method: "POST",
+		Async:  true,
+		RequestSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		ResponseSchema: &openapi.Schema{
+			Type: "object",
+			Properties: openapi.Properties{
+				"status": {Type: "string"},
+			},
+		},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(100 * time.Millisecond)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{
+				"status": "written",
+			})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	// Create a book first.
+	doRequest(t, h, "POST", "/books?id=book1", `{"title":"Test Book"}`)
+
+	// Call the async custom method.
+	resp := doRequest(t, h, "POST", "/books/book1:write", `{}`)
+	if resp.StatusCode != 202 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 202, got %d: %v", resp.StatusCode, m)
+	}
+
+	op := readJSON(t, resp)
+	if op["done"] != false {
+		t.Errorf("expected done=false, got %v", op["done"])
+	}
+	opPath, ok := op["path"].(string)
+	if !ok || !strings.HasPrefix(opPath, "operations/") {
+		t.Fatalf("expected operation path, got %v", op["path"])
+	}
+
+	// Poll the operation until done.
+	opID := op["id"].(string)
+	var finalOp map[string]any
+	for range 50 {
+		time.Sleep(50 * time.Millisecond)
+		pollResp := doRequest(t, h, "GET", "/operations/"+opID, "")
+		if pollResp.StatusCode != 200 {
+			t.Fatalf("polling operation: status %d", pollResp.StatusCode)
+		}
+		finalOp = readJSON(t, pollResp)
+		if finalOp["done"] == true {
+			break
+		}
+	}
+	if finalOp["done"] != true {
+		t.Fatalf("operation did not complete in time")
+	}
+
+	// Check the response.
+	response, ok := finalOp["response"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected response map, got %v", finalOp["response"])
+	}
+	if response["status"] != "written" {
+		t.Errorf("expected status=written, got %v", response["status"])
+	}
+
+	// Verify the operation appears in list.
+	listResp := doRequest(t, h, "GET", "/operations", "")
+	listBody := readJSON(t, listResp)
+	results := listBody["results"].([]any)
+	if len(results) != 1 {
+		t.Errorf("expected 1 operation in list, got %d", len(results))
+	}
+}
+
+func TestAsyncCustomMethodError(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+
+	err := state.AddCustomMethod("book", "fail", aepbase.CustomMethodConfig{
+		Method: "POST",
+		Async:  true,
+		RequestSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		ResponseSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": map[string]any{
+					"code":    500,
+					"message": "something went wrong",
+				},
+			})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	doRequest(t, h, "POST", "/books?id=book1", `{"title":"Test"}`)
+	resp := doRequest(t, h, "POST", "/books/book1:fail", `{}`)
+	if resp.StatusCode != 202 {
+		t.Fatalf("expected 202, got %d", resp.StatusCode)
+	}
+
+	op := readJSON(t, resp)
+	opID := op["id"].(string)
+
+	// Poll until done.
+	var finalOp map[string]any
+	for range 20 {
+		time.Sleep(50 * time.Millisecond)
+		pollResp := doRequest(t, h, "GET", "/operations/"+opID, "")
+		finalOp = readJSON(t, pollResp)
+		if finalOp["done"] == true {
+			break
+		}
+	}
+	if finalOp["done"] != true {
+		t.Fatalf("operation did not complete")
+	}
+
+	// Should have an error, no response.
+	if finalOp["error"] == nil {
+		t.Errorf("expected error to be set")
+	}
+	errMap := finalOp["error"].(map[string]any)
+	if errMap["message"] != "something went wrong" {
+		t.Errorf("expected error message, got %v", errMap["message"])
+	}
+	if finalOp["response"] != nil {
+		t.Errorf("expected nil response on error, got %v", finalOp["response"])
+	}
+}
+
+func TestAsyncCustomMethodPending(t *testing.T) {
+	// Test that async custom methods can be registered before the resource exists.
+	state := newTestState(t)
+	h := state.Handler()
+
+	err := state.AddCustomMethod("book", "write", aepbase.CustomMethodConfig{
+		Method: "POST",
+		Async:  true,
+		RequestSchema: &openapi.Schema{
+			Type:       "object",
+			Properties: openapi.Properties{},
+		},
+		ResponseSchema: &openapi.Schema{
+			Type: "object",
+			Properties: openapi.Properties{
+				"status": {Type: "string"},
+			},
+		},
+		Handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"status": "done"})
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddCustomMethod: %v", err)
+	}
+
+	// Now create the resource — the pending method should be applied.
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/books?id=book1", `{"title":"Test"}`)
+
+	resp := doRequest(t, h, "POST", "/books/book1:write", `{}`)
+	if resp.StatusCode != 202 {
+		m := readJSON(t, resp)
+		t.Fatalf("expected 202, got %d: %v", resp.StatusCode, m)
+	}
+}
+
+func TestExportUserResourcesOpenAPI(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Add a user-defined resource.
+	createResource(t, h, "book", "book", "books", nil, map[string]any{
+		"title":  map[string]any{"type": "string"},
+		"author": map[string]any{"type": "string"},
+	})
+
+	// Generate the filtered spec.
+	jsonBytes, err := state.ExportUserResourcesOpenAPI()
+	if err != nil {
+		t.Fatalf("ExportUserResourcesOpenAPI: %v", err)
+	}
+
+	var doc map[string]any
+	if err := json.Unmarshal(jsonBytes, &doc); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+
+	// Paths should include /books but not /aep-resource-definitions or /operations.
+	paths, _ := doc["paths"].(map[string]any)
+	if paths == nil {
+		t.Fatal("expected paths in OpenAPI spec")
+	}
+	for path := range paths {
+		if strings.Contains(path, "aep-resource-definition") {
+			t.Errorf("exported spec should not contain built-in path %q", path)
+		}
+		if strings.Contains(path, "operation") {
+			t.Errorf("exported spec should not contain built-in path %q", path)
+		}
+	}
+	if _, ok := paths["/books"]; !ok {
+		t.Error("exported spec should contain /books path")
+	}
+
+	// Schemas should include book but not aep-resource-definition or operation.
+	components, _ := doc["components"].(map[string]any)
+	schemas, _ := components["schemas"].(map[string]any)
+	if _, ok := schemas["book"]; !ok {
+		t.Error("exported spec should contain book schema")
+	}
+	if _, ok := schemas["aep-resource-definition"]; ok {
+		t.Error("exported spec should not contain aep-resource-definition schema")
+	}
+	if _, ok := schemas["operation"]; ok {
+		t.Error("exported spec should not contain operation schema")
+	}
+}
+
+// --- Singleton Resource Tests ---
+
+func createSingletonResource(t *testing.T, h http.Handler, id, singular, plural string, parents []string, props map[string]any) map[string]any {
+	t.Helper()
+	schema := map[string]any{"properties": props}
+	body := map[string]any{
+		"singular":  singular,
+		"plural":    plural,
+		"schema":    schema,
+		"singleton": true,
+	}
+	if len(parents) > 0 {
+		body["parents"] = parents
+	}
+	b, _ := json.Marshal(body)
+	path := "/aep-resource-definitions"
+	if id != "" {
+		path += "?id=" + id
+	}
+	resp := doRequest(t, h, "POST", path, string(b))
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("createSingletonResource %s: status %d: %v", singular, resp.StatusCode, m)
+	}
+	return readJSON(t, resp)
+}
+
+func TestCreateSingletonRequiresParent(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Singleton without parents should fail.
+	body := `{"singular":"config","plural":"configs","schema":{"properties":{"theme":{"type":"string"}}},"singleton":true}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions", body)
+	if resp.StatusCode != 400 {
+		t.Errorf("expected 400 for singleton without parent, got %d", resp.StatusCode)
+	}
+}
+
+func TestSingletonGetImplicitCreation(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Create parent resource.
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/users?id=alice", `{"name":"Alice"}`)
+
+	// Create singleton resource definition.
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+		"lang":  map[string]any{"type": "string"},
+	})
+
+	// GET the singleton before any explicit creation — should implicitly create it.
+	resp := doRequest(t, h, "GET", "/users/alice/config", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+
+	// Should have path but no id.
+	if m["path"] != "users/alice/config" {
+		t.Errorf("expected path=users/alice/config, got %v", m["path"])
+	}
+	if _, hasID := m["id"]; hasID {
+		t.Error("singleton should not have an id field")
+	}
+	if m["create_time"] == nil || m["update_time"] == nil {
+		t.Error("expected timestamps")
+	}
+}
+
+func TestSingletonUpdate(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Create parent and singleton.
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/users?id=alice", `{"name":"Alice"}`)
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+		"lang":  map[string]any{"type": "string"},
+	})
+
+	// PATCH the singleton (implicitly creates it with the patch values).
+	resp := doRequest(t, h, "PATCH", "/users/alice/config", `{"theme":"dark","lang":"en"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["theme"] != "dark" {
+		t.Errorf("expected theme=dark, got %v", m["theme"])
+	}
+	if m["lang"] != "en" {
+		t.Errorf("expected lang=en, got %v", m["lang"])
+	}
+
+	// GET should return the updated values.
+	resp = doRequest(t, h, "GET", "/users/alice/config", "")
+	m = readJSON(t, resp)
+	if m["theme"] != "dark" {
+		t.Errorf("expected theme=dark after update, got %v", m["theme"])
+	}
+
+	// PATCH again (partial update on existing).
+	resp = doRequest(t, h, "PATCH", "/users/alice/config", `{"lang":"fr"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m = readJSON(t, resp)
+	if m["theme"] != "dark" {
+		t.Errorf("expected theme=dark (unchanged), got %v", m["theme"])
+	}
+	if m["lang"] != "fr" {
+		t.Errorf("expected lang=fr, got %v", m["lang"])
+	}
+}
+
+func TestSingletonPerParent(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	// Create parent and singleton.
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/users?id=alice", `{"name":"Alice"}`)
+	doRequest(t, h, "POST", "/users?id=bob", `{"name":"Bob"}`)
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+	})
+
+	// Set different themes for each user.
+	doRequest(t, h, "PATCH", "/users/alice/config", `{"theme":"dark"}`)
+	doRequest(t, h, "PATCH", "/users/bob/config", `{"theme":"light"}`)
+
+	// Each user should have their own singleton instance.
+	resp := doRequest(t, h, "GET", "/users/alice/config", "")
+	m := readJSON(t, resp)
+	if m["theme"] != "dark" {
+		t.Errorf("expected alice's theme=dark, got %v", m["theme"])
+	}
+
+	resp = doRequest(t, h, "GET", "/users/bob/config", "")
+	m = readJSON(t, resp)
+	if m["theme"] != "light" {
+		t.Errorf("expected bob's theme=light, got %v", m["theme"])
+	}
+}
+
+func TestSingletonNoCreateDeleteEndpoints(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	doRequest(t, h, "POST", "/users?id=alice", `{"name":"Alice"}`)
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+	})
+
+	// POST (Create) should not be available for singletons.
+	resp := doRequest(t, h, "POST", "/users/alice/configs", `{"theme":"dark"}`)
+	if resp.StatusCode < 400 {
+		t.Errorf("expected error status for POST to singleton collection, got %d", resp.StatusCode)
+	}
+
+	// DELETE should not be available for singletons.
+	resp = doRequest(t, h, "DELETE", "/users/alice/config", "")
+	if resp.StatusCode < 400 {
+		t.Errorf("expected error status for DELETE on singleton, got %d", resp.StatusCode)
+	}
+}
+
+func TestSingletonOpenAPI(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+	})
+
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+
+	paths, _ := m["paths"].(map[string]any)
+
+	// Should have the singleton path.
+	singletonPath, ok := paths["/users/{user_id}/config"]
+	if !ok {
+		t.Fatalf("expected singleton path /users/{user_id}/config in OpenAPI spec, paths: %v", keysOf(paths))
+	}
+	singletonOps := singletonPath.(map[string]any)
+	if _, ok := singletonOps["get"]; !ok {
+		t.Error("expected GET operation on singleton path")
+	}
+	if _, ok := singletonOps["patch"]; !ok {
+		t.Error("expected PATCH operation on singleton path")
+	}
+
+	// Should NOT have collection paths for the singleton.
+	if _, ok := paths["/users/{user_id}/configs"]; ok {
+		t.Error("singleton should not have a collection path")
+	}
+	if _, ok := paths["/users/{user_id}/configs/{config_id}"]; ok {
+		t.Error("singleton should not have a resource path with ID")
+	}
+
+	// Check x-aep-resource has singleton: true.
+	components, _ := m["components"].(map[string]any)
+	schemas, _ := components["schemas"].(map[string]any)
+	configSchema, _ := schemas["config"].(map[string]any)
+	if configSchema == nil {
+		// Try capitalized name.
+		configSchema, _ = schemas["Config"].(map[string]any)
+	}
+	if configSchema != nil {
+		xaep, _ := configSchema["x-aep-resource"].(map[string]any)
+		if xaep != nil {
+			if singleton, ok := xaep["singleton"]; !ok || singleton != true {
+				t.Errorf("expected x-aep-resource.singleton=true, got %v", xaep)
+			}
+		}
+	}
+}
+
+func TestSingletonDefinitionPersistence(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "user", "user", "users", nil, map[string]any{
+		"name": map[string]any{"type": "string"},
+	})
+	createSingletonResource(t, h, "config", "config", "configs", []string{"user"}, map[string]any{
+		"theme": map[string]any{"type": "string"},
+	})
+
+	// GET the definition — should have singleton=true.
+	resp := doRequest(t, h, "GET", "/aep-resource-definitions/config", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	if m["singleton"] != true {
+		t.Errorf("expected singleton=true in definition, got %v", m["singleton"])
+	}
+}
+
+// --- File field tests ---
+
+func newTestStateWithFiles(t *testing.T) (*aepbase.State, string) {
+	t.Helper()
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	filesDir := t.TempDir()
+	state := aepbase.NewState(d, "http://localhost:8080")
+	state.EnableFileFields(filesDir)
+	return state, filesDir
+}
+
+func registerFileFieldResource(t *testing.T, h http.Handler) {
+	t.Helper()
+	body := `{
+		"singular":"document",
+		"plural":"documents",
+		"schema":{"properties":{
+			"title":{"type":"string"},
+			"body":{"type":"binary","x-aepbase-file-field":true}
+		},"required":["title","body"]}
+	}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=document", body)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("register document: status %d: %v", resp.StatusCode, m)
+	}
+}
+
+// doMultipartRequest posts a multipart/form-data create/update to handler h.
+// files is a map of form-field-name -> file content bytes. The non-file JSON
+// body is sent as a part named "resource".
+func doMultipartRequest(t *testing.T, h http.Handler, method, path, jsonBody string, files map[string][]byte) *http.Response {
+	t.Helper()
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+	if jsonBody != "" {
+		if err := mw.WriteField("resource", jsonBody); err != nil {
+			t.Fatalf("writing resource part: %v", err)
+		}
+	}
+	for name, content := range files {
+		fw, err := mw.CreateFormFile(name, name)
+		if err != nil {
+			t.Fatalf("create form file: %v", err)
+		}
+		if _, err := fw.Write(content); err != nil {
+			t.Fatalf("write form file: %v", err)
+		}
+	}
+	if err := mw.Close(); err != nil {
+		t.Fatalf("closing multipart: %v", err)
+	}
+	req := httptest.NewRequest(method, path, &buf)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+	return w.Result()
+}
+
+func TestFileFieldDisabledRejectsSchema(t *testing.T) {
+	// Default state: file fields NOT enabled. Registering a resource whose
+	// schema marks a property as a file field must fail.
+	state := newTestState(t)
+	h := state.Handler()
+	body := `{
+		"singular":"document",
+		"plural":"documents",
+		"schema":{"properties":{
+			"body":{"type":"binary","x-aepbase-file-field":true}
+		}}
+	}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=document", body)
+	if resp.StatusCode == 200 {
+		t.Fatalf("expected failure when file fields disabled, got 200")
+	}
+}
+
+func TestFileFieldCreateAndDownload(t *testing.T) {
+	state, filesDir := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	content := []byte("hello aepbase file field")
+	resp := doMultipartRequest(t, h, "POST", "/documents?id=doc1",
+		`{"title":"my doc"}`,
+		map[string][]byte{"body": content},
+	)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create: status %d: %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	if m["title"] != "my doc" {
+		t.Errorf("expected title=my doc, got %v", m["title"])
+	}
+	urlStr, ok := m["body"].(string)
+	if !ok {
+		t.Fatalf("expected body field to be a URL string, got %T: %v", m["body"], m["body"])
+	}
+	if !strings.Contains(urlStr, "/documents/doc1:download") {
+		t.Errorf("expected download URL, got %q", urlStr)
+	}
+
+	// File should exist on disk.
+	onDisk := filepath.Join(filesDir, "documents", "doc1", "body")
+	gotBytes, err := os.ReadFile(onDisk)
+	if err != nil {
+		t.Fatalf("reading file from disk: %v", err)
+	}
+	if !bytes.Equal(gotBytes, content) {
+		t.Errorf("disk bytes mismatch: got %q want %q", gotBytes, content)
+	}
+
+	// GET returns the URL.
+	resp = doRequest(t, h, "GET", "/documents/doc1", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("get: %d", resp.StatusCode)
+	}
+	m = readJSON(t, resp)
+	if _, ok := m["body"].(string); !ok {
+		t.Errorf("expected body URL on GET, got %v", m["body"])
+	}
+
+	// :download custom method returns the bytes.
+	resp = doRequest(t, h, "POST", "/documents/doc1:download", `{"field":"body"}`)
+	if resp.StatusCode != 200 {
+		b, _ := io.ReadAll(resp.Body)
+		t.Fatalf("download: status %d: %s", resp.StatusCode, b)
+	}
+	got, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if !bytes.Equal(got, content) {
+		t.Errorf("downloaded bytes mismatch: got %q want %q", got, content)
+	}
+}
+
+func TestFileFieldRequiredMissing(t *testing.T) {
+	state, _ := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	resp := doMultipartRequest(t, h, "POST", "/documents?id=doc1",
+		`{"title":"no file"}`,
+		nil,
+	)
+	if resp.StatusCode != 400 {
+		t.Fatalf("expected 400 when required file field missing, got %d", resp.StatusCode)
+	}
+}
+
+func TestFileFieldPatchOverwrites(t *testing.T) {
+	state, filesDir := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	first := []byte("first")
+	second := []byte("second version")
+	resp := doMultipartRequest(t, h, "POST", "/documents?id=doc1",
+		`{"title":"v1"}`, map[string][]byte{"body": first})
+	if resp.StatusCode != 200 {
+		t.Fatalf("create: %d", resp.StatusCode)
+	}
+	resp = doMultipartRequest(t, h, "PATCH", "/documents/doc1",
+		`{"title":"v2"}`, map[string][]byte{"body": second})
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("patch: %d: %v", resp.StatusCode, m)
+	}
+
+	onDisk := filepath.Join(filesDir, "documents", "doc1", "body")
+	got, err := os.ReadFile(onDisk)
+	if err != nil {
+		t.Fatalf("reading: %v", err)
+	}
+	if !bytes.Equal(got, second) {
+		t.Errorf("expected %q got %q", second, got)
+	}
+}
+
+func TestFileFieldDeleteCleansUp(t *testing.T) {
+	state, filesDir := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	resp := doMultipartRequest(t, h, "POST", "/documents?id=doc1",
+		`{"title":"doomed"}`, map[string][]byte{"body": []byte("bytes")})
+	if resp.StatusCode != 200 {
+		t.Fatalf("create: %d", resp.StatusCode)
+	}
+	onDisk := filepath.Join(filesDir, "documents", "doc1", "body")
+	if _, err := os.Stat(onDisk); err != nil {
+		t.Fatalf("file should exist: %v", err)
+	}
+
+	resp = doRequest(t, h, "DELETE", "/documents/doc1", "")
+	if resp.StatusCode != 204 {
+		t.Fatalf("delete: %d", resp.StatusCode)
+	}
+	if _, err := os.Stat(onDisk); !os.IsNotExist(err) {
+		t.Errorf("file should be cleaned up, stat err: %v", err)
+	}
+}
+
+// TestFileFieldResourceRecreate verifies that a resource with file fields
+// can be deleted and re-created. RemoveResource previously left the
+// auto-registered :download custom method behind, which then tripped
+// AddResource's "method already exists" guard on the second create.
+func TestFileFieldResourceRecreate(t *testing.T) {
+	state, _ := newTestStateWithFiles(t)
+	h := state.Handler()
+
+	create := func() *http.Response {
+		return doRequest(t, h, "POST", "/aep-resource-definitions?id=document", `{
+			"singular":"document",
+			"plural":"documents",
+			"schema":{"properties":{
+				"title":{"type":"string"},
+				"body":{"type":"binary","x-aepbase-file-field":true}
+			}}
+		}`)
+	}
+
+	resp := create()
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("first create: status %d: %v", resp.StatusCode, m)
+	}
+
+	resp = doRequest(t, h, "DELETE", "/aep-resource-definitions/document", "")
+	if resp.StatusCode != 204 {
+		t.Fatalf("delete: status %d", resp.StatusCode)
+	}
+
+	resp = create()
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("recreate: status %d: %v", resp.StatusCode, m)
+	}
+}
+
+// TestFileFieldDefinitionRoundTrip verifies that the meta GET handler echoes
+// x-aepbase-file-field: true inside the schema, matching what was sent on
+// POST. Without this, terraform's round-trip on
+// `aep_aep-resource-definition.schema` is lossy and the apply fails with
+// "Provider produced inconsistent result after apply".
+func TestFileFieldDefinitionRoundTrip(t *testing.T) {
+	state, _ := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	check := func(label string, body []byte) {
+		t.Helper()
+		var doc map[string]any
+		if err := json.Unmarshal(body, &doc); err != nil {
+			t.Fatalf("%s: invalid json: %v", label, err)
+		}
+		schema, ok := doc["schema"].(map[string]any)
+		if !ok {
+			t.Fatalf("%s: schema missing or not an object: %v", label, doc["schema"])
+		}
+		props, ok := schema["properties"].(map[string]any)
+		if !ok {
+			t.Fatalf("%s: properties missing: %v", label, schema)
+		}
+		bodyProp, ok := props["body"].(map[string]any)
+		if !ok {
+			t.Fatalf("%s: body property missing: %v", label, props)
+		}
+		if bodyProp["x-aepbase-file-field"] != true {
+			t.Errorf("%s: expected x-aepbase-file-field=true on body, got prop=%v", label, bodyProp)
+		}
+	}
+
+	// GET single
+	resp := doRequest(t, h, "GET", "/aep-resource-definitions/document", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("get def: %d", resp.StatusCode)
+	}
+	b, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	check("GET", b)
+
+	// LIST
+	resp = doRequest(t, h, "GET", "/aep-resource-definitions", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("list defs: %d", resp.StatusCode)
+	}
+	b, _ = io.ReadAll(resp.Body)
+	resp.Body.Close()
+	var listDoc struct {
+		Results []json.RawMessage `json:"results"`
+	}
+	if err := json.Unmarshal(b, &listDoc); err != nil {
+		t.Fatalf("list parse: %v", err)
+	}
+	for _, raw := range listDoc.Results {
+		var probe struct {
+			Singular string `json:"singular"`
+		}
+		json.Unmarshal(raw, &probe)
+		if probe.Singular == "document" {
+			check("LIST", raw)
+		}
+	}
+}
+
+func TestFileFieldOpenAPIExtension(t *testing.T) {
+	state, _ := newTestStateWithFiles(t)
+	h := state.Handler()
+	registerFileFieldResource(t, h)
+
+	resp := doRequest(t, h, "GET", "/openapi.json", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("openapi: %d", resp.StatusCode)
+	}
+	b, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if !strings.Contains(string(b), `"x-aepbase-file-field": true`) {
+		t.Errorf("openapi.json should contain x-aepbase-file-field extension; got:\n%s", string(b))
+	}
+}
+
+// TestFileFieldOpenAPIExtensionAfterPatch verifies that adding a file field
+// to an existing resource via PATCH updates openapi.json. Previously
+// UpdateResourceSchema did not sync the in-memory file-field tracking, so the
+// extension was silently dropped.
+func TestFileFieldOpenAPIExtensionAfterPatch(t *testing.T) {
+	state, filesDir := newTestStateWithFiles(t)
+	h := state.Handler()
+
+	// Create the resource without any file field.
+	body := `{
+		"singular":"document",
+		"plural":"documents",
+		"schema":{"properties":{
+			"title":{"type":"string"}
+		}}
+	}`
+	resp := doRequest(t, h, "POST", "/aep-resource-definitions?id=document", body)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create def: status %d: %v", resp.StatusCode, m)
+	}
+
+	// PATCH the schema to add a file field.
+	patch := `{
+		"schema":{"properties":{
+			"title":{"type":"string"},
+			"body":{"type":"binary","x-aepbase-file-field":true}
+		}}
+	}`
+	resp = doRequest(t, h, "PATCH", "/aep-resource-definitions/document", patch)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("patch def: status %d: %v", resp.StatusCode, m)
+	}
+
+	// openapi.json should now mark the body property with the extension.
+	resp = doRequest(t, h, "GET", "/openapi.json", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("openapi: %d", resp.StatusCode)
+	}
+	b, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if !strings.Contains(string(b), `"x-aepbase-file-field": true`) {
+		t.Errorf("openapi.json should contain x-aepbase-file-field extension after PATCH; got:\n%s", string(b))
+	}
+
+	// End-to-end: uploads should work on the newly file-fielded resource,
+	// and the auto-registered :download custom method should serve the bytes.
+	content := []byte("patched bytes")
+	resp = doMultipartRequest(t, h, "POST", "/documents?id=doc1",
+		`{"title":"hello"}`, map[string][]byte{"body": content})
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create after patch: status %d: %v", resp.StatusCode, m)
+	}
+	onDisk := filepath.Join(filesDir, "documents", "doc1", "body")
+	gotBytes, err := os.ReadFile(onDisk)
+	if err != nil {
+		t.Fatalf("reading file from disk: %v", err)
+	}
+	if !bytes.Equal(gotBytes, content) {
+		t.Errorf("disk bytes mismatch: got %q want %q", gotBytes, content)
+	}
+	resp = doRequest(t, h, "POST", "/documents/doc1:download", `{"field":"body"}`)
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("download after patch: status %d: %s", resp.StatusCode, body)
+	}
+	got, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if !bytes.Equal(got, content) {
+		t.Errorf("downloaded bytes mismatch: got %q want %q", got, content)
+	}
+}
+
+func keysOf(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// --- User Support Tests ---
+
+// testAdminPassword is the password for the admin superuser that the
+// user-support test helpers provision via provisionAdmin.
+const testAdminPassword = "admin-test-pass"
+
+// provisionAdmin inserts the admin@example.com superuser used across the
+// user-support tests. It replaces the old auto-bootstrap behavior; EnableUsers
+// must have been called on state first.
+func provisionAdmin(t *testing.T, state *aepbase.State) {
+	t.Helper()
+	if _, err := user.CreateSuperuser(state.DB, "admin@example.com", "Admin", testAdminPassword); err != nil {
+		t.Fatalf("CreateSuperuser: %v", err)
+	}
+}
+
+func newTestStateWithUsers(t *testing.T) (*aepbase.State, http.Handler) {
+	t.Helper()
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	provisionAdmin(t, state)
+	return state, state.Handler()
+}
+
+// TestCreateSuperuser exercises the entry point behind the `create-superuser`
+// CLI subcommand: it writes a superuser to the on-disk database that a server
+// started against the same database can then authenticate.
+func TestCreateSuperuser(t *testing.T) {
+	dir := t.TempDir()
+	opts := aepbase.ServerOptions{DataDir: dir, DBFile: "test.db"}
+
+	if err := aepbase.CreateSuperuser(opts, "root@example.com", "Root", "rootpass"); err != nil {
+		t.Fatalf("CreateSuperuser: %v", err)
+	}
+
+	// A duplicate email is reported as ErrEmailExists.
+	if err := aepbase.CreateSuperuser(opts, "root@example.com", "Root", "rootpass"); !errors.Is(err, user.ErrEmailExists) {
+		t.Fatalf("expected ErrEmailExists, got %v", err)
+	}
+
+	// Email and password are required.
+	if err := aepbase.CreateSuperuser(opts, "", "", "pw"); err == nil {
+		t.Fatal("expected error for missing email")
+	}
+	if err := aepbase.CreateSuperuser(opts, "x@example.com", "", ""); err == nil {
+		t.Fatal("expected error for missing password")
+	}
+
+	// A server backed by the same database authenticates the new superuser.
+	d, err := db.Init(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	h := state.Handler()
+
+	resp := doAuthRequest(t, h, "POST", "/users/:login", `{"email":"root@example.com","password":"rootpass"}`, "")
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("login as created superuser: expected 200, got %d %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	u := m["user"].(map[string]any)
+	if u["type"] != "superuser" {
+		t.Fatalf("expected type superuser, got %v", u["type"])
+	}
+}
+
+func doAuthRequest(t *testing.T, handler http.Handler, method, path, body, token string) *http.Response {
+	t.Helper()
+	var bodyReader io.Reader
+	if body != "" {
+		bodyReader = strings.NewReader(body)
+	}
+	req := httptest.NewRequest(method, path, bodyReader)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	return w.Result()
+}
+
+// loginAdmin logs in as admin@example.com with the given password and returns the token.
+func loginAdmin(t *testing.T, h http.Handler, password string) string {
+	t.Helper()
+	body := fmt.Sprintf(`{"email":"admin@example.com","password":"%s"}`, password)
+	resp := doAuthRequest(t, h, "POST", "/users/:login", body, "")
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("login failed: %d %v", resp.StatusCode, m)
+	}
+	m := readJSON(t, resp)
+	token, ok := m["token"].(string)
+	if !ok || token == "" {
+		t.Fatalf("login response missing token: %v", m)
+	}
+	return token
+}
+
+func TestUsersDisabledByDefault(t *testing.T) {
+	state := newTestState(t)
+	if state.UsersEnabled() {
+		t.Fatal("users should be disabled by default")
+	}
+	// Requests should work without auth.
+	h := state.Handler()
+	createResource(t, h, "", "widget", "widgets", nil, map[string]any{
+		"color": map[string]any{"type": "string"},
+	})
+	resp := doRequest(t, h, "GET", "/widgets", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+}
+
+func TestUsersRequireAuth(t *testing.T) {
+	_, h := newTestStateWithUsers(t)
+	// Unauthenticated request should fail.
+	resp := doAuthRequest(t, h, "GET", "/aep-resource-definitions", "", "")
+	if resp.StatusCode != 401 {
+		t.Fatalf("expected 401, got %d", resp.StatusCode)
+	}
+}
+
+func TestOpenAPIExemptFromAuth(t *testing.T) {
+	_, h := newTestStateWithUsers(t)
+	// openapi.json should be accessible without authentication even when
+	// users are enabled.
+	resp := doAuthRequest(t, h, "GET", "/openapi.json", "", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+}
+
+func TestLoginLogout(t *testing.T) {
+	_, h := newTestStateWithUsers(t)
+
+	// Login with wrong password should fail.
+	resp := doAuthRequest(t, h, "POST", "/users/:login", `{"email":"admin@example.com","password":"wrong"}`, "")
+	if resp.StatusCode != 401 {
+		t.Fatalf("expected 401 for wrong password, got %d", resp.StatusCode)
+	}
+
+	// Login with the correct password succeeds and returns a usable token.
+	token := loginAdmin(t, h, testAdminPassword)
+	resp = doAuthRequest(t, h, "GET", "/users", "", token)
+	if resp.StatusCode != 200 {
+		t.Fatalf("list users with token: expected 200, got %d", resp.StatusCode)
+	}
+
+	// After logout the token is revoked.
+	resp = doAuthRequest(t, h, "POST", "/users/:logout", "", token)
+	if resp.StatusCode != 200 {
+		t.Fatalf("logout: expected 200, got %d", resp.StatusCode)
+	}
+	resp = doAuthRequest(t, h, "GET", "/users", "", token)
+	if resp.StatusCode != 401 {
+		t.Fatalf("list users after logout: expected 401, got %d", resp.StatusCode)
+	}
+}
+
+// TestFullUserFlow provisions an admin superuser, then exercises the full CRUD
+// and auth flow.
+func TestFullUserFlow(t *testing.T) {
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	provisionAdmin(t, state)
+
+	h := state.Handler()
+
+	// Login as admin.
+	adminToken := loginAdmin(t, h, testAdminPassword)
+
+	// List users as admin (superuser).
+	resp := doAuthRequest(t, h, "GET", "/users", "", adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("list users: expected 200, got %d", resp.StatusCode)
+	}
+	listResult := readJSON(t, resp)
+	results := listResult["results"].([]any)
+	if len(results) != 1 {
+		t.Fatalf("expected 1 user, got %d", len(results))
+	}
+
+	// Create a regular user.
+	resp = doAuthRequest(t, h, "POST", "/users", `{"email":"alice@example.com","password":"alice123","display_name":"Alice","type":"regular"}`, adminToken)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create user: expected 200, got %d: %v", resp.StatusCode, m)
+	}
+	aliceData := readJSON(t, resp)
+	aliceID := aliceData["id"].(string)
+
+	// Login as alice.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"alice@example.com","password":"alice123"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("alice login: expected 200, got %d", resp.StatusCode)
+	}
+	aliceLogin := readJSON(t, resp)
+	aliceToken := aliceLogin["token"].(string)
+
+	// Alice can get her own user.
+	resp = doAuthRequest(t, h, "GET", "/users/"+aliceID, "", aliceToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("alice get self: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Alice cannot list users.
+	resp = doAuthRequest(t, h, "GET", "/users", "", aliceToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("alice list users: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Alice cannot create users.
+	resp = doAuthRequest(t, h, "POST", "/users", `{"email":"bob@example.com","password":"bob123","type":"regular"}`, aliceToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("alice create user: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Alice cannot get admin's user record.
+	adminUser := results[0].(map[string]any)
+	adminID := adminUser["id"].(string)
+	resp = doAuthRequest(t, h, "GET", "/users/"+adminID, "", aliceToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("alice get admin: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Admin can delete alice.
+	resp = doAuthRequest(t, h, "DELETE", "/users/"+aliceID, "", adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("admin delete alice: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Alice's token should now be invalid.
+	resp = doAuthRequest(t, h, "GET", "/users/"+aliceID, "", aliceToken)
+	if resp.StatusCode != 401 {
+		t.Fatalf("alice after delete: expected 401, got %d", resp.StatusCode)
+	}
+
+	// Logout admin.
+	resp = doAuthRequest(t, h, "POST", "/users/:logout", "", adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("admin logout: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Admin token should now be invalid.
+	resp = doAuthRequest(t, h, "GET", "/users", "", adminToken)
+	if resp.StatusCode != 401 {
+		t.Fatalf("admin after logout: expected 401, got %d", resp.StatusCode)
+	}
+}
+
+func TestUserScopedChildResources(t *testing.T) {
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	provisionAdmin(t, state)
+
+	h := state.Handler()
+	adminToken := loginAdmin(t, h, testAdminPassword)
+
+	// Create a child resource under users: users/{user_id}/preferences
+	resp := doAuthRequest(t, h, "POST", "/aep-resource-definitions", `{
+		"singular": "preference",
+		"plural": "preferences",
+		"parents": ["user"],
+		"schema": {"properties": {"theme": {"type": "string"}}}
+	}`, adminToken)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create preference resource: %d: %v", resp.StatusCode, m)
+	}
+
+	// Create two regular users.
+	resp = doAuthRequest(t, h, "POST", "/users", `{"email":"user1@test.com","password":"pass1","type":"regular"}`, adminToken)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create user1: %d %v", resp.StatusCode, m)
+	}
+	user1 := readJSON(t, resp)
+	user1ID := user1["id"].(string)
+
+	resp = doAuthRequest(t, h, "POST", "/users", `{"email":"user2@test.com","password":"pass2","type":"regular"}`, adminToken)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create user2: %d %v", resp.StatusCode, m)
+	}
+	user2 := readJSON(t, resp)
+	user2ID := user2["id"].(string)
+
+	// Login as user1.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"user1@test.com","password":"pass1"}`, "")
+	user1Login := readJSON(t, resp)
+	user1Token := user1Login["token"].(string)
+
+	// Login as user2.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"user2@test.com","password":"pass2"}`, "")
+	user2Login := readJSON(t, resp)
+	user2Token := user2Login["token"].(string)
+
+	// User1 creates a preference.
+	resp = doAuthRequest(t, h, "POST", fmt.Sprintf("/users/%s/preferences", user1ID), `{"theme":"dark"}`, user1Token)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("user1 create preference: %d %v", resp.StatusCode, m)
+	}
+
+	// User1 can list their own preferences.
+	resp = doAuthRequest(t, h, "GET", fmt.Sprintf("/users/%s/preferences", user1ID), "", user1Token)
+	if resp.StatusCode != 200 {
+		t.Fatalf("user1 list own preferences: expected 200, got %d", resp.StatusCode)
+	}
+
+	// User2 CANNOT list user1's preferences.
+	resp = doAuthRequest(t, h, "GET", fmt.Sprintf("/users/%s/preferences", user1ID), "", user2Token)
+	if resp.StatusCode != 403 {
+		t.Fatalf("user2 list user1 preferences: expected 403, got %d", resp.StatusCode)
+	}
+
+	// User2 can access their own (empty) preferences.
+	resp = doAuthRequest(t, h, "GET", fmt.Sprintf("/users/%s/preferences", user2ID), "", user2Token)
+	if resp.StatusCode != 200 {
+		t.Fatalf("user2 list own preferences: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Admin (superuser) can list user1's preferences.
+	resp = doAuthRequest(t, h, "GET", fmt.Sprintf("/users/%s/preferences", user1ID), "", adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("admin list user1 preferences: expected 200, got %d", resp.StatusCode)
+	}
+}
+
+func TestUserUpdateSelf(t *testing.T) {
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	provisionAdmin(t, state)
+
+	h := state.Handler()
+	adminToken := loginAdmin(t, h, testAdminPassword)
+
+	// Create a regular user.
+	resp := doAuthRequest(t, h, "POST", "/users", `{"email":"bob@test.com","password":"bobpass","type":"regular"}`, adminToken)
+	bob := readJSON(t, resp)
+	bobID := bob["id"].(string)
+
+	// Login as bob.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"bob@test.com","password":"bobpass"}`, "")
+	bobLogin := readJSON(t, resp)
+	bobToken := bobLogin["token"].(string)
+
+	// Bob can update his own display name.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"display_name":"Bob Updated"}`, bobToken)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("bob update self: expected 200, got %d %v", resp.StatusCode, m)
+	}
+	updated := readJSON(t, resp)
+	if updated["display_name"] != "Bob Updated" {
+		t.Fatalf("expected display_name 'Bob Updated', got %v", updated["display_name"])
+	}
+
+	// Bob cannot change his own type to superuser.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"type":"superuser"}`, bobToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("bob promote self: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Bob can change his own password.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"password":"newpass"}`, bobToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("bob change password: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Old login should still work (existing token), but new login uses new password.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"bob@test.com","password":"newpass"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("bob login with new password: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Bob can change his own email, and the new email works for login.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"email":"bob2@test.com"}`, bobToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("bob change email: expected 200, got %d", resp.StatusCode)
+	}
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"bob2@test.com","password":"newpass"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("bob login with new email: expected 200, got %d", resp.StatusCode)
+	}
+}
+
+// TestUserUpdatePermissions verifies that regular users cannot change another
+// user's password or email, that superusers can, and that unauthenticated
+// PATCH requests are rejected.
+func TestUserUpdatePermissions(t *testing.T) {
+	d, err := db.Init(":memory:")
+	if err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	t.Cleanup(func() { d.Close() })
+	state := aepbase.NewState(d, "http://localhost:8080")
+
+	if err := state.EnableUsers(); err != nil {
+		t.Fatalf("EnableUsers: %v", err)
+	}
+	provisionAdmin(t, state)
+
+	h := state.Handler()
+	adminToken := loginAdmin(t, h, testAdminPassword)
+
+	// Create two regular users.
+	resp := doAuthRequest(t, h, "POST", "/users", `{"email":"alice@test.com","password":"alicepass","type":"regular"}`, adminToken)
+	alice := readJSON(t, resp)
+	aliceID := alice["id"].(string)
+
+	resp = doAuthRequest(t, h, "POST", "/users", `{"email":"bob@test.com","password":"bobpass","type":"regular"}`, adminToken)
+	bob := readJSON(t, resp)
+	bobID := bob["id"].(string)
+
+	// Login as alice.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"alice@test.com","password":"alicepass"}`, "")
+	aliceLogin := readJSON(t, resp)
+	aliceToken := aliceLogin["token"].(string)
+
+	// Alice cannot change bob's password.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"password":"hacked"}`, aliceToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("alice change bob password: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Alice cannot change bob's email.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"email":"hacked@test.com"}`, aliceToken)
+	if resp.StatusCode != 403 {
+		t.Fatalf("alice change bob email: expected 403, got %d", resp.StatusCode)
+	}
+
+	// Bob's original credentials still work.
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"bob@test.com","password":"bobpass"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("bob original login after failed hijack: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Unauthenticated PATCH is rejected.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+bobID, `{"password":"newpass"}`, "")
+	if resp.StatusCode != 401 {
+		t.Fatalf("unauthenticated update: expected 401, got %d", resp.StatusCode)
+	}
+
+	// Superuser can change another user's password.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+aliceID, `{"password":"adminset"}`, adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("admin change alice password: expected 200, got %d", resp.StatusCode)
+	}
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"alice@test.com","password":"adminset"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("alice login with admin-set password: expected 200, got %d", resp.StatusCode)
+	}
+
+	// Superuser can change another user's email.
+	resp = doAuthRequest(t, h, "PATCH", "/users/"+aliceID, `{"email":"alice2@test.com"}`, adminToken)
+	if resp.StatusCode != 200 {
+		t.Fatalf("admin change alice email: expected 200, got %d", resp.StatusCode)
+	}
+	resp = doAuthRequest(t, h, "POST", "/users/:login", `{"email":"alice2@test.com","password":"adminset"}`, "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("alice login with new email: expected 200, got %d", resp.StatusCode)
+	}
+}
+
+// TestKebabCaseParentFK creates a parent with a kebab-case singular
+// ("gift-card") and a child of that parent ("transaction"), then POSTs a
+// child via the nested URL. Before the fix in extractDirectParentIDs the
+// child insert hit a NOT NULL constraint because the parent FK column was
+// never populated — `extractDirectParentIDs` was building the param name
+// from the raw singular ("gift-card_id") while the URL pattern uses
+// underscores ("gift_card_id"), so the lookup missed and the FK column
+// went into the SQL with a nil value.
+func TestKebabCaseParentFK(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "gift-card", "gift-card", "gift-cards", nil, map[string]any{
+		"merchant": map[string]any{"type": "string"},
+	})
+	createResource(t, h, "transaction", "transaction", "transactions", []string{"gift-card"}, map[string]any{
+		"amount": map[string]any{"type": "number"},
+	})
+
+	resp := doRequest(t, h, "POST", "/gift-cards?id=gc1", `{"merchant":"x"}`)
+	if resp.StatusCode != 200 {
+		t.Fatalf("create gift-card: %d", resp.StatusCode)
+	}
+	resp = doRequest(t, h, "POST", "/gift-cards/gc1/transactions?id=tx1", `{"amount":5}`)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create transaction: status %d: %v", resp.StatusCode, m)
+	}
+
+	// And confirm the FK is queryable: listing the parent's children must
+	// return the just-created row.
+	resp = doRequest(t, h, "GET", "/gift-cards/gc1/transactions", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("list children: %d", resp.StatusCode)
+	}
+	m := readJSON(t, resp)
+	results, _ := m["results"].([]any)
+	if len(results) != 1 {
+		t.Fatalf("expected 1 child, got %d", len(results))
+	}
+}
+
+// TestObjectFieldJSONBinding verifies that an `object` schema property can
+// hold a real map without the SQL driver tripping on it. Before the fix in
+// store.go's bindFieldValue, Insert/Update passed map[string]any straight to
+// db.Exec, which the SQLite driver rejects with "unsupported type
+// map[string]interface{}, a map".
+func TestObjectFieldJSONBinding(t *testing.T) {
+	state := newTestState(t)
+	h := state.Handler()
+
+	createResource(t, h, "widget", "widget", "widgets", nil, map[string]any{
+		"name":     map[string]any{"type": "string"},
+		"settings": map[string]any{"type": "object"},
+	})
+
+	body := `{"name":"x","settings":{"theme":"dark","count":3}}`
+	resp := doRequest(t, h, "POST", "/widgets?id=w1", body)
+	if resp.StatusCode != 200 {
+		m := readJSON(t, resp)
+		t.Fatalf("create widget with object field: status %d: %v", resp.StatusCode, m)
+	}
+
+	// Round-trip: read back and verify the map survived.
+	resp = doRequest(t, h, "GET", "/widgets/w1", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("get widget: %d", resp.StatusCode)
+	}
+	got := readJSON(t, resp)
+	settings, ok := got["settings"]
+	if !ok {
+		t.Fatalf("settings missing from response: %v", got)
+	}
+	// Marshal whatever the server returned back to JSON and compare against
+	// the original payload — handles both string and object representations.
+	b, _ := json.Marshal(settings)
+	s := string(b)
+	if !strings.Contains(s, `"theme":"dark"`) || !strings.Contains(s, `"count":3`) {
+		t.Errorf("settings did not round-trip cleanly: got %s", s)
+	}
+}
+
+// TestMiddleware_RunsOnEveryRequestInOrder verifies that middleware registered
+// via State.Use runs on every request and that multiple middlewares execute in
+// registration order (first registered is outermost).
+func TestMiddleware_RunsOnEveryRequestInOrder(t *testing.T) {
+	s := newTestState(t)
+
+	var order []string
+	s.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			order = append(order, "A-before")
+			next.ServeHTTP(w, r)
+			order = append(order, "A-after")
+		})
+	})
+	s.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			order = append(order, "B-before")
+			next.ServeHTTP(w, r)
+			order = append(order, "B-after")
+		})
+	})
+
+	resp := doRequest(t, s.Handler(), "GET", "/openapi.json", "")
+	if resp.StatusCode != 200 {
+		t.Fatalf("openapi: %d", resp.StatusCode)
+	}
+	got := strings.Join(order, ",")
+	want := "A-before,B-before,B-after,A-after"
+	if got != want {
+		t.Errorf("middleware order: got %q want %q", got, want)
+	}
+}
+
+// TestMiddleware_CanShortCircuit verifies that middleware can respond without
+// calling next, blocking downstream handlers.
+func TestMiddleware_CanShortCircuit(t *testing.T) {
+	s := newTestState(t)
+	s.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusTeapot)
+		})
+	})
+	resp := doRequest(t, s.Handler(), "GET", "/openapi.json", "")
+	if resp.StatusCode != http.StatusTeapot {
+		t.Errorf("short-circuit: got %d want 418", resp.StatusCode)
+	}
+}
+
+// Ensure unused imports are consumed.
+var _ = (*sql.DB)(nil)
+var _ = meta.ResourceDefinition{}
