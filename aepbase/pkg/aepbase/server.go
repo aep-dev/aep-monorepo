@@ -1,0 +1,251 @@
+package aepbase
+
+import (
+	"database/sql"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/openapi"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/db"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/meta"
+	"github.com/aep-dev/aep-monorepo/aepbase/pkg/user"
+)
+
+// ServerOptions configures an aepbase server.
+// Zero-value fields use sensible defaults (port 8080, DB "aepbase.db").
+type ServerOptions struct {
+	Port     int
+	DataDir  string
+	DBFile   string
+	InMemory bool
+	// Defaults to ["https://ui.aep.dev"]. Setting this replaces the default.
+	CORSAllowedOrigins []string
+	// Turns CORS off entirely (no headers sent, default origin not added).
+	DisableCORS     bool
+	CustomMethods   []CustomMethodOption
+	ExportResources bool
+	// EnableFileFields turns on experimental support for file-field properties
+	// on resources (schema extension x-aepbase-file-field: true). File fields
+	// are NOT part of the AEP specification and this option is intentionally
+	// library-only — it is not registered as a CLI flag, so `main.go` cannot
+	// enable it. Off by default.
+	EnableFileFields bool
+	// EnableUsers turns on user authentication and authorization. When enabled,
+	// all API requests (except login) require a valid Bearer token. A default
+	// superuser is created on first run. This option is intentionally
+	// library-only — it is not registered as a CLI flag. Off by default.
+	EnableUsers bool
+	// Middlewares are user-registered http handlers that run on every request,
+	// in registration order (first is outermost). They run after CORS preflight
+	// handling and, when EnableUsers is set, after the built-in auth middleware
+	// — so middleware here sees requests with the user already resolved (via
+	// user.FromContext) and unauthenticated requests are rejected before
+	// reaching it. To run middleware before auth (e.g. to see all requests,
+	// including 401s), call State.Use() before EnableUsers directly.
+	Middlewares []Middleware
+	corsRaw     string
+}
+
+// CustomMethodOption defines a custom method to register on a resource.
+// The Handler factory receives the initialized *sql.DB so handlers can
+// access the database without needing it at configuration time.
+type CustomMethodOption struct {
+	ResourceSingular string
+	MethodName       string
+	Method           string
+	RequestSchema    *openapi.Schema
+	ResponseSchema   *openapi.Schema
+	Handler          func(*sql.DB) http.HandlerFunc
+	// Async, when true, makes this a long-running operation.
+	// The handler runs in the background and callers receive an Operation
+	// resource (HTTP 202) that can be polled for completion.
+	Async bool
+}
+
+// RegisterFlags registers CLI flags for the server options.
+// If Port or DBPath are already set, their values are used as the flag defaults.
+// Call flag.Parse() after this method.
+func (o *ServerOptions) RegisterFlags() {
+	if o.Port == 0 {
+		o.Port = 8080
+	}
+	if o.DataDir == "" {
+		o.DataDir = "aepbase_data"
+	}
+	if o.DBFile == "" {
+		o.DBFile = "aepbase.db"
+	}
+	flag.IntVar(&o.Port, "port", o.Port, "port to listen on")
+	flag.StringVar(&o.DataDir, "data-dir", o.DataDir, "directory for database files")
+	flag.StringVar(&o.DBFile, "db", o.DBFile, "database file name")
+	flag.StringVar(&o.corsRaw, "cors-allowed-origins", "", "comma-separated list of allowed CORS origins, replacing the default (https://ui.aep.dev)")
+	flag.BoolVar(&o.DisableCORS, "disable-cors", false, "disable CORS entirely (no Access-Control-* headers)")
+	flag.BoolVar(&o.ExportResources, "export-resources", false, "output the OpenAPI spec for user-defined resources only (excludes built-in endpoints) and exit")
+}
+
+// Run initializes the database, loads existing resources, registers custom
+// methods, and starts the HTTP server. It blocks until the server exits.
+func Run(opts ServerOptions) error {
+	if opts.Port == 0 {
+		opts.Port = 8080
+	}
+	if opts.DataDir == "" {
+		opts.DataDir = "aepbase_data"
+	}
+	if opts.DBFile == "" {
+		opts.DBFile = "aepbase.db"
+	}
+	// If RegisterFlags was used, merge the parsed CORS flag.
+	if opts.corsRaw != "" && len(opts.CORSAllowedOrigins) == 0 {
+		opts.CORSAllowedOrigins = strings.Split(opts.corsRaw, ",")
+	}
+	if opts.DisableCORS {
+		opts.CORSAllowedOrigins = nil
+	} else if len(opts.CORSAllowedOrigins) == 0 {
+		opts.CORSAllowedOrigins = []string{"https://ui.aep.dev"}
+	}
+
+	serverURL := fmt.Sprintf("http://localhost:%d", opts.Port)
+
+	var dbPath string
+	if opts.InMemory {
+		dbPath = ":memory:"
+	} else {
+		dbPath = filepath.Join(opts.DataDir, opts.DBFile)
+	}
+	d, err := db.Init(dbPath)
+	if err != nil {
+		return fmt.Errorf("failed to initialize database: %v", err)
+	}
+	defer d.Close()
+
+	state := NewState(d, serverURL)
+	state.CORSAllowedOrigins = opts.CORSAllowedOrigins
+	if opts.EnableFileFields {
+		state.EnableFileFields(filepath.Join(opts.DataDir, "files"))
+	}
+	// Enable users before registering user-provided middleware so the built-in
+	// auth middleware is the outermost wrapper and runs first — user
+	// middleware then sees requests with the authenticated user resolved.
+	if opts.EnableUsers {
+		if err := state.EnableUsers(); err != nil {
+			return fmt.Errorf("failed to enable users: %v", err)
+		}
+	}
+	if len(opts.Middlewares) > 0 {
+		state.Use(opts.Middlewares...)
+	}
+
+	// Load existing resource definitions from a previous run.
+	defs, err := meta.LoadAll(d)
+	if err != nil {
+		return fmt.Errorf("failed to load resource definitions: %v", err)
+	}
+	defs = topoSortDefs(defs)
+	for _, def := range defs {
+		if err := state.AddResource(def); err != nil {
+			return fmt.Errorf("failed to restore resource %q: %v", def.Singular, err)
+		}
+		log.Printf("restored resource: %s (%s)", def.Singular, def.Plural)
+	}
+
+	// If --export-resources is set, output the filtered OpenAPI spec and exit.
+	if opts.ExportResources {
+		jsonBytes, err := state.ExportUserResourcesOpenAPI()
+		if err != nil {
+			return fmt.Errorf("failed to export OpenAPI spec: %v", err)
+		}
+		os.Stdout.Write(jsonBytes)
+		os.Stdout.Write([]byte("\n"))
+		return nil
+	}
+
+	// Register custom methods.
+	for _, cm := range opts.CustomMethods {
+		if err := state.AddCustomMethod(cm.ResourceSingular, cm.MethodName, CustomMethodConfig{
+			Method:         cm.Method,
+			RequestSchema:  cm.RequestSchema,
+			ResponseSchema: cm.ResponseSchema,
+			Handler:        cm.Handler(d),
+			Async:          cm.Async,
+		}); err != nil {
+			return fmt.Errorf("failed to register custom method %q: %v", cm.MethodName, err)
+		}
+	}
+
+	log.Printf("aepbase listening on %s", serverURL)
+	log.Printf("OpenAPI spec at %s/openapi.json", serverURL)
+	return http.ListenAndServe(fmt.Sprintf(":%d", opts.Port), state.Handler())
+}
+
+// CreateSuperuser opens the database configured by opts and inserts a new
+// superuser with the given email, display name, and password. The users table
+// is created if it does not yet exist, so this can be run before the server's
+// first start. It powers the `create-superuser` CLI subcommand, letting an
+// operator (or an automated system) provision access when EnableUsers is set.
+// Returns user.ErrEmailExists if a user with that email already exists.
+func CreateSuperuser(opts ServerOptions, email, displayName, password string) error {
+	if email == "" {
+		return fmt.Errorf("email is required")
+	}
+	if password == "" {
+		return fmt.Errorf("password is required")
+	}
+	if opts.DataDir == "" {
+		opts.DataDir = "aepbase_data"
+	}
+	if opts.DBFile == "" {
+		opts.DBFile = "aepbase.db"
+	}
+	dbPath := filepath.Join(opts.DataDir, opts.DBFile)
+	d, err := db.Init(dbPath)
+	if err != nil {
+		return fmt.Errorf("failed to initialize database: %w", err)
+	}
+	defer d.Close()
+
+	if err := user.CreateUsersTable(d); err != nil {
+		return fmt.Errorf("creating users table: %w", err)
+	}
+	if _, err := user.CreateSuperuser(d, email, displayName, password); err != nil {
+		return err
+	}
+	return nil
+}
+
+// topoSortDefs orders resource definitions so that parents come before children.
+func topoSortDefs(defs []meta.ResourceDefinition) []meta.ResourceDefinition {
+	byName := make(map[string]meta.ResourceDefinition, len(defs))
+	for _, d := range defs {
+		byName[d.Singular] = d
+	}
+
+	visited := make(map[string]bool, len(defs))
+	var sorted []meta.ResourceDefinition
+
+	var visit func(string)
+	visit = func(name string) {
+		if visited[name] {
+			return
+		}
+		visited[name] = true
+		d, ok := byName[name]
+		if !ok {
+			return
+		}
+		for _, p := range d.Parents {
+			visit(p)
+		}
+		sorted = append(sorted, d)
+	}
+
+	for _, d := range defs {
+		visit(d.Singular)
+	}
+	return sorted
+}

@@ -42,6 +42,9 @@ require (
 	github.com/mattn/go-runewidth v0.0.19
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/muesli/termenv v0.16.0
+	github.com/ncruces/go-sqlite3 v0.34.0
+	github.com/ncruces/go-sqlite3-wasm/v2 v2.1.35300
+	github.com/ncruces/julianday v1.0.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	github.com/rivo/uniseg v0.4.7
@@ -52,11 +55,12 @@ require (
 	github.com/stoewer/go-strcase v1.3.1
 	github.com/stretchr/testify v1.11.1
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e
+	golang.org/x/crypto v0.50.0
 	golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b
 	golang.org/x/net v0.48.0
 	golang.org/x/sync v0.19.0
-	golang.org/x/sys v0.39.0
-	golang.org/x/text v0.32.0
+	golang.org/x/sys v0.43.0
+	golang.org/x/text v0.36.0
 	google.golang.org/genproto v0.0.0-20251014184007-4626949a642f
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
@@ -67,4 +71,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	pluginrpc.com/pluginrpc v0.5.0
 )
-

@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "aepbase_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//aepbase/pkg/aepbase",
+        "//aepbase/pkg/user",
+    ],
+)
+
+go_binary(
+    name = "aepbase",
+    embed = [":aepbase_lib"],
+    visibility = ["//visibility:public"],
+)

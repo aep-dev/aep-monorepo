@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "oauth",
+    srcs = [
+        "handler.go",
+        "models.go",
+        "store.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/oauth",
+    visibility = ["//visibility:public"],
+    deps = ["//aepbase/pkg/user"],
+)

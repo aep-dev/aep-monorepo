@@ -1,0 +1,38 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "aepbase",
+    srcs = [
+        "aepbase.go",
+        "server.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbase",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aep-lib-go/pkg/api",
+        "//aep-lib-go/pkg/openapi",
+        "//aepbase/pkg/db",
+        "//aepbase/pkg/meta",
+        "//aepbase/pkg/oauth",
+        "//aepbase/pkg/operation",
+        "//aepbase/pkg/resource",
+        "//aepbase/pkg/user",
+    ],
+)
+
+go_test(
+    name = "aepbase_test",
+    srcs = [
+        "aepbase_test.go",
+        "oauth_additions_test.go",
+        "oauth_test.go",
+    ],
+    deps = [
+        ":aepbase",
+        "//aep-lib-go/pkg/openapi",
+        "//aepbase/pkg/db",
+        "//aepbase/pkg/meta",
+        "//aepbase/pkg/oauth",
+        "//aepbase/pkg/user",
+    ],
+)

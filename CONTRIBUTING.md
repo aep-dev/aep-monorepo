@@ -20,6 +20,7 @@ aep-monorepo/
 ├── DESIGN/                       # Architecture and design documents
 ├── aep-e2e-validator/            # End-to-end validator for AEP HTTP APIs
 ├── aep-lib-go/                   # Shared Go core libraries, types, and OpenAPI utilities
+├── aepbase/                      # Runtime-defined AEP resource server backed by SQLite
 ├── aepc/                         # Compiler/generator for AEP-compliant resource models
 ├── aepcli/                       # Command-line interface for interacting with AEP APIs
 ├── api-linter/                   # Protocol buffer linter for AEP rules
@@ -32,6 +33,7 @@ aep-monorepo/
 
 - [aep-e2e-validator](aep-e2e-validator): Runtime end-to-end conformance testing suite for AEP APIs.
 - [aep-lib-go](aep-lib-go): Common Go library with core types, OpenAPI parsing, and resource schema representations.
+- [aepbase](aepbase): Backend server exposing AEP-compliant resources defined at runtime.
 - [aepc](aepc): Compiler and code generator for AEP services.
 - [aepcli](aepcli): Command-line interface tool for interacting with AEP-compliant APIs.
 - [api-linter](api-linter): Protobuf linter enforcing AEP design rules and naming standards.
@@ -77,7 +79,7 @@ For IDE integration (`gopls`, VSCode, GoLand), the repository maintains Go works
 
 ## Dependency Management & Synchronization
 
-- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized across dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`).
+- Changes to shared libraries like [aep-lib-go](aep-lib-go) must be synchronized across dependent modules (`aepcli`, `aepc`, `aep-e2e-validator`, `aepbase`).
 - Synchronize all dependent module `go.mod` files and Bazel definitions automatically:
   ```bash
   just fix

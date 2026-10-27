@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "meta",
+    srcs = [
+        "handler.go",
+        "models.go",
+    ],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/meta",
+    visibility = ["//visibility:public"],
+    deps = ["//aep-lib-go/pkg/openapi"],
+)

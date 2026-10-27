@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "filestore",
+    srcs = ["filestore.go"],
+    importpath = "github.com/aep-dev/aep-monorepo/aepbase/pkg/filestore",
+    visibility = ["//visibility:public"],
+)
