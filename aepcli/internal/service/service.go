@@ -129,6 +129,10 @@ func (s *ServiceCommand) doRequest(r *http.Request) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to read response body: %v", err)
 	}
+	// Responses such as 204 No Content have no body to format.
+	if len(respBody) == 0 {
+		return &Result{"", resp.StatusCode}, nil
+	}
 	var prettyJSON bytes.Buffer
 	err = json.Indent(&prettyJSON, respBody, "", "  ")
 	if err != nil {
