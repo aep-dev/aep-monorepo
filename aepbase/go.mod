@@ -3,7 +3,7 @@ module github.com/aep-dev/aep-monorepo/aepbase
 go 1.25.0
 
 require (
-	github.com/aep-dev/aep-monorepo/aep-lib-go v0.1.1-0.20260901160652-11bfb44e55ed
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20261023185101-9822e16655bb
 	github.com/google/cel-go v0.22.1
 	github.com/ncruces/go-sqlite3 v0.34.0
 	golang.org/x/crypto v0.50.0

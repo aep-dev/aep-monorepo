@@ -196,6 +196,21 @@ From the monorepo root:
 bazel test //aepbase/...
 ```
 
+## Testing against aepbase
+
+The `aepbasetest` package starts an aepbase server backed by an in-memory database, so clients of AEP APIs can be tested against a real server instead of canned responses:
+
+```go
+import "github.com/aep-dev/aep-monorepo/aepbase/pkg/aepbasetest"
+
+func TestMyClient(t *testing.T) {
+    srv := aepbasetest.NewServer(t, aepbasetest.Bookstore()...)
+    // srv.URL serves the API; srv.OpenAPIURL() serves its OpenAPI spec.
+}
+```
+
+`NewServer` creates the given resource definitions through the resource definition API, and the server is closed when the test ends.
+
 ## License
 
 MIT
