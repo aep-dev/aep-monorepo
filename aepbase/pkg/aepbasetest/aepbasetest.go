@@ -23,6 +23,7 @@ import (
 
 // Server is an aepbase server backed by an in-memory database.
 type Server struct {
+	// Server is the underlying HTTP test server.
 	*httptest.Server
 	// State is the server's aepbase state, for tests that need to register
 	// custom methods or inspect the API directly.
@@ -62,14 +63,19 @@ func (s *Server) OpenAPIURL() string {
 }
 
 // CreateResourceDefinition creates def through the resource definition API,
-// using def.Singular as the ID, and fails the test if the request fails.
+// using def.ID as the ID (or def.Singular if def.ID is unset), and fails the
+// test if the request fails.
 func (s *Server) CreateResourceDefinition(t testing.TB, def meta.ResourceDefinition) {
 	t.Helper()
 	body, err := json.Marshal(def)
 	if err != nil {
 		t.Fatalf("aepbasetest: marshaling resource definition %q: %v", def.Singular, err)
 	}
-	u := s.URL + "/aep-resource-definitions?id=" + url.QueryEscape(def.Singular)
+	id := def.ID
+	if id == "" {
+		id = def.Singular
+	}
+	u := s.URL + "/aep-resource-definitions?id=" + url.QueryEscape(id)
 	resp, err := s.Client().Post(u, "application/json", bytes.NewReader(body))
 	if err != nil {
 		t.Fatalf("aepbasetest: creating resource definition %q: %v", def.Singular, err)
@@ -91,6 +97,7 @@ func Bookstore() []meta.ResourceDefinition {
 			Plural:         "publishers",
 			UserSettableId: true,
 			Schema: openapi.Schema{
+				Type: "object",
 				Properties: map[string]openapi.Schema{
 					"name":     {Type: "string"},
 					"location": {Type: "string"},
@@ -103,6 +110,7 @@ func Bookstore() []meta.ResourceDefinition {
 			Parents:        []string{"publisher"},
 			UserSettableId: true,
 			Schema: openapi.Schema{
+				Type: "object",
 				Properties: map[string]openapi.Schema{
 					"title":  {Type: "string"},
 					"author": {Type: "string"},
