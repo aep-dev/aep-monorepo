@@ -21,6 +21,7 @@ go_library(
 go_test(
     name = "service_test",
     srcs = [
+        "aepbase_test.go",
         "ca_test.go",
         "field_description_test.go",
         "flagtypes_test.go",
@@ -31,5 +32,6 @@ go_test(
     deps = [
         "//aep-lib-go/pkg/api",
         "//aep-lib-go/pkg/openapi",
+        "//aepbase/pkg/aepbasetest",
     ],
 )
