@@ -40,7 +40,11 @@ func execute(t *testing.T, svc *ServiceCommand, wantStatus int, args ...string) 
 	if err != nil {
 		t.Fatalf("Execute(%q): %v", args, err)
 	}
-	if wantStatus == 0 && result.StatusCode/100 != 2 || wantStatus != 0 && result.StatusCode != wantStatus {
+	if wantStatus == 0 {
+		if result.StatusCode < 200 || result.StatusCode >= 300 {
+			t.Fatalf("Execute(%q): expected 2xx status, got %d: %s", args, result.StatusCode, result.Output)
+		}
+	} else if result.StatusCode != wantStatus {
 		t.Fatalf("Execute(%q): expected status %d, got %d: %s", args, wantStatus, result.StatusCode, result.Output)
 	}
 	var body map[string]any
@@ -63,7 +67,10 @@ func TestAepbase_ResourceLifecycle(t *testing.T) {
 		t.Errorf("create: expected path publishers/acme/books/gatsby, got %v", body["path"])
 	}
 
-	execute(t, svc, http.StatusOK, "book", "--publisher", "acme", "update", "gatsby", "--author", "F. Scott Fitzgerald")
+	body = execute(t, svc, http.StatusOK, "book", "--publisher", "acme", "update", "gatsby", "--author", "F. Scott Fitzgerald")
+	if body["author"] != "F. Scott Fitzgerald" {
+		t.Errorf("update: unexpected author in response %v", body["author"])
+	}
 
 	body = execute(t, svc, http.StatusOK, "book", "--publisher", "acme", "get", "gatsby")
 	if body["title"] != "The Great Gatsby" || body["author"] != "F. Scott Fitzgerald" {
@@ -86,7 +93,11 @@ func TestAepbase_ResourceDefinitions(t *testing.T) {
 	got := map[string]bool{}
 	results, _ := body["results"].([]any)
 	for _, r := range results {
-		got[r.(map[string]any)["singular"].(string)] = true
+		if m, ok := r.(map[string]any); ok {
+			if s, ok := m["singular"].(string); ok {
+				got[s] = true
+			}
+		}
 	}
 	if !got["publisher"] || !got["book"] {
 		t.Errorf("list: expected publisher and book definitions, got %v", got)
