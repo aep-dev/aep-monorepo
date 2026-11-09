@@ -98,8 +98,8 @@ func TestNewServerCRUD(t *testing.T) {
 	}
 
 	status, _ = do(t, srv, "DELETE", "/publishers/acme/books/gatsby", "", "")
-	if status/100 != 2 {
-		t.Fatalf("delete book: expected 2xx, got %d", status)
+	if status != http.StatusNoContent {
+		t.Fatalf("delete book: expected 204 No Content, got %d", status)
 	}
 	status, _ = do(t, srv, "GET", "/publishers/acme/books/gatsby", "", "")
 	if status != http.StatusNotFound {
