@@ -54,10 +54,26 @@ func (v *Validator) Logger() *log.Logger {
 func (v *Validator) Run() int {
 	start := time.Now()
 
+	allResults, code := v.runTests()
+	if allResults == nil {
+		return code
+	}
+
+	if v.jsonOutput {
+		printJSON(allResults)
+	} else {
+		printSummary(allResults, time.Since(start))
+	}
+	return code
+}
+
+// runTests runs the configured tests and returns their results along with the
+// process exit code. The results are nil if the tests could not be run at all.
+func (v *Validator) runTests() ([]TestResult, int) {
 	doc, err := openapi.FetchOpenAPI(v.configPath)
 	if err != nil {
 		log.Printf("failed to fetch OpenAPI spec: %v", err)
-		return ExitCodePreconditionFailed // Or some other code for setup failure
+		return nil, ExitCodePreconditionFailed
 	}
 
 	serverURL := ""
@@ -68,12 +84,12 @@ func (v *Validator) Run() int {
 	aepAPI, err := api.GetAPI(doc, serverURL, "")
 	if err != nil {
 		log.Printf("failed to parse API: %v", err)
-		return ExitCodePreconditionFailed
+		return nil, ExitCodePreconditionFailed
 	}
 
 	if err := api.AddImplicitFieldsAndValidate(aepAPI); err != nil {
 		log.Printf("failed to validate API: %v", err)
-		return ExitCodePreconditionFailed
+		return nil, ExitCodePreconditionFailed
 	}
 
 	var allResults []TestResult
@@ -96,18 +112,16 @@ func (v *Validator) Run() int {
 		}
 		if targetResource == nil {
 			log.Printf("collection %s not found in API", v.collection)
-			return ExitCodePreconditionFailed
+			return nil, ExitCodePreconditionFailed
 		}
 		results := v.validateResource(targetResource)
 		allResults = append(allResults, results...)
 	}
 
-	if v.jsonOutput {
-		printJSON(allResults)
-	} else {
-		printSummary(allResults, time.Since(start))
+	if allResults == nil {
+		allResults = []TestResult{}
 	}
-	return worstExitCode(allResults)
+	return allResults, worstExitCode(allResults)
 }
 
 func (v *Validator) collectionURL(r *api.Resource) string {
