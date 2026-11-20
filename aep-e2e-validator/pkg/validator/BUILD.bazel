@@ -22,7 +22,14 @@ go_library(
 
 go_test(
     name = "validator_test",
-    srcs = ["validator_test.go"],
+    srcs = [
+        "aepbase_test.go",
+        "validator_test.go",
+    ],
     embed = [":validator"],
-    deps = ["//aep-lib-go/pkg/api"],
+    deps = [
+        "//aep-e2e-validator/pkg/tests",
+        "//aep-lib-go/pkg/api",
+        "//aepbase/pkg/aepbasetest",
+    ],
 )
