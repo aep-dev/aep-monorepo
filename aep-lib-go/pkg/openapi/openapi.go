@@ -20,12 +20,13 @@ const (
 
 type OpenAPI struct {
 	// oas 2.0 has swagger in the root.
-	Swagger    string               `json:"swagger,omitempty"`
-	Info       Info                 `json:"info"`
-	OpenAPI    string               `json:"openapi,omitempty"`
-	Servers    []Server             `json:"servers,omitempty"`
-	Paths      map[string]*PathItem `json:"paths"`
-	Components Components           `json:"components,omitempty"`
+	Swagger    string                `json:"swagger,omitempty"`
+	Info       Info                  `json:"info"`
+	OpenAPI    string                `json:"openapi,omitempty"`
+	Servers    []Server              `json:"servers,omitempty"`
+	Paths      map[string]*PathItem  `json:"paths"`
+	Components Components            `json:"components,omitempty"`
+	Security   []SecurityRequirement `json:"security,omitempty"`
 	// oas 2.0 has definitions in the root.
 	Definitions map[string]Schema `json:"definitions,omitempty"`
 }
@@ -136,17 +137,22 @@ type Operation struct {
 	Summary                  string                    `json:"summary,omitempty"`
 	Description              string                    `json:"description,omitempty"`
 	OperationID              string                    `json:"operationId,omitempty"`
+	Tags                     []string                  `json:"tags,omitempty"`
+	Deprecated               bool                      `json:"deprecated,omitempty"`
 	Parameters               []Parameter               `json:"parameters,omitempty"`
 	Responses                map[string]Response       `json:"responses,omitempty"`
 	RequestBody              *RequestBody              `json:"requestBody,omitempty"`
+	Security                 []SecurityRequirement     `json:"security,omitempty"`
 	XAEPLongRunningOperation *XAEPLongRunningOperation `json:"x-aep-long-running-operation,omitempty"`
 }
 
 type Parameter struct {
+	Ref         string     `json:"$ref,omitempty"`
 	Name        string     `json:"name,omitempty"`
 	In          string     `json:"in,omitempty"`
 	Description string     `json:"description,omitempty"`
 	Required    bool       `json:"required,omitempty"`
+	Deprecated  bool       `json:"deprecated,omitempty"`
 	Schema      *Schema    `json:"schema,omitempty"`
 	Type        string     `json:"type,omitempty"`
 	XAEPField   *XAEPField `json:"x-aep-field,omitempty"`
@@ -171,6 +177,11 @@ type MediaType struct {
 	Schema *Schema `json:"schema,omitempty"`
 }
 
+type Discriminator struct {
+	PropertyName string            `json:"propertyName"`
+	Mapping      map[string]string `json:"mapping,omitempty"`
+}
+
 type Schema struct {
 	Type         string        `json:"type,omitempty"`
 	Format       string        `json:"format,omitempty"`
@@ -183,17 +194,103 @@ type Schema struct {
 	/// If unset, proto generation will not create a proto message for this schema.
 	XAEPProtoMessageName string   `json:"x-aep-proto-message-name,omitempty"`
 	ReadOnly             bool     `json:"readOnly,omitempty"`
+	WriteOnly            bool     `json:"writeOnly,omitempty"`
 	Required             []string `json:"required,omitempty"`
 	Description          string   `json:"description,omitempty"`
 	// AdditionalProperties can be a bool and an object - this allows
 	// handling for both.
 	AdditionalProperties json.RawMessage `json:"additionalProperties,omitempty"`
+
+	// Composition & polymorphism
+	OneOf         []Schema       `json:"oneOf,omitempty"`
+	AnyOf         []Schema       `json:"anyOf,omitempty"`
+	AllOf         []Schema       `json:"allOf,omitempty"`
+	Discriminator *Discriminator `json:"discriminator,omitempty"`
+
+	// Enums, defaults, nullability, and lifecycle
+	Enum       []any           `json:"enum,omitempty"`
+	Default    json.RawMessage `json:"default,omitempty"`
+	Nullable   bool            `json:"nullable,omitempty"`
+	Deprecated bool            `json:"deprecated,omitempty"`
+
+	// Validation constraints
+	MinLength   *int     `json:"minLength,omitempty"`
+	MaxLength   *int     `json:"maxLength,omitempty"`
+	Pattern     string   `json:"pattern,omitempty"`
+	Minimum     *float64 `json:"minimum,omitempty"`
+	Maximum     *float64 `json:"maximum,omitempty"`
+	MinItems    *int     `json:"minItems,omitempty"`
+	MaxItems    *int     `json:"maxItems,omitempty"`
+	UniqueItems bool     `json:"uniqueItems,omitempty"`
+}
+
+// UnmarshalJSON supports both OpenAPI 3.0 string types (with nullable: true)
+// and OpenAPI 3.1 type arrays such as ["string", "null"].
+func (s *Schema) UnmarshalJSON(data []byte) error {
+	type schemaAlias Schema
+	aux := &struct {
+		RawType json.RawMessage `json:"type,omitempty"`
+		*schemaAlias
+	}{
+		schemaAlias: (*schemaAlias)(s),
+	}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+	if len(aux.RawType) > 0 && string(aux.RawType) != "null" {
+		var single string
+		if err := json.Unmarshal(aux.RawType, &single); err == nil {
+			s.Type = single
+		} else {
+			var list []string
+			if err := json.Unmarshal(aux.RawType, &list); err != nil {
+				return fmt.Errorf("invalid schema type %s: %w", string(aux.RawType), err)
+			}
+			for _, t := range list {
+				if t == "null" {
+					s.Nullable = true
+				} else if s.Type == "" {
+					s.Type = t
+				}
+			}
+		}
+	}
+	return nil
 }
 
 type Properties map[string]Schema
 
 type Components struct {
-	Schemas map[string]Schema `json:"schemas"`
+	Schemas         map[string]Schema         `json:"schemas"`
+	SecuritySchemes map[string]SecurityScheme `json:"securitySchemes,omitempty"`
+}
+
+// SecurityRequirement maps a security scheme name to the list of required scopes.
+type SecurityRequirement map[string][]string
+
+type SecurityScheme struct {
+	Type             string      `json:"type"`
+	Description      string      `json:"description,omitempty"`
+	Name             string      `json:"name,omitempty"`
+	In               string      `json:"in,omitempty"`
+	Scheme           string      `json:"scheme,omitempty"`
+	BearerFormat     string      `json:"bearerFormat,omitempty"`
+	Flows            *OAuthFlows `json:"flows,omitempty"`
+	OpenIDConnectURL string      `json:"openIdConnectUrl,omitempty"`
+}
+
+type OAuthFlows struct {
+	Implicit          *OAuthFlow `json:"implicit,omitempty"`
+	Password          *OAuthFlow `json:"password,omitempty"`
+	ClientCredentials *OAuthFlow `json:"clientCredentials,omitempty"`
+	AuthorizationCode *OAuthFlow `json:"authorizationCode,omitempty"`
+}
+
+type OAuthFlow struct {
+	AuthorizationURL string            `json:"authorizationUrl,omitempty"`
+	TokenURL         string            `json:"tokenUrl,omitempty"`
+	RefreshURL       string            `json:"refreshUrl,omitempty"`
+	Scopes           map[string]string `json:"scopes,omitempty"`
 }
 
 type XAEPResource struct {
@@ -212,10 +309,15 @@ type XAEPField struct {
 }
 
 type XAEPLongRunningOperation struct {
-	Response XAEPLongRunningOperationResponse `json:"response,omitempty"`
+	Response XAEPLongRunningOperationResponse  `json:"response,omitempty"`
+	Metadata *XAEPLongRunningOperationMetadata `json:"metadata,omitempty"`
 }
 
 type XAEPLongRunningOperationResponse struct {
+	Schema *Schema `json:"schema,omitempty"`
+}
+
+type XAEPLongRunningOperationMetadata struct {
 	Schema *Schema `json:"schema,omitempty"`
 }
 
