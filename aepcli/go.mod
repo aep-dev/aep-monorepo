@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.4.0
-	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20261023185101-9822e16655bb
+	github.com/aep-dev/aep-monorepo/aep-lib-go v0.0.0-20261127231358-84497231b2fb
 	github.com/aep-dev/aep-monorepo/aepbase v0.0.0-20261027053501-033aa500b9d3
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
