@@ -588,6 +588,266 @@ func TestGetAPI(t *testing.T) {
 				assert.True(t, customOp.IsLongRunning, "customOp method should be marked as long running")
 			},
 		},
+		{
+			name: "apply, merge-patch response, if-match, force, request_id, etag, and pagination metadata",
+			api: &openapi.OpenAPI{
+				OpenAPI: "3.1.0",
+				Servers: []openapi.Server{{URL: "https://api.example.com"}},
+				Paths: map[string]*openapi.PathItem{
+					"/widgets": {
+						Post: &openapi.Operation{
+							Parameters: []openapi.Parameter{
+								{Name: "id", In: "query"},
+								{Name: "request_id", In: "query"},
+							},
+							Responses: map[string]openapi.Response{
+								"201": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {
+											Schema: &openapi.Schema{Ref: "#/components/schemas/Widget"},
+										},
+									},
+								},
+							},
+						},
+						Get: &openapi.Operation{
+							Parameters: []openapi.Parameter{
+								{Name: "filter", In: "query"},
+								{Name: "order_by", In: "query"},
+								{Name: "skip", In: "query"},
+							},
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {
+											Schema: &openapi.Schema{
+												Type: "object",
+												Properties: map[string]openapi.Schema{
+													"unreachable": {
+														Type:  "array",
+														Items: &openapi.Schema{Type: "string"},
+													},
+													"results": {
+														Type:  "array",
+														Items: &openapi.Schema{Ref: "#/components/schemas/Widget"},
+													},
+													"next_page_token": {Type: "string"},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					"/widgets/{widget_id}": {
+						Patch: &openapi.Operation{
+							Parameters: []openapi.Parameter{
+								{Name: "If-Match", In: "header"},
+							},
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/merge-patch+json": {
+											Schema: &openapi.Schema{Ref: "#/components/schemas/Widget"},
+										},
+									},
+								},
+							},
+						},
+						Put: &openapi.Operation{
+							Parameters: []openapi.Parameter{
+								{Name: "if-match", In: "header"},
+							},
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {
+											Schema: &openapi.Schema{Ref: "#/components/schemas/Widget"},
+										},
+									},
+								},
+							},
+						},
+						Delete: &openapi.Operation{
+							Parameters: []openapi.Parameter{
+								{Name: "force", In: "query"},
+								{Name: "If-Match", In: "header"},
+							},
+							Responses: map[string]openapi.Response{
+								"204": {Description: "Deleted"},
+							},
+						},
+					},
+				},
+				Components: openapi.Components{
+					Schemas: map[string]openapi.Schema{
+						"Widget": {
+							Type: "object",
+							Properties: map[string]openapi.Schema{
+								"path": {Type: "string"},
+								"etag": {Type: "string"},
+							},
+						},
+					},
+				},
+			},
+			validateResult: func(t *testing.T, sd *API) {
+				widget, ok := sd.Resources["widget"]
+				require.True(t, ok, "widget resource should exist")
+				assert.True(t, widget.HasETag, "widget should detect etag property")
+
+				require.NotNil(t, widget.Methods.Create)
+				assert.True(t, widget.Methods.Create.SupportsUserSettableCreate)
+				assert.True(t, widget.Methods.Create.SupportsRequestID)
+
+				require.NotNil(t, widget.Methods.List)
+				assert.Equal(t, "results", widget.Methods.List.ItemsField)
+				assert.Equal(t, "next_page_token", widget.Methods.List.NextPageTokenField)
+				assert.True(t, widget.Methods.List.HasUnreachableResources)
+				assert.True(t, widget.Methods.List.SupportsFilter)
+				assert.True(t, widget.Methods.List.SupportsOrderBy)
+				assert.True(t, widget.Methods.List.SupportsSkip)
+
+				require.NotNil(t, widget.Methods.Update)
+				assert.True(t, widget.Methods.Update.SupportsIfMatch)
+
+				require.NotNil(t, widget.Methods.Apply)
+				assert.True(t, widget.Methods.Apply.SupportsIfMatch)
+				assert.False(t, widget.Methods.Apply.IsLongRunning)
+
+				require.NotNil(t, widget.Methods.Delete)
+				assert.True(t, widget.Methods.Delete.SupportsForce)
+				assert.True(t, widget.Methods.Delete.SupportsIfMatch)
+			},
+		},
+		{
+			name: "multi-pattern resource and collection-level custom methods",
+			api: &openapi.OpenAPI{
+				OpenAPI: "3.1.0",
+				Servers: []openapi.Server{{URL: "https://api.example.com"}},
+				Paths: map[string]*openapi.PathItem{
+					"/orgs/{org_id}/books/{book_id}": {
+						Get: &openapi.Operation{
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {
+											Schema: &openapi.Schema{Ref: "#/components/schemas/book"},
+										},
+									},
+								},
+							},
+						},
+					},
+					"/users/{user_id}/books/{book_id}": {
+						Get: &openapi.Operation{
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {
+											Schema: &openapi.Schema{Ref: "#/components/schemas/book"},
+										},
+									},
+								},
+							},
+						},
+					},
+					"/users/{user_id}/books/{book_id}:archive": {
+						Post: &openapi.Operation{
+							RequestBody: &openapi.RequestBody{
+								Content: map[string]openapi.MediaType{
+									"application/json": {Schema: &openapi.Schema{Type: "object"}},
+								},
+							},
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {Schema: &openapi.Schema{Type: "object"}},
+									},
+								},
+							},
+						},
+					},
+					"/orgs/{org_id}/books:batchGet": {
+						Get: &openapi.Operation{
+							Responses: map[string]openapi.Response{
+								"200": {
+									Content: map[string]openapi.MediaType{
+										"application/json": {Schema: &openapi.Schema{Type: "object"}},
+									},
+								},
+							},
+						},
+					},
+				},
+				Components: openapi.Components{
+					Schemas: map[string]openapi.Schema{
+						"org": {
+							Type: "object",
+							XAEPResource: &openapi.XAEPResource{
+								Singular: "org",
+								Plural:   "orgs",
+								Patterns: []string{"/orgs/{org_id}"},
+							},
+						},
+						"user": {
+							Type: "object",
+							XAEPResource: &openapi.XAEPResource{
+								Singular: "user",
+								Plural:   "users",
+								Patterns: []string{"/users/{user_id}"},
+							},
+						},
+						"book": {
+							Type: "object",
+							XAEPResource: &openapi.XAEPResource{
+								Singular: "book",
+								Plural:   "books",
+								Parents:  []string{"org", "user"},
+								Patterns: []string{
+									"/orgs/{org_id}/books/{book_id}",
+									"/users/{user_id}/books/{book_id}",
+								},
+							},
+						},
+					},
+				},
+			},
+			validateResult: func(t *testing.T, sd *API) {
+				book, ok := sd.Resources["book"]
+				require.True(t, ok, "book resource should exist")
+				assert.Equal(t, []string{
+					"orgs/{org_id}/books/{book_id}",
+					"users/{user_id}/books/{book_id}",
+				}, book.GetPatterns())
+				assert.Equal(t, "orgs/{org_id}/books/{book_id}", book.GetPattern())
+
+				org, ok := sd.Resources["org"]
+				require.True(t, ok)
+				require.Len(t, org.Children, 1)
+				assert.Equal(t, book, org.Children[0])
+
+				require.Len(t, book.CustomMethods, 2)
+				byName := map[string]*CustomMethod{}
+				for _, cm := range book.CustomMethods {
+					byName[cm.Name] = cm
+				}
+				require.Contains(t, byName, "archive")
+				assert.False(t, byName["archive"].IsCollectionMethod)
+				require.Contains(t, byName, "batchGet")
+				assert.True(t, byName["batchGet"].IsCollectionMethod)
+				assert.Equal(t, "GET", byName["batchGet"].Method)
+
+				// Round-trip through ConvertToOpenAPI preserves multiple patterns and collection custom method.
+				rt, err := ConvertToOpenAPI(sd)
+				require.NoError(t, err)
+				assert.Contains(t, rt.Paths, "/orgs/{org_id}/books/{book_id}")
+				assert.Contains(t, rt.Paths, "/users/{user_id}/books/{book_id}")
+				assert.Contains(t, rt.Paths, "/orgs/{org_id}/books:batchGet")
+				assert.Contains(t, rt.Paths, "/users/{user_id}/books:batchGet")
+			},
+		},
 	}
 
 	for _, tt := range tests {

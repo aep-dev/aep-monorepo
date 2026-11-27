@@ -29,5 +29,9 @@ const (
 	FIELD_UNREACHABLE_NUMBER     = 10019
 	FIELD_RESULTS_NAME           = "results"
 	FIELD_RESULTS_NUMBER         = 10016
+	FIELD_ORDER_BY_NAME          = "order_by"
+	FIELD_REQUEST_ID_NAME        = "request_id"
+	FIELD_ETAG_NAME              = "etag"
+	HEADER_IF_MATCH_NAME         = "If-Match"
 	// next number: 10023
 )

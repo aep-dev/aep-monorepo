@@ -370,10 +370,15 @@ func ConvertToOpenAPI(api *API) (*openapi.OpenAPI, error) {
 					methodType = "post"
 				}
 				cmPath := fmt.Sprintf("%s:%s", resourcePath, custom.Name)
+				cmParams := append(pwp.Params, idParam)
+				if custom.IsCollectionMethod {
+					cmPath = fmt.Sprintf("%s%s:%s", pwp.Pattern, collection, custom.Name)
+					cmParams = pwp.Params
+				}
 				methodInfo := openapi.Operation{
 					OperationID: fmt.Sprintf(":%s%s", cases.SnakeToPascalCase(custom.Name), cases.SnakeToPascalCase(singularSnake)),
 					Description: fmt.Sprintf("Custom method %s for %s", custom.Name, r.Singular),
-					Parameters:  append(pwp.Params, idParam),
+					Parameters:  cmParams,
 					Responses: map[string]openapi.Response{
 						"200": {
 							Description: "Successful response",
@@ -486,30 +491,38 @@ type PathWithParams struct {
 // names.
 func generateParentPatternsWithParams(r *Resource) (string, *[]PathWithParams) {
 	// case 1: pattern elems are present, so we use them.
-	// TODO(yft): support multiple patterns
-	if len(r.patternElems) > 0 {
-		collection := fmt.Sprintf("/%s", r.patternElems[len(r.patternElems)-2])
-		params := []openapi.Parameter{}
-		for i := 0; i < len(r.patternElems)-2; i += 2 {
-			pElem := r.patternElems[i+1]
-			// Extract the parameter name without the _id suffix
-			paramName := pElem[1 : len(pElem)-1]
-			params = append(params, openapi.Parameter{
-				In:       "path",
-				Name:     paramName,
-				Required: true,
-				Schema: &openapi.Schema{
-					Type: "string",
-				},
-			})
+	allPatterns := r.patterns
+	if len(allPatterns) == 0 && len(r.patternElems) > 0 {
+		allPatterns = [][]string{r.patternElems}
+	}
+	if len(allPatterns) > 0 {
+		collection := fmt.Sprintf("/%s", allPatterns[0][len(allPatterns[0])-2])
+		pwps := make([]PathWithParams, 0, len(allPatterns))
+		for _, elems := range allPatterns {
+			if len(elems) < 2 {
+				continue
+			}
+			params := []openapi.Parameter{}
+			for i := 0; i < len(elems)-2; i += 2 {
+				pElem := elems[i+1]
+				// Extract the parameter name without the surrounding curly braces.
+				paramName := pElem[1 : len(pElem)-1]
+				params = append(params, openapi.Parameter{
+					In:       "path",
+					Name:     paramName,
+					Required: true,
+					Schema: &openapi.Schema{
+						Type: "string",
+					},
+				})
+			}
+			pattern := strings.Join(elems[0:len(elems)-2], "/")
+			if pattern != "" {
+				pattern = fmt.Sprintf("/%s", pattern)
+			}
+			pwps = append(pwps, PathWithParams{Pattern: pattern, Params: params})
 		}
-		pattern := strings.Join(r.patternElems[0:len(r.patternElems)-2], "/")
-		if pattern != "" {
-			pattern = fmt.Sprintf("/%s", pattern)
-		}
-		return collection, &[]PathWithParams{
-			{Pattern: pattern, Params: params},
-		}
+		return collection, &pwps
 	}
 	// case 2: no pattern elems, so we need to generate the collection names
 	collection := fmt.Sprintf("/%s", CollectionName(r))
