@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"log/slog"
+	"sort"
 	"strings"
 
 	"github.com/aep-dev/aep-monorepo/aep-lib-go/pkg/cases"
@@ -35,6 +36,7 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 	slog.Debug("parsing openapi", "pathPrefix", pathPrefix)
 	resourceBySingular := make(map[string]*Resource)
 	customMethodsByPattern := make(map[string][]*CustomMethod)
+	collectionCustomMethodsByPattern := make(map[string][]*CustomMethod)
 	// we try to parse the paths to find possible resources, since
 	// they may not always be annotated as such.
 	for path, pathItem := range api.Paths {
@@ -43,93 +45,71 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 		var r Resource
 		var sRef *openapi.Schema
 		p := getPatternInfo(path)
-		var lroDetails *openapi.XAEPLongRunningOperation
 		if p == nil { // not a resource pattern
 			slog.Debug("path is not a resource", "path", path)
 			continue
 		}
 		slog.Debug("parsing path for resource", "path", path)
-		if p.CustomMethodName != "" && p.IsResourcePattern {
+		if p.CustomMethodName != "" {
 			// strip the leading slash and the custom method suffix
-			pattern := strings.Split(path, ":")[0][1:]
-			if _, ok := customMethodsByPattern[pattern]; !ok {
-				customMethodsByPattern[pattern] = []*CustomMethod{}
+			pattern := strings.TrimPrefix(strings.Split(path, ":")[0], "/")
+			isCollection := !p.IsResourcePattern
+			parsed, err := parseCustomMethods(api, pathItem, p.CustomMethodName, isCollection)
+			if err != nil {
+				return nil, err
 			}
-			if pathItem.Post != nil {
-				if resp, ok := pathItem.Post.Responses["200"]; ok {
-					lroDetails = pathItem.Post.XAEPLongRunningOperation
-					schema := api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
-					responseSchema := &openapi.Schema{}
-					if lroDetails != nil {
-						schema = lroDetails.Response.Schema
-					}
-					if schema != nil {
-						var err error
-						responseSchema, err = api.DereferenceSchema(*schema)
-						if err != nil {
-							return nil, fmt.Errorf("error dereferencing schema %v: %v", schema, err)
-						}
-					}
-					if pathItem.Post.RequestBody == nil {
-						return nil, fmt.Errorf("custom method %q has a POST response, but no request body", p.CustomMethodName)
-					}
-					schema = api.GetSchemaFromRequestBody(*pathItem.Post.RequestBody, openapi.APPLICATION_JSON)
-					requestSchema, err := api.DereferenceSchema(*schema)
-					if err != nil {
-						return nil, fmt.Errorf("error dereferencing schema %q: %v", schema.Ref, err)
-					}
-					customMethodsByPattern[pattern] = append(customMethodsByPattern[pattern], &CustomMethod{
-						Name:          p.CustomMethodName,
-						Method:        "POST",
-						Request:       requestSchema,
-						Response:      responseSchema,
-						IsLongRunning: lroDetails != nil,
-					})
-				}
-			}
-			if pathItem.Get != nil {
-				if resp, ok := pathItem.Get.Responses["200"]; ok {
-					lroDetails = pathItem.Get.XAEPLongRunningOperation
-					schema := api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
-					responseSchema := &openapi.Schema{}
-					if lroDetails != nil {
-						schema = lroDetails.Response.Schema
-					}
-					if schema != nil {
-						var err error
-						responseSchema, err = api.DereferenceSchema(*schema)
-						if err != nil {
-							return nil, fmt.Errorf("error dereferencing schema %v: %v", schema.Ref, err)
-						}
-					}
-					customMethodsByPattern[pattern] = append(customMethodsByPattern[pattern], &CustomMethod{
-						Name:          p.CustomMethodName,
-						Method:        "GET",
-						Response:      responseSchema,
-						IsLongRunning: lroDetails != nil,
-					})
-				}
+			if isCollection {
+				collectionCustomMethodsByPattern[pattern] = append(collectionCustomMethodsByPattern[pattern], parsed...)
+			} else {
+				customMethodsByPattern[pattern] = append(customMethodsByPattern[pattern], parsed...)
 			}
 		} else if p.IsResourcePattern {
-			// treat it like a collection pattern (update, delete, get)
+			// individual resource pattern (get, update, apply, delete)
 			if pathItem.Delete != nil {
-				lroDetails = pathItem.Delete.XAEPLongRunningOperation
+				opLRO := pathItem.Delete.XAEPLongRunningOperation
 				r.Methods.Delete = &DeleteMethod{
-					IsLongRunning: lroDetails != nil,
+					IsLongRunning:   opLRO != nil,
+					SupportsForce:   hasParam(pathItem.Delete.Parameters, constants.FIELD_FORCE_NAME, ""),
+					SupportsIfMatch: hasHeaderParam(pathItem.Delete.Parameters, constants.HEADER_IF_MATCH_NAME),
+				}
+				if opLRO != nil && opLRO.Response.Schema != nil {
+					sRef = opLRO.Response.Schema
 				}
 			}
 			if pathItem.Get != nil {
 				if resp, ok := pathItem.Get.Responses["200"]; ok {
-					sRef = api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
+					sRef = getJSONSchemaFromResponse(api, resp)
 					r.Methods.Get = &GetMethod{}
 				}
 			}
 			if pathItem.Patch != nil {
-				lroDetails = pathItem.Patch.XAEPLongRunningOperation
+				opLRO := pathItem.Patch.XAEPLongRunningOperation
 				if resp, ok := pathItem.Patch.Responses["200"]; ok {
-					sRef = api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
+					if opLRO != nil && opLRO.Response.Schema != nil {
+						sRef = opLRO.Response.Schema
+					} else {
+						sRef = getJSONSchemaFromResponse(api, resp)
+					}
 					r.Methods.Update = &UpdateMethod{
-						IsLongRunning: lroDetails != nil,
+						IsLongRunning:   opLRO != nil,
+						SupportsIfMatch: hasHeaderParam(pathItem.Patch.Parameters, constants.HEADER_IF_MATCH_NAME),
+					}
+				}
+			}
+			if pathItem.Put != nil {
+				opLRO := pathItem.Put.XAEPLongRunningOperation
+				for _, statusCode := range []string{"200", "201"} {
+					if resp, ok := pathItem.Put.Responses[statusCode]; ok {
+						if opLRO != nil && opLRO.Response.Schema != nil {
+							sRef = opLRO.Response.Schema
+						} else {
+							sRef = getJSONSchemaFromResponse(api, resp)
+						}
+						r.Methods.Apply = &ApplyMethod{
+							IsLongRunning:   opLRO != nil,
+							SupportsIfMatch: hasHeaderParam(pathItem.Put.Parameters, constants.HEADER_IF_MATCH_NAME),
+						}
+						break
 					}
 				}
 			}
@@ -139,26 +119,25 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 				for _, statusCode := range []string{"200", "201"} {
 					// check if there is a query parameter "id"
 					if resp, ok := pathItem.Post.Responses[statusCode]; ok {
-						lroDetails = pathItem.Post.XAEPLongRunningOperation
-						sRef = api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
-						supportsUserSettableCreate := false
-						for _, param := range pathItem.Post.Parameters {
-							if param.Name == "id" {
-								supportsUserSettableCreate = true
-								break
-							}
+						opLRO := pathItem.Post.XAEPLongRunningOperation
+						if opLRO != nil && opLRO.Response.Schema != nil {
+							sRef = opLRO.Response.Schema
+						} else {
+							sRef = getJSONSchemaFromResponse(api, resp)
 						}
 						r.Methods.Create = &CreateMethod{
-							SupportsUserSettableCreate: supportsUserSettableCreate,
-							IsLongRunning:              lroDetails != nil,
+							SupportsUserSettableCreate: hasParam(pathItem.Post.Parameters, constants.FIELD_ID_NAME, ""),
+							SupportsRequestID:          hasParam(pathItem.Post.Parameters, constants.FIELD_REQUEST_ID_NAME, ""),
+							IsLongRunning:              opLRO != nil,
 						}
+						break
 					}
 				}
 			}
 			// list method
 			if pathItem.Get != nil {
 				if resp, ok := pathItem.Get.Responses["200"]; ok {
-					respSchema := api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON)
+					respSchema := getJSONSchemaFromResponse(api, resp)
 					if respSchema == nil {
 						slog.Warn(fmt.Sprintf("resource %q has a LIST method with a response schema, but the response schema is nil.", path))
 					} else {
@@ -166,36 +145,39 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 						if err != nil {
 							return nil, fmt.Errorf("error dereferencing schema %q: %v", respSchema.Ref, err)
 						}
-						found := false
-						for _, property := range resolvedSchema.Properties {
-							if property.Type == "array" {
-								sRef = property.Items
-								r.Methods.List = &ListMethod{}
-								found = true
-								break
+						itemsField, itemSchema := findListItemsProperty(resolvedSchema)
+						if itemSchema != nil {
+							sRef = itemSchema
+							listMethod := &ListMethod{
+								ItemsField: itemsField,
 							}
-						}
-						if found {
+							if _, ok := resolvedSchema.Properties[constants.FIELD_NEXT_PAGE_TOKEN_NAME]; ok {
+								listMethod.NextPageTokenField = constants.FIELD_NEXT_PAGE_TOKEN_NAME
+							} else if _, ok := resolvedSchema.Properties["nextPageToken"]; ok {
+								listMethod.NextPageTokenField = "nextPageToken"
+							}
+							if _, ok := resolvedSchema.Properties[constants.FIELD_UNREACHABLE_NAME]; ok {
+								listMethod.HasUnreachableResources = true
+							}
 							for _, param := range pathItem.Get.Parameters {
-								if param.Name == constants.FIELD_SKIP_NAME {
-									r.Methods.List.SupportsSkip = true
-								}
-								if param.Name == constants.FIELD_UNREACHABLE_NAME {
-									r.Methods.List.HasUnreachableResources = true
-								}
-								if param.Name == constants.FIELD_FILTER_NAME {
-									r.Methods.List.SupportsFilter = true
+								switch param.Name {
+								case constants.FIELD_SKIP_NAME:
+									listMethod.SupportsSkip = true
+								case constants.FIELD_UNREACHABLE_NAME:
+									listMethod.HasUnreachableResources = true
+								case constants.FIELD_FILTER_NAME:
+									listMethod.SupportsFilter = true
+								case constants.FIELD_ORDER_BY_NAME:
+									listMethod.SupportsOrderBy = true
 								}
 							}
+							r.Methods.List = listMethod
 						} else {
 							slog.Warn(fmt.Sprintf("resource %q has a LIST method with a response schema, but the items field is not present or is not an array.", path))
 						}
 					}
 				}
 			}
-		}
-		if lroDetails != nil {
-			sRef = lroDetails.Response.Schema
 		}
 		if sRef != nil && p.CustomMethodName == "" {
 			// s should always be a reference to a schema in the components section.
@@ -228,21 +210,32 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 		}
 	}
 	// the custom methods are trickier - because they may not respond with the schema of the resource
-	// (which would allow us to map the resource via looking at it's reference), we instead will have to
-	// map it by the pattern.
-	// we also have to do this by longest pattern match - this helps account for situations where
-	// the custom method doesn't match the resource pattern exactly with things like deduping.
+	// (which would allow us to map the resource via looking at its reference), we instead map them
+	// by pattern across all patterns of each resource.
 	for pattern, customMethods := range customMethodsByPattern {
 		found := false
 		for _, r := range resourceBySingular {
-			if r.GetPattern() == pattern {
-				r.CustomMethods = customMethods
+			if resourceHasPattern(r, pattern) {
+				r.CustomMethods = append(r.CustomMethods, customMethods...)
 				found = true
 				break
 			}
 		}
 		if !found {
 			slog.Debug(fmt.Sprintf("custom methods with pattern %q have no resource associated with it", pattern))
+		}
+	}
+	for pattern, customMethods := range collectionCustomMethodsByPattern {
+		found := false
+		for _, r := range resourceBySingular {
+			if resourceHasCollectionPattern(r, pattern) {
+				r.CustomMethods = append(r.CustomMethods, customMethods...)
+				found = true
+				break
+			}
+		}
+		if !found {
+			slog.Debug(fmt.Sprintf("collection custom methods with pattern %q have no resource associated with it", pattern))
 		}
 	}
 	if serverURL == "" {
@@ -271,6 +264,145 @@ func GetAPI(api *openapi.OpenAPI, serverURL, pathPrefix string) (*API, error) {
 		Resources: resourceBySingular,
 		Schemas:   schemas,
 	}, nil
+}
+
+func parseCustomMethods(api *openapi.OpenAPI, pathItem *openapi.PathItem, customMethodName string, isCollection bool) ([]*CustomMethod, error) {
+	var result []*CustomMethod
+	if pathItem.Post != nil {
+		if resp, ok := pathItem.Post.Responses["200"]; ok {
+			lroDetails := pathItem.Post.XAEPLongRunningOperation
+			schema := getJSONSchemaFromResponse(api, resp)
+			responseSchema := &openapi.Schema{}
+			if lroDetails != nil {
+				schema = lroDetails.Response.Schema
+			}
+			if schema != nil {
+				var err error
+				responseSchema, err = api.DereferenceSchema(*schema)
+				if err != nil {
+					return nil, fmt.Errorf("error dereferencing schema %v: %v", schema, err)
+				}
+			}
+			if pathItem.Post.RequestBody == nil {
+				return nil, fmt.Errorf("custom method %q has a POST response, but no request body", customMethodName)
+			}
+			schema = api.GetSchemaFromRequestBody(*pathItem.Post.RequestBody, openapi.APPLICATION_JSON)
+			requestSchema := &openapi.Schema{}
+			if schema != nil {
+				var err error
+				requestSchema, err = api.DereferenceSchema(*schema)
+				if err != nil {
+					return nil, fmt.Errorf("error dereferencing schema %q: %v", schema.Ref, err)
+				}
+			}
+			result = append(result, &CustomMethod{
+				Name:               customMethodName,
+				Method:             "POST",
+				Request:            requestSchema,
+				Response:           responseSchema,
+				IsLongRunning:      lroDetails != nil,
+				IsCollectionMethod: isCollection,
+			})
+		}
+	}
+	if pathItem.Get != nil {
+		if resp, ok := pathItem.Get.Responses["200"]; ok {
+			lroDetails := pathItem.Get.XAEPLongRunningOperation
+			schema := getJSONSchemaFromResponse(api, resp)
+			responseSchema := &openapi.Schema{}
+			if lroDetails != nil {
+				schema = lroDetails.Response.Schema
+			}
+			if schema != nil {
+				var err error
+				responseSchema, err = api.DereferenceSchema(*schema)
+				if err != nil {
+					return nil, fmt.Errorf("error dereferencing schema %v: %v", schema.Ref, err)
+				}
+			}
+			result = append(result, &CustomMethod{
+				Name:               customMethodName,
+				Method:             "GET",
+				Response:           responseSchema,
+				IsLongRunning:      lroDetails != nil,
+				IsCollectionMethod: isCollection,
+			})
+		}
+	}
+	return result, nil
+}
+
+func getJSONSchemaFromResponse(api *openapi.OpenAPI, resp openapi.Response) *openapi.Schema {
+	if s := api.GetSchemaFromResponse(resp, openapi.APPLICATION_JSON); s != nil {
+		return s
+	}
+	return api.GetSchemaFromResponse(resp, openapi.JSON_MERGE_PATCH)
+}
+
+func hasParam(params []openapi.Parameter, name, in string) bool {
+	for _, param := range params {
+		if param.Name != name {
+			continue
+		}
+		if in != "" && param.In != in {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
+func hasHeaderParam(params []openapi.Parameter, name string) bool {
+	for _, param := range params {
+		if strings.EqualFold(param.Name, name) && (param.In == "" || strings.EqualFold(param.In, "header")) {
+			return true
+		}
+	}
+	return false
+}
+
+// findListItemsProperty deterministically selects the resource array property
+// from a List response schema, preferring "results" and ignoring "unreachable".
+func findListItemsProperty(resolvedSchema *openapi.Schema) (string, *openapi.Schema) {
+	if resolvedSchema == nil || len(resolvedSchema.Properties) == 0 {
+		return "", nil
+	}
+	if prop, ok := resolvedSchema.Properties[constants.FIELD_RESULTS_NAME]; ok && prop.Type == "array" && prop.Items != nil {
+		return constants.FIELD_RESULTS_NAME, prop.Items
+	}
+	keys := make([]string, 0, len(resolvedSchema.Properties))
+	for k := range resolvedSchema.Properties {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		if k == constants.FIELD_UNREACHABLE_NAME {
+			continue
+		}
+		prop := resolvedSchema.Properties[k]
+		if prop.Type == "array" && prop.Items != nil {
+			return k, prop.Items
+		}
+	}
+	return "", nil
+}
+
+func resourceHasPattern(r *Resource, pattern string) bool {
+	for _, p := range r.GetPatterns() {
+		if p == pattern {
+			return true
+		}
+	}
+	return false
+}
+
+func resourceHasCollectionPattern(r *Resource, collectionPattern string) bool {
+	for _, elems := range r.AllPatternElems() {
+		if len(elems) >= 2 && strings.Join(elems[:len(elems)-1], "/") == collectionPattern {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *API) GetResource(resource string) (*Resource, error) {
@@ -319,9 +451,14 @@ func getPatternInfo(path string) *PatternInfo {
 // - otherwise, it attempts to infer the resource from the schema and name.
 func getOrPopulateResource(singular string, pattern []string, s *openapi.Schema, resourceBySingular map[string]*Resource, api *openapi.OpenAPI) (*Resource, error) {
 	if r, ok := resourceBySingular[singular]; ok {
+		r.addPattern(pattern)
 		return r, nil
 	}
 	var r *Resource
+	hasETag := false
+	if s != nil && s.Properties != nil {
+		_, hasETag = s.Properties[constants.FIELD_ETAG_NAME]
+	}
 	// use the X-AEP-Resource annotation to populate the resource,
 	// if it exists.
 	if s.XAEPResource != nil {
@@ -336,29 +473,40 @@ func getOrPopulateResource(singular string, pattern []string, s *openapi.Schema,
 				return nil, fmt.Errorf("error parsing resource %q parent %q: %v", singular, parentSingular, err)
 			}
 			parents = append(parents, parentResource)
-			parentResource.Children = append(parentResource.Children, r)
 		}
-		patternElems := strings.Split(strings.TrimPrefix(s.XAEPResource.Patterns[0], "/"), "/")
 		r = &Resource{
 			Singular:        s.XAEPResource.Singular,
 			Plural:          s.XAEPResource.Plural,
 			Parents:         s.XAEPResource.Parents,
 			parentResources: parents,
 			Children:        []*Resource{},
-			patternElems:    patternElems,
+			HasETag:         hasETag,
 			Schema:          s,
+		}
+		for _, rawPattern := range s.XAEPResource.Patterns {
+			trimmed := strings.TrimPrefix(rawPattern, "/")
+			if trimmed != "" {
+				r.addPattern(strings.Split(trimmed, "/"))
+			}
+		}
+		if len(r.patterns) == 0 {
+			r.addPattern(pattern)
+		}
+		for _, parentResource := range parents {
+			parentResource.Children = append(parentResource.Children, r)
 		}
 	} else {
 		// best effort otherwise
 		r = &Resource{
 			Schema:          s,
-			patternElems:    pattern,
 			Singular:        singular,
 			Parents:         []string{},
 			parentResources: []*Resource{},
 			Children:        []*Resource{},
 			Plural:          plural(singular),
+			HasETag:         hasETag,
 		}
+		r.addPattern(pattern)
 	}
 	// update the resource map
 	resourceBySingular[singular] = r
@@ -371,6 +519,9 @@ func foldResourceMethods(from, into *Resource) {
 	}
 	if from.Methods.List != nil {
 		into.Methods.List = from.Methods.List
+	}
+	if from.Methods.Apply != nil {
+		into.Methods.Apply = from.Methods.Apply
 	}
 	if from.Methods.Create != nil {
 		into.Methods.Create = from.Methods.Create

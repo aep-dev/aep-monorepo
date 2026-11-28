@@ -23,7 +23,10 @@ type Resource struct {
 	parentResources []*Resource `json:"-"`
 	// Children is populated on load
 	Children     []*Resource `json:"-"`
-	patternElems []string    `json:"-"` // TOO(yft): support multiple patterns
+	patternElems []string    `json:"-"`
+	patterns     [][]string  `json:"-"`
+	// HasETag reports whether the resource schema defines an etag property (AEP-154).
+	HasETag bool `json:"has_etag,omitempty"`
 	// the API reference is used to retrieve things like the parent resources.
 	API           *API            `json:"-"`
 	Schema        *openapi.Schema `json:"schema,omitempty"`
@@ -42,40 +45,83 @@ type Methods struct {
 
 type CreateMethod struct {
 	SupportsUserSettableCreate bool `json:"supports_user_settable_create"`
+	SupportsRequestID          bool `json:"supports_request_id,omitempty"`
 	IsLongRunning              bool `json:"is_long_running"`
 }
 
 type ApplyMethod struct {
-	IsLongRunning bool `json:"is_long_running"`
+	IsLongRunning   bool `json:"is_long_running"`
+	SupportsIfMatch bool `json:"supports_if_match,omitempty"`
 }
 
 type GetMethod struct {
 }
 
 type UpdateMethod struct {
-	IsLongRunning bool `json:"is_long_running"`
+	IsLongRunning   bool `json:"is_long_running"`
+	SupportsIfMatch bool `json:"supports_if_match,omitempty"`
 }
 
 type ListMethod struct {
-	HasUnreachableResources bool `json:"has_unreachable_resources"`
-	SupportsFilter          bool `json:"supports_filter"`
-	SupportsSkip            bool `json:"supports_skip"`
+	HasUnreachableResources bool   `json:"has_unreachable_resources"`
+	SupportsFilter          bool   `json:"supports_filter"`
+	SupportsSkip            bool   `json:"supports_skip"`
+	SupportsOrderBy         bool   `json:"supports_order_by,omitempty"`
+	ItemsField              string `json:"items_field,omitempty"`
+	NextPageTokenField      string `json:"next_page_token_field,omitempty"`
 }
 
 type DeleteMethod struct {
-	IsLongRunning bool `json:"is_long_running"`
+	IsLongRunning   bool `json:"is_long_running"`
+	SupportsForce   bool `json:"supports_force,omitempty"`
+	SupportsIfMatch bool `json:"supports_if_match,omitempty"`
 }
 
 type CustomMethod struct {
-	Name          string
-	Method        string
-	Request       *openapi.Schema
-	Response      *openapi.Schema
-	IsLongRunning bool `json:"is_long_running"`
+	Name               string
+	Method             string
+	Request            *openapi.Schema
+	Response           *openapi.Schema
+	IsLongRunning      bool `json:"is_long_running"`
+	IsCollectionMethod bool `json:"is_collection_method,omitempty"`
 }
 
 func (r *Resource) GetPattern() string {
 	return strings.Join(r.PatternElems(), "/")
+}
+
+// GetPatterns returns all resource path patterns (e.g. "orgs/{org_id}/books/{book_id}").
+func (r *Resource) GetPatterns() []string {
+	all := r.AllPatternElems()
+	result := make([]string, 0, len(all))
+	for _, elems := range all {
+		result = append(result, strings.Join(elems, "/"))
+	}
+	return result
+}
+
+// AllPatternElems returns all parsed or derived resource patterns as path segment slices.
+func (r *Resource) AllPatternElems() [][]string {
+	if len(r.patterns) > 0 {
+		return r.patterns
+	}
+	return [][]string{r.PatternElems()}
+}
+
+func (r *Resource) addPattern(elems []string) {
+	if len(elems) == 0 {
+		return
+	}
+	candidate := strings.Join(elems, "/")
+	for _, existing := range r.patterns {
+		if strings.Join(existing, "/") == candidate {
+			return
+		}
+	}
+	r.patterns = append(r.patterns, elems)
+	if len(r.patternElems) == 0 {
+		r.patternElems = elems
+	}
 }
 
 // return the parent resources of the resource.
@@ -114,9 +160,12 @@ func CollectionName(r *Resource) string {
 }
 
 // GeneratePatternStrings generates the pattern strings for a resource
-// TODO(yft): support multiple parents
 func (r *Resource) PatternElems() []string {
 	if len(r.patternElems) == 0 {
+		if len(r.patterns) > 0 {
+			r.patternElems = r.patterns[0]
+			return r.patternElems
+		}
 		// Convert kebab-case singular to snake_case for path variables
 		singularSnake := cases.KebabToSnakeCase(r.Singular)
 		// Base pattern without params
